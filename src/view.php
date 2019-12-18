@@ -41,7 +41,8 @@ class RecitDashboard{
 
     public function display(){       
         $roles = Utils::getUserRolesOnContext(context_system::instance(), $this->user->id);
-        $studentId = (in_array('ad', $roles) ? 0 : $this->user->id);
+        //$studentId = (in_array('ad', $roles) ? 0 : $this->user->id);
+        $studentId = $this->user->id;
         
         echo sprintf("<div id='recit_dashboard' data-student-id='%ld' data-roles='%s'></div>", $studentId, implode(",", $roles));
     }
@@ -62,8 +63,8 @@ $PAGE->set_context(context_system::instance());
 // Set page layout.
 $PAGE->set_pagelayout('myrecitdashboard');
 
-$PAGE->set_title("page title");
-$PAGE->set_heading("page title");
+$PAGE->set_title(get_string('pluginname', 'local_recitdashboard'));
+$PAGE->set_heading(get_string('pluginname', 'local_recitdashboard'));
 
 echo $OUTPUT->header();
 $recitDashboard = new RecitDashboard($CFG, $PAGE, $USER, $OUTPUT);

@@ -78070,6 +78070,12 @@ function () {
     value: function wwwRoot() {
       return M.cfg.wwwroot;
     }
+  }, {
+    key: "getActivityIconUrl",
+    value: function getActivityIconUrl(moduleName) {
+      //src="http://devserver/shared/moodle/theme/image.php?theme=recit&component=lesson&rev=1576685339&image=icon"
+      return "".concat(M.cfg.wwwroot, "/theme/image.php?theme=").concat(M.cfg.theme, "&component=").concat(moduleName, "&rev=").concat(M.cfg.themerev, "&image=icon");
+    }
   }]);
 
   return UtilsMoodle;
@@ -78389,105 +78395,7 @@ function () {
 }();
 
 exports.UtilsTreeStruct = UtilsTreeStruct;
-},{"./WebApi":"libs/utils/WebApi.js","./Cookies":"libs/utils/Cookies.js","./I18n":"libs/utils/I18n.js"}],"views/Views.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.StudentView = exports.TeacherView = void 0;
-
-var _react = _interopRequireWildcard(require("react"));
-
-function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; if (obj != null) { var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
-
-function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
-
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
-
-function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
-
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
-
-/*import {ButtonGroup, Button, Form, Col, Tabs, Tab, DropdownButton, Dropdown, Modal, Collapse, Card} from 'react-bootstrap';
-import {faArrowLeft, faArrowRight, faPencilAlt, faPlusCircle, faWrench, faTrashAlt, faCopy, faBars, faGripVertical, faCheckSquare} from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {ComboBox, FeedbackCtrl, DataGrid, RichEditor} from '../libs/components/Components';
-import Utils, {UtilsMoodle, JsNx} from '../libs/utils/Utils';
-import {$glVars} from '../common/common';
-*/
-var TeacherView =
-/*#__PURE__*/
-function (_Component) {
-  _inherits(TeacherView, _Component);
-
-  function TeacherView(props) {
-    var _this;
-
-    _classCallCheck(this, TeacherView);
-
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(TeacherView).call(this, props));
-    _this.state = {};
-    return _this;
-  }
-
-  _createClass(TeacherView, [{
-    key: "componentDidMount",
-    value: function componentDidMount() {}
-  }, {
-    key: "componentWillUnmount",
-    value: function componentWillUnmount() {}
-  }, {
-    key: "render",
-    value: function render() {
-      var main = _react.default.createElement("h1", null, "Student view");
-
-      return main;
-    }
-  }]);
-
-  return TeacherView;
-}(_react.Component);
-
-exports.TeacherView = TeacherView;
-
-var StudentView =
-/*#__PURE__*/
-function (_Component2) {
-  _inherits(StudentView, _Component2);
-
-  function StudentView(props) {
-    _classCallCheck(this, StudentView);
-
-    return _possibleConstructorReturn(this, _getPrototypeOf(StudentView).call(this, props));
-  }
-
-  _createClass(StudentView, [{
-    key: "render",
-    value: function render() {
-      var main = _react.default.createElement("h1", null, "Student view");
-
-      return main;
-    }
-  }]);
-
-  return StudentView;
-}(_react.Component);
-
-exports.StudentView = StudentView;
-},{"react":"../node_modules/react/index.js"}],"../package.json":[function(require,module,exports) {
+},{"./WebApi":"libs/utils/WebApi.js","./Cookies":"libs/utils/Cookies.js","./I18n":"libs/utils/I18n.js"}],"../package.json":[function(require,module,exports) {
 module.exports = {
   "name": "recit_dashboard",
   "version": "1.0.0",
@@ -78668,11 +78576,30 @@ function (_WebApi) {
       }
     }
   }, {
-    key: "getEnrolledUserList",
-    value: function getEnrolledUserList(cmId, onSuccess) {
+    key: "getEnrolledCourseList",
+    value: function getEnrolledCourseList(userId, onSuccess) {
       var data = {
-        cmId: cmId,
-        service: "getEnrolledUserList"
+        userId: userId,
+        service: "getEnrolledCourseList"
+      };
+      this.post(this.gateway, data, onSuccess);
+    }
+  }, {
+    key: "getCourseProgressionOverview",
+    value: function getCourseProgressionOverview(courseId, onSuccess) {
+      var data = {
+        courseId: courseId,
+        service: "getCourseProgressionOverview"
+      };
+      this.post(this.gateway, data, onSuccess);
+    }
+  }, {
+    key: "getCourseProgressionDetails",
+    value: function getCourseProgressionDetails(courseId, userId, onSuccess) {
+      var data = {
+        courseId: courseId,
+        userId: userId,
+        service: "getCourseProgressionDetails"
       };
       this.post(this.gateway, data, onSuccess);
     }
@@ -78723,7 +78650,417 @@ var $glVars = {
   webApi: new _AppWebApi.AppWebApi()
 };
 exports.$glVars = $glVars;
-},{"../libs/utils/Utils":"libs/utils/Utils.js","../libs/components/Feedback":"libs/components/Feedback.js","./AppWebApi":"common/AppWebApi.js","./Options":"common/Options.js"}],"common/i18n.js":[function(require,module,exports) {
+},{"../libs/utils/Utils":"libs/utils/Utils.js","../libs/components/Feedback":"libs/components/Feedback.js","./AppWebApi":"common/AppWebApi.js","./Options":"common/Options.js"}],"views/Views.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.StudentView = exports.TeacherView = void 0;
+
+var _react = _interopRequireWildcard(require("react"));
+
+var _reactBootstrap = require("react-bootstrap");
+
+var _freeSolidSvgIcons = require("@fortawesome/free-solid-svg-icons");
+
+var _reactFontawesome = require("@fortawesome/react-fontawesome");
+
+var _Components = require("../libs/components/Components");
+
+var _Utils = require("../libs/utils/Utils");
+
+var _common = require("../common/common");
+
+function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function () { return cache; }; return cache; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; if (obj != null) { var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
+
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+var TeacherView =
+/*#__PURE__*/
+function (_Component) {
+  _inherits(TeacherView, _Component);
+
+  function TeacherView(props) {
+    var _this;
+
+    _classCallCheck(this, TeacherView);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(TeacherView).call(this, props));
+    _this.getData = _this.getData.bind(_assertThisInitialized(_this));
+    _this.getDataResult = _this.getDataResult.bind(_assertThisInitialized(_this));
+    _this.onSelectCourse = _this.onSelectCourse.bind(_assertThisInitialized(_this));
+    _this.state = {
+      courseList: [],
+      selectedCourse: null
+    };
+    return _this;
+  }
+
+  _createClass(TeacherView, [{
+    key: "componentDidMount",
+    value: function componentDidMount() {
+      this.getData();
+    }
+  }, {
+    key: "componentWillUnmount",
+    value: function componentWillUnmount() {}
+  }, {
+    key: "getData",
+    value: function getData() {
+      _common.$glVars.webApi.getEnrolledCourseList(_common.$glVars.signedUser.userId, this.getDataResult);
+    }
+  }, {
+    key: "getDataResult",
+    value: function getDataResult(result) {
+      if (result.success) {
+        this.setState({
+          courseList: result.data,
+          selectedCourse: null
+        });
+      } else {
+        _common.$glVars.feedback.showError(_common.$glVars.i18n.tags.appname, result.msg);
+      }
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      var that = this;
+
+      var main = _react.default.createElement("div", null, _react.default.createElement(_reactBootstrap.Navbar, null, _react.default.createElement(_reactBootstrap.Navbar.Brand, {
+        href: "#"
+      }, "Tableau de bord"), _react.default.createElement(_reactBootstrap.Navbar.Collapse, {
+        id: "basic-navbar-nav"
+      }, _react.default.createElement(_reactBootstrap.NavDropdown, {
+        variant: "primary",
+        title: this.state.selectedCourse !== null ? "Cours: ".concat(this.state.selectedCourse.courseName) : "Sélectionnez le cours",
+        id: "basic-nav-dropdown"
+      }, this.state.courseList.map(function (item, index) {
+        return _react.default.createElement(_reactBootstrap.NavDropdown.Item, {
+          key: index,
+          href: "#",
+          onClick: function onClick() {
+            return that.onSelectCourse(item);
+          }
+        }, item.courseName);
+      })))), this.state.selectedCourse !== null ? _react.default.createElement("div", {
+        style: {
+          marginTop: 15
+        }
+      }, _react.default.createElement(GadgetCourseProgress, {
+        courseId: this.state.selectedCourse.courseId
+      })) : null);
+
+      return main;
+    }
+  }, {
+    key: "onSelectCourse",
+    value: function onSelectCourse(item) {
+      this.setState({
+        selectedCourse: item
+      });
+    }
+  }]);
+
+  return TeacherView;
+}(_react.Component);
+
+exports.TeacherView = TeacherView;
+
+var StudentView =
+/*#__PURE__*/
+function (_Component2) {
+  _inherits(StudentView, _Component2);
+
+  function StudentView(props) {
+    _classCallCheck(this, StudentView);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(StudentView).call(this, props));
+  }
+
+  _createClass(StudentView, [{
+    key: "render",
+    value: function render() {
+      var main = _react.default.createElement("h1", null, "Student view");
+
+      return main;
+    }
+  }]);
+
+  return StudentView;
+}(_react.Component);
+
+exports.StudentView = StudentView;
+
+var GadgetCourseProgress =
+/*#__PURE__*/
+function (_Component3) {
+  _inherits(GadgetCourseProgress, _Component3);
+
+  function GadgetCourseProgress(props) {
+    var _this2;
+
+    _classCallCheck(this, GadgetCourseProgress);
+
+    _this2 = _possibleConstructorReturn(this, _getPrototypeOf(GadgetCourseProgress).call(this, props));
+    _this2.getData = _this2.getData.bind(_assertThisInitialized(_this2));
+    _this2.getDataResult = _this2.getDataResult.bind(_assertThisInitialized(_this2));
+    _this2.onBack = _this2.onBack.bind(_assertThisInitialized(_this2));
+    _this2.onDetails = _this2.onDetails.bind(_assertThisInitialized(_this2));
+    _this2.state = {
+      userId: 0,
+      overview: [],
+      details: []
+    };
+    return _this2;
+  }
+
+  _createClass(GadgetCourseProgress, [{
+    key: "componentDidMount",
+    value: function componentDidMount() {
+      this.getData();
+    }
+  }, {
+    key: "componentDidUpdate",
+    value: function componentDidUpdate(prevProps) {
+      // Typical usage (don't forget to compare props):
+      if (this.props.courseId !== prevProps.courseId) {
+        this.getData();
+      }
+    }
+  }, {
+    key: "getData",
+    value: function getData() {
+      _common.$glVars.webApi.getCourseProgressionOverview(this.props.courseId, this.getDataResult);
+    }
+  }, {
+    key: "getDataResult",
+    value: function getDataResult(result) {
+      if (result.success) {
+        this.setState({
+          userId: 0,
+          overview: result.data
+        });
+      } else {
+        _common.$glVars.feedback.showError(_common.$glVars.i18n.tags.appname, result.msg);
+      }
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      var _this3 = this;
+
+      var bodyContent = {
+        maxHeight: 400,
+        overflowY: "auto"
+      };
+      var cardTitle = "Aperçu de la progression";
+
+      if (this.state.userId > 0) {
+        cardTitle += ": " + _Utils.JsNx.get(_Utils.JsNx.at(this.state.details, 0, null), "studentName", "");
+      } //<Card.Header>{cardTitle}</Card.Header>
+
+
+      var main = _react.default.createElement(_reactBootstrap.Card, {
+        style: {
+          width: "60%"
+        }
+      }, _react.default.createElement(_reactBootstrap.Card.Body, null, _react.default.createElement(_reactBootstrap.Card.Title, {
+        style: {
+          display: "flex",
+          justifyContent: "space-between"
+        }
+      }, cardTitle, _react.default.createElement(_reactBootstrap.ButtonGroup, null, this.state.userId > 0 && _react.default.createElement(_reactBootstrap.Button, {
+        variant: "outline-secondary",
+        size: "sm",
+        onClick: this.onBack
+      }, _react.default.createElement(_reactFontawesome.FontAwesomeIcon, {
+        icon: _freeSolidSvgIcons.faArrowLeft
+      })), _react.default.createElement(_reactBootstrap.Button, {
+        variant: "outline-secondary",
+        size: "sm",
+        onClick: this.getData
+      }, _react.default.createElement(_reactFontawesome.FontAwesomeIcon, {
+        icon: _freeSolidSvgIcons.faSync
+      })))), _react.default.createElement("div", {
+        style: bodyContent
+      }, this.state.userId === 0 ? _react.default.createElement(_Components.DataGrid, {
+        orderBy: true
+      }, _react.default.createElement(_Components.DataGrid.Header, null, _react.default.createElement(_Components.DataGrid.Header.Row, null, _react.default.createElement(_Components.DataGrid.Header.Cell, {
+        style: {
+          width: 70
+        }
+      }, "#"), _react.default.createElement(_Components.DataGrid.Header.Cell, null, "Élève"), _react.default.createElement(_Components.DataGrid.Header.Cell, {
+        style: {
+          width: 150
+        }
+      }, "Progression"), _react.default.createElement(_Components.DataGrid.Header.Cell, {
+        style: {
+          width: 180
+        }
+      }, "Mise à jour"))), _react.default.createElement(_Components.DataGrid.Body, null, this.state.overview.map(function (item, index) {
+        var row = _react.default.createElement(_Components.DataGrid.Body.Row, {
+          key: index,
+          onDbClick: function onDbClick() {
+            return _this3.onDetails(item.userId);
+          }
+        }, _react.default.createElement(_Components.DataGrid.Body.Cell, null, index + 1), _react.default.createElement(_Components.DataGrid.Body.Cell, {
+          sortValue: item.studentName
+        }, _react.default.createElement("a", {
+          href: "#",
+          onClick: function onClick() {
+            return _this3.onDetails(item.userId);
+          }
+        }, item.studentName)), _react.default.createElement(_Components.DataGrid.Body.Cell, {
+          sortValue: item.pct.toString(),
+          style: {
+            textAlign: "center"
+          }
+        }, _react.default.createElement(_reactBootstrap.ProgressBar, {
+          striped: true,
+          min: 0,
+          max: 100,
+          variant: "success",
+          now: item.pct,
+          label: "".concat(item.pct, "%")
+        })), _react.default.createElement(_Components.DataGrid.Body.Cell, null, item.lastUpdate));
+
+        return row;
+      }))) : _react.default.createElement(_Components.DataGrid, {
+        orderBy: true
+      }, _react.default.createElement(_Components.DataGrid.Header, null, _react.default.createElement(_Components.DataGrid.Header.Row, null, _react.default.createElement(_Components.DataGrid.Header.Cell, {
+        style: {
+          width: 70
+        }
+      }, "#"), _react.default.createElement(_Components.DataGrid.Header.Cell, null, "Activité"), _react.default.createElement(_Components.DataGrid.Header.Cell, {
+        style: {
+          width: 100
+        }
+      }, "État"), _react.default.createElement(_Components.DataGrid.Header.Cell, {
+        style: {
+          width: 110
+        }
+      }, "Grade"), _react.default.createElement(_Components.DataGrid.Header.Cell, {
+        style: {
+          width: 190
+        }
+      }, "Date d'échéance"))), _react.default.createElement(_Components.DataGrid.Body, null, this.state.details.map(function (item, index) {
+        var row = _react.default.createElement(_Components.DataGrid.Body.Row, {
+          key: index
+        }, _react.default.createElement(_Components.DataGrid.Body.Cell, null, index + 1), _react.default.createElement(_Components.DataGrid.Body.Cell, {
+          sortValue: item.activity.name
+        }, _react.default.createElement("img", {
+          className: "activityicon",
+          alt: "activity icon",
+          role: "presentation",
+          "aria-hidden": "true",
+          src: _Utils.UtilsMoodle.getActivityIconUrl(item.module)
+        }), " ".concat(item.activity.name)), _react.default.createElement(_Components.DataGrid.Body.Cell, {
+          sortValue: item.completionState.toString(),
+          style: {
+            textAlign: "center"
+          }
+        }, item.completionState === 1 ? _react.default.createElement(_reactFontawesome.FontAwesomeIcon, {
+          icon: _freeSolidSvgIcons.faCheckSquare
+        }) : _react.default.createElement(_reactFontawesome.FontAwesomeIcon, {
+          icon: _freeSolidSvgIcons.faSquare
+        })), _react.default.createElement(_Components.DataGrid.Body.Cell, {
+          style: {
+            textAlign: "center"
+          }
+        }, item.activity.grade), _react.default.createElement(_Components.DataGrid.Body.Cell, {
+          sortValue: item.completionExpected,
+          alert: _this3.getDeadline(item),
+          style: {
+            textAlign: "center"
+          }
+        }, item.completionExpected, _react.default.createElement("br", null), _react.default.createElement("span", {
+          style: {
+            fontSize: ".7rem"
+          }
+        }, _this3.getDeadlineInDays(item))));
+
+        return row;
+      }))))));
+
+      return main;
+    }
+  }, {
+    key: "getDeadline",
+    value: function getDeadline(item) {
+      if (item.completionState === 1) {
+        return "";
+      } else if (item.completionExpected === null) {
+        return "";
+      } else if (item.daysDeadline < 0) {
+        return "error";
+      } else if (item.daysDeadline <= 3) {
+        return "warning";
+      } else {
+        return "";
+      }
+    }
+  }, {
+    key: "getDeadlineInDays",
+    value: function getDeadlineInDays(item) {
+      if (item.completionState === 1) {
+        return "";
+      }
+
+      return item.daysDeadline < 0 ? "(".concat(Math.abs(item.daysDeadline), " jours en retard)") : "";
+    }
+  }, {
+    key: "onDetails",
+    value: function onDetails(userId) {
+      var that = this;
+
+      var callback = function callback(result) {
+        if (result.success) {
+          that.setState({
+            userId: parseInt(userId, 10),
+            details: result.data
+          });
+        } else {
+          _common.$glVars.feedback.showError(_common.$glVars.i18n.tags.appname, result.msg);
+        }
+      };
+
+      _common.$glVars.webApi.getCourseProgressionDetails(this.props.courseId, userId, callback);
+    }
+  }, {
+    key: "onBack",
+    value: function onBack() {
+      this.setState({
+        userId: 0
+      });
+    }
+  }]);
+
+  return GadgetCourseProgress;
+}(_react.Component);
+
+GadgetCourseProgress.defaultProps = {
+  courseId: 0
+};
+},{"react":"../node_modules/react/index.js","react-bootstrap":"../node_modules/react-bootstrap/esm/index.js","@fortawesome/free-solid-svg-icons":"../node_modules/@fortawesome/free-solid-svg-icons/index.es.js","@fortawesome/react-fontawesome":"../node_modules/@fortawesome/react-fontawesome/index.es.js","../libs/components/Components":"libs/components/Components.js","../libs/utils/Utils":"libs/utils/Utils.js","../common/common":"common/common.js"}],"common/i18n.js":[function(require,module,exports) {
 "use strict";
 
 var _common = require("./common");
@@ -78830,7 +79167,8 @@ function (_Component) {
   }, {
     key: "render",
     value: function render() {
-      var main = _react.default.createElement("div", null, this.state.mode === 't' ? _react.default.createElement(_Views.TeacherView, null) : _react.default.createElement(_Views.StudentView, null), _common.$glVars.feedback.msg.map(function (item, index) {
+      //{this.state.mode  === 't' ? <TeacherView/> : <StudentView/>}     
+      var main = _react.default.createElement("div", null, _react.default.createElement(_Views.TeacherView, null), _common.$glVars.feedback.msg.map(function (item, index) {
         return _react.default.createElement(_Components.VisualFeedback, {
           key: index,
           id: index,
@@ -78902,7 +79240,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "65448" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "62442" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

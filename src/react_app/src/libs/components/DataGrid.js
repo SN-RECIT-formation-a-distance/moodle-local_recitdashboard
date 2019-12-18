@@ -131,7 +131,7 @@ class Body extends Component {
         else if(cell1.props.children !== null){
             str1 =  cell1.props.children.toString();
         }
-
+        
         let str2 = "";
         if((cell2.props.sortValue !== null) && (cell2.props.sortValue.length > 0)){
             str2 = cell2.props.sortValue;
@@ -139,6 +139,7 @@ class Body extends Component {
         else if(cell2.props.children !== null){
             str2 =  cell2.props.children.toString();
         }
+        
         
         let result = str1.localeCompare(str2, "en", {numeric: true}) * this.props.orderBy.direction;
         

@@ -209,6 +209,11 @@ export class UtilsMoodle
     static wwwRoot(){
         return M.cfg.wwwroot;
     };
+
+    static getActivityIconUrl(moduleName){
+        //src="http://devserver/shared/moodle/theme/image.php?theme=recit&component=lesson&rev=1576685339&image=icon"
+        return `${M.cfg.wwwroot}/theme/image.php?theme=${M.cfg.theme}&component=${moduleName}&rev=${M.cfg.themerev}&image=icon`;
+    }
 }
 
 export class UtilsString

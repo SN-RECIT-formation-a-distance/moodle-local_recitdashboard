@@ -28,9 +28,18 @@ export class AppWebApi extends WebApi
         }
     }
     
-    getEnrolledUserList(cmId, onSuccess){
-        let data = {cmId: cmId, service: "getEnrolledUserList"};
+    getEnrolledCourseList(userId, onSuccess){
+        let data = {userId: userId, service: "getEnrolledCourseList"};
         this.post(this.gateway, data, onSuccess);
     }
     
+    getCourseProgressionOverview(courseId, onSuccess){
+        let data = {courseId: courseId, service: "getCourseProgressionOverview"};
+        this.post(this.gateway, data, onSuccess);
+    }
+
+    getCourseProgressionDetails(courseId, userId, onSuccess){
+        let data = {courseId: courseId, userId: userId, service: "getCourseProgressionDetails"};
+        this.post(this.gateway, data, onSuccess);
+    }
 };
