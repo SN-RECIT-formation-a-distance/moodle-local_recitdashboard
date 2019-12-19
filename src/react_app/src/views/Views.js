@@ -1,10 +1,289 @@
 import React, { Component } from 'react';
 import {Navbar, NavDropdown, Card, ButtonGroup, Button, ProgressBar} from 'react-bootstrap';
+import { ResponsiveLine } from '@nivo/line'
 import {faSync, faArrowLeft, faSquare, faCheckSquare} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {DataGrid} from '../libs/components/Components';
 import {UtilsMoodle, JsNx} from '../libs/utils/Utils';
 import {$glVars} from '../common/common';
+
+// make sure parent container have a defined height when using
+// responsive component, otherwise height will be 0 and
+// no chart will be rendered.
+// website examples showcase many properties,
+// you'll often use just a few of them.
+var glData = [
+    {
+      "id": "japan",
+      "color": "hsl(238, 70%, 50%)",
+      "data": [
+        {
+          "x": "plane",
+          "y": 9
+        },
+        {
+          "x": "helicopter",
+          "y": 66
+        },
+        {
+          "x": "boat",
+          "y": 188
+        },
+        {
+          "x": "train",
+          "y": 282
+        },
+        {
+          "x": "subway",
+          "y": 117
+        },
+        {
+          "x": "bus",
+          "y": 153
+        },
+        {
+          "x": "car",
+          "y": 14
+        },
+        {
+          "x": "moto",
+          "y": 100
+        },
+        {
+          "x": "bicycle",
+          "y": 95
+        },
+        {
+          "x": "horse",
+          "y": 257
+        },
+        {
+          "x": "skateboard",
+          "y": 193
+        },
+        {
+          "x": "others",
+          "y": 217
+        }
+      ]
+    },
+    {
+      "id": "france",
+      "color": "hsl(209, 70%, 50%)",
+      "data": [
+        {
+          "x": "plane",
+          "y": 115
+        },
+        {
+          "x": "helicopter",
+          "y": 28
+        },
+        {
+          "x": "boat",
+          "y": 176
+        },
+        {
+          "x": "train",
+          "y": 233
+        },
+        {
+          "x": "subway",
+          "y": 279
+        },
+        {
+          "x": "bus",
+          "y": 168
+        },
+        {
+          "x": "car",
+          "y": 295
+        },
+        {
+          "x": "moto",
+          "y": 129
+        },
+        {
+          "x": "bicycle",
+          "y": 187
+        },
+        {
+          "x": "horse",
+          "y": 216
+        },
+        {
+          "x": "skateboard",
+          "y": 226
+        },
+        {
+          "x": "others",
+          "y": 200
+        }
+      ]
+    },
+    {
+      "id": "us",
+      "color": "hsl(292, 70%, 50%)",
+      "data": [
+        {
+          "x": "plane",
+          "y": 178
+        },
+        {
+          "x": "helicopter",
+          "y": 266
+        },
+        {
+          "x": "boat",
+          "y": 87
+        },
+        {
+          "x": "train",
+          "y": 286
+        },
+        {
+          "x": "subway",
+          "y": 107
+        },
+        {
+          "x": "bus",
+          "y": 157
+        },
+        {
+          "x": "car",
+          "y": 181
+        },
+        {
+          "x": "moto",
+          "y": 211
+        },
+        {
+          "x": "bicycle",
+          "y": 232
+        },
+        {
+          "x": "horse",
+          "y": 58
+        },
+        {
+          "x": "skateboard",
+          "y": 185
+        },
+        {
+          "x": "others",
+          "y": 76
+        }
+      ]
+    },
+    {
+      "id": "germany",
+      "color": "hsl(87, 70%, 50%)",
+      "data": [
+        {
+          "x": "plane",
+          "y": 300
+        },
+        {
+          "x": "helicopter",
+          "y": 29
+        },
+        {
+          "x": "boat",
+          "y": 13
+        },
+        {
+          "x": "train",
+          "y": 188
+        },
+        {
+          "x": "subway",
+          "y": 174
+        },
+        {
+          "x": "bus",
+          "y": 122
+        },
+        {
+          "x": "car",
+          "y": 192
+        },
+        {
+          "x": "moto",
+          "y": 20
+        },
+        {
+          "x": "bicycle",
+          "y": 187
+        },
+        {
+          "x": "horse",
+          "y": 167
+        },
+        {
+          "x": "skateboard",
+          "y": 206
+        },
+        {
+          "x": "others",
+          "y": 256
+        }
+      ]
+    },
+    {
+      "id": "norway",
+      "color": "hsl(81, 70%, 50%)",
+      "data": [
+        {
+          "x": "plane",
+          "y": 140
+        },
+        {
+          "x": "helicopter",
+          "y": 83
+        },
+        {
+          "x": "boat",
+          "y": 239
+        },
+        {
+          "x": "train",
+          "y": 284
+        },
+        {
+          "x": "subway",
+          "y": 274
+        },
+        {
+          "x": "bus",
+          "y": 31
+        },
+        {
+          "x": "car",
+          "y": 87
+        },
+        {
+          "x": "moto",
+          "y": 58
+        },
+        {
+          "x": "bicycle",
+          "y": 67
+        },
+        {
+          "x": "horse",
+          "y": 49
+        },
+        {
+          "x": "skateboard",
+          "y": 136
+        },
+        {
+          "x": "others",
+          "y": 116
+        }
+      ]
+    }
+  ]
 
 export class TeacherView extends Component {
     constructor(props) {
@@ -54,6 +333,8 @@ export class TeacherView extends Component {
                 {this.state.selectedCourse !== null ?
                     <div style={{marginTop: 15}}>
                         <GadgetCourseProgress courseId={this.state.selectedCourse.courseId}/>
+                        <br/>
+                        <GadgetAttendance courseId={this.state.selectedCourse.courseId} data={glData}/>
                     </div>
                 :
                     null
@@ -129,7 +410,7 @@ class GadgetCourseProgress extends Component{
         }
         //<Card.Header>{cardTitle}</Card.Header>
         let main = 
-            <Card style={{width: "60%"}}>
+            <Card>
                 <Card.Body>
                     <Card.Title style={{display: "flex", justifyContent: "space-between"}}>
                         {cardTitle}
@@ -245,5 +526,128 @@ class GadgetCourseProgress extends Component{
 
     onBack(){
         this.setState({userId: 0});
+    }
+}
+
+class GadgetAttendance extends Component{
+    static defaultProps = {        
+        courseId: 0
+    };
+
+    constructor(props) {
+        super(props);
+
+        this.getData = this.getData.bind(this);
+        this.getDataResult = this.getDataResult.bind(this);
+
+        this.state = {dataProvider:[]};
+    }
+
+    componentDidMount(){
+        this.getData();
+    }
+
+    componentDidUpdate(prevProps){
+       // Typical usage (don't forget to compare props):
+       if (this.props.courseId !== prevProps.courseId) {
+            this.getData();
+        }
+    }
+
+    getData(){
+        $glVars.webApi.getCourseAttendance(this.props.courseId, this.getDataResult);        
+    }
+
+    getDataResult(result){         
+        if(result.success){
+            this.setState({dataProvider: result.data});
+        }
+        else{
+            $glVars.feedback.showError($glVars.i18n.tags.appname, result.msg);
+        }
+    }
+
+    render(){
+        let bodyContent = {height: 400};
+
+        let main =
+            <Card>
+                <Card.Body>
+                    <Card.Title style={{display: "flex", justifyContent: "space-between"}}>
+                        {"Assiduité des élèves"}
+                        <ButtonGroup  >
+                            <Button  variant="outline-secondary" size="sm" onClick={this.getData}><FontAwesomeIcon icon={faSync}/></Button>
+                        </ButtonGroup>
+                    </Card.Title>
+
+                    <div style={bodyContent}>
+                        <ResponsiveLine
+                            data={this.state.dataProvider}
+                            margin={{ top: 50, right: 160, bottom: 50, left: 60 }}
+                            xScale={{ type: 'point' }}
+                            yScale={{ type: 'linear', min: 0, max: 'auto', stacked: false, reverse: false }}
+                            curve="cardinal"
+                            axisTop={null}
+                            axisRight={null}
+                            axisBottom={{
+                                orient: 'bottom',
+                                tickSize: 1,
+                                tickPadding: 5,
+                                tickRotation: 0,
+                                legend: '# semaine',
+                                legendOffset: 36,
+                                legendPosition: 'middle'
+                            }}
+                            axisLeft={{
+                                orient: 'left',
+                                tickSize: 1,
+                                tickPadding: 5,
+                                tickRotation: 0,
+                                legend: '# heures',
+                                legendOffset: -40,
+                                legendPosition: 'middle'
+                            }}
+                            colors={{ scheme: 'nivo' }}
+                            pointSize={10}
+                            pointColor={{ theme: 'background' }}
+                            pointBorderWidth={2}
+                            pointBorderColor={{ from: 'serieColor' }}
+                            pointLabel="y"
+                            pointLabelYOffset={-12}
+                            enableArea={true}
+                            useMesh={true}
+                            legends={[
+                                {
+                                    anchor: 'bottom-right',
+                                    direction: 'column',
+                                    justify: false,
+                                    translateX: 100,
+                                    translateY: 0,
+                                    itemsSpacing: 0,
+                                    itemDirection: 'left-to-right',
+                                    itemWidth: 80,
+                                    itemHeight: 20,
+                                    itemOpacity: 0.75,
+                                    symbolSize: 12,
+                                    symbolShape: 'circle',
+                                    symbolBorderColor: 'rgba(0, 0, 0, .5)',
+                                    effects: [
+                                        {
+                                            on: 'hover',
+                                            style: {
+                                                itemBackground: 'rgba(0, 0, 0, .03)',
+                                                itemOpacity: 1
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]}
+                        />
+                    </div>
+                </Card.Body>
+            </Card>;
+//
+//enablePointLabel={true}
+        return main;
     }
 }
