@@ -1,289 +1,11 @@
 import React, { Component } from 'react';
-import {Navbar, NavDropdown, Card, ButtonGroup, Button, ProgressBar} from 'react-bootstrap';
+import {Navbar, NavDropdown, Card, ButtonGroup, Button, Badge, OverlayTrigger, Tooltip} from 'react-bootstrap';
 import { ResponsiveLine } from '@nivo/line'
-import {faSync, faArrowLeft, faSquare, faCheckSquare} from '@fortawesome/free-solid-svg-icons';
+import {faSync, faArrowLeft} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {DataGrid} from '../libs/components/Components';
 import {UtilsMoodle, JsNx} from '../libs/utils/Utils';
 import {$glVars} from '../common/common';
-
-// make sure parent container have a defined height when using
-// responsive component, otherwise height will be 0 and
-// no chart will be rendered.
-// website examples showcase many properties,
-// you'll often use just a few of them.
-var glData = [
-    {
-      "id": "japan",
-      "color": "hsl(238, 70%, 50%)",
-      "data": [
-        {
-          "x": "plane",
-          "y": 9
-        },
-        {
-          "x": "helicopter",
-          "y": 66
-        },
-        {
-          "x": "boat",
-          "y": 188
-        },
-        {
-          "x": "train",
-          "y": 282
-        },
-        {
-          "x": "subway",
-          "y": 117
-        },
-        {
-          "x": "bus",
-          "y": 153
-        },
-        {
-          "x": "car",
-          "y": 14
-        },
-        {
-          "x": "moto",
-          "y": 100
-        },
-        {
-          "x": "bicycle",
-          "y": 95
-        },
-        {
-          "x": "horse",
-          "y": 257
-        },
-        {
-          "x": "skateboard",
-          "y": 193
-        },
-        {
-          "x": "others",
-          "y": 217
-        }
-      ]
-    },
-    {
-      "id": "france",
-      "color": "hsl(209, 70%, 50%)",
-      "data": [
-        {
-          "x": "plane",
-          "y": 115
-        },
-        {
-          "x": "helicopter",
-          "y": 28
-        },
-        {
-          "x": "boat",
-          "y": 176
-        },
-        {
-          "x": "train",
-          "y": 233
-        },
-        {
-          "x": "subway",
-          "y": 279
-        },
-        {
-          "x": "bus",
-          "y": 168
-        },
-        {
-          "x": "car",
-          "y": 295
-        },
-        {
-          "x": "moto",
-          "y": 129
-        },
-        {
-          "x": "bicycle",
-          "y": 187
-        },
-        {
-          "x": "horse",
-          "y": 216
-        },
-        {
-          "x": "skateboard",
-          "y": 226
-        },
-        {
-          "x": "others",
-          "y": 200
-        }
-      ]
-    },
-    {
-      "id": "us",
-      "color": "hsl(292, 70%, 50%)",
-      "data": [
-        {
-          "x": "plane",
-          "y": 178
-        },
-        {
-          "x": "helicopter",
-          "y": 266
-        },
-        {
-          "x": "boat",
-          "y": 87
-        },
-        {
-          "x": "train",
-          "y": 286
-        },
-        {
-          "x": "subway",
-          "y": 107
-        },
-        {
-          "x": "bus",
-          "y": 157
-        },
-        {
-          "x": "car",
-          "y": 181
-        },
-        {
-          "x": "moto",
-          "y": 211
-        },
-        {
-          "x": "bicycle",
-          "y": 232
-        },
-        {
-          "x": "horse",
-          "y": 58
-        },
-        {
-          "x": "skateboard",
-          "y": 185
-        },
-        {
-          "x": "others",
-          "y": 76
-        }
-      ]
-    },
-    {
-      "id": "germany",
-      "color": "hsl(87, 70%, 50%)",
-      "data": [
-        {
-          "x": "plane",
-          "y": 300
-        },
-        {
-          "x": "helicopter",
-          "y": 29
-        },
-        {
-          "x": "boat",
-          "y": 13
-        },
-        {
-          "x": "train",
-          "y": 188
-        },
-        {
-          "x": "subway",
-          "y": 174
-        },
-        {
-          "x": "bus",
-          "y": 122
-        },
-        {
-          "x": "car",
-          "y": 192
-        },
-        {
-          "x": "moto",
-          "y": 20
-        },
-        {
-          "x": "bicycle",
-          "y": 187
-        },
-        {
-          "x": "horse",
-          "y": 167
-        },
-        {
-          "x": "skateboard",
-          "y": 206
-        },
-        {
-          "x": "others",
-          "y": 256
-        }
-      ]
-    },
-    {
-      "id": "norway",
-      "color": "hsl(81, 70%, 50%)",
-      "data": [
-        {
-          "x": "plane",
-          "y": 140
-        },
-        {
-          "x": "helicopter",
-          "y": 83
-        },
-        {
-          "x": "boat",
-          "y": 239
-        },
-        {
-          "x": "train",
-          "y": 284
-        },
-        {
-          "x": "subway",
-          "y": 274
-        },
-        {
-          "x": "bus",
-          "y": 31
-        },
-        {
-          "x": "car",
-          "y": 87
-        },
-        {
-          "x": "moto",
-          "y": 58
-        },
-        {
-          "x": "bicycle",
-          "y": 67
-        },
-        {
-          "x": "horse",
-          "y": 49
-        },
-        {
-          "x": "skateboard",
-          "y": 136
-        },
-        {
-          "x": "others",
-          "y": 116
-        }
-      ]
-    }
-  ]
 
 export class TeacherView extends Component {
     constructor(props) {
@@ -334,7 +56,7 @@ export class TeacherView extends Component {
                     <div style={{marginTop: 15}}>
                         <GadgetCourseProgress courseId={this.state.selectedCourse.courseId}/>
                         <br/>
-                        <GadgetAttendance courseId={this.state.selectedCourse.courseId} data={glData}/>
+                        <GadgetAttendance courseId={this.state.selectedCourse.courseId}/>
                     </div>
                 :
                     null
@@ -433,12 +155,18 @@ class GadgetCourseProgress extends Component{
                                 </DataGrid.Header>
                                 <DataGrid.Body>
                                     {this.state.overview.map((item, index) => {
+                                      //<ProgressBar striped min={0} max={100} variant="primary" now={item.pctWork} label={`${item.pctWork}%`}/>
                                             let row = 
                                                 <DataGrid.Body.Row key={index} onDbClick={() => this.onDetails(item.userId)}>
                                                     <DataGrid.Body.Cell>{index + 1}</DataGrid.Body.Cell>
                                                     <DataGrid.Body.Cell sortValue={item.studentName}><a href="#" onClick={() => this.onDetails(item.userId)}>{item.studentName}</a></DataGrid.Body.Cell>
-                                                    <DataGrid.Body.Cell sortValue={item.pct.toString()} style={{textAlign: "center"}}>
-                                                        <ProgressBar striped min={0} max={100} variant="success" now={item.pct} label={`${item.pct}%`}/>
+                                                    <DataGrid.Body.Cell sortValue={item.pctWork.toString()} style={{textAlign: "center"}}>
+                                                    <OverlayTrigger placement="right" delay={{ show: 250, hide: 400 }}
+                                                        overlay={<Tooltip>{`Temps: ${item.pctTime}%  | Travail: ${item.pctWork}%`}</Tooltip>}>
+                                                        <Button variant={this.getProgressColor(item)} size="sm">
+                                                            <Badge variant="light">{`${item.pctWork}%`}</Badge>
+                                                        </Button>
+                                                    </OverlayTrigger>
                                                     </DataGrid.Body.Cell>                                            
                                                     <DataGrid.Body.Cell>{item.lastUpdate}</DataGrid.Body.Cell>
                                                 </DataGrid.Body.Row>
@@ -453,7 +181,6 @@ class GadgetCourseProgress extends Component{
                                     <DataGrid.Header.Row>
                                         <DataGrid.Header.Cell style={{width: 70}}>{"#"}</DataGrid.Header.Cell>
                                         <DataGrid.Header.Cell >{"Activité"}</DataGrid.Header.Cell>
-                                        <DataGrid.Header.Cell style={{width: 100}}>{"État"}</DataGrid.Header.Cell>
                                         <DataGrid.Header.Cell style={{width: 110}}>{"Grade"}</DataGrid.Header.Cell>
                                         <DataGrid.Header.Cell style={{width: 190}}>{"Date d'échéance"}</DataGrid.Header.Cell>
                                     </DataGrid.Header.Row>
@@ -461,17 +188,14 @@ class GadgetCourseProgress extends Component{
                                 <DataGrid.Body>
                                     {this.state.details.map((item, index) => {
                                             let row = 
-                                                <DataGrid.Body.Row key={index} >
+                                                <DataGrid.Body.Row key={index} alert={this.getDeadline(item)} >
                                                     <DataGrid.Body.Cell>{index + 1}</DataGrid.Body.Cell>
                                                     <DataGrid.Body.Cell sortValue={item.activity.name}>
                                                         <img className="activityicon" alt="activity icon" role="presentation" aria-hidden="true" src={UtilsMoodle.getActivityIconUrl(item.module)}/>
                                                         {` ${item.activity.name}`}
                                                         </DataGrid.Body.Cell>
-                                                    <DataGrid.Body.Cell sortValue={item.completionState.toString()} style={{textAlign: "center"}}>
-                                                        {item.completionState === 1 ? <FontAwesomeIcon icon={faCheckSquare}/> : <FontAwesomeIcon icon={faSquare}/> }
-                                                    </DataGrid.Body.Cell>
                                                     <DataGrid.Body.Cell style={{textAlign: "center"}}>{item.activity.grade}</DataGrid.Body.Cell>
-                                                    <DataGrid.Body.Cell sortValue={item.completionExpected} alert={this.getDeadline(item)} style={{textAlign: "center"}}>
+                                                    <DataGrid.Body.Cell sortValue={item.completionExpected} style={{textAlign: "center"}}>
                                                         {item.completionExpected}<br/><span style={{fontSize: ".7rem"}}>{this.getDeadlineInDays(item)}</span>
                                                     </DataGrid.Body.Cell>
                                                 </DataGrid.Body.Row>
@@ -490,7 +214,7 @@ class GadgetCourseProgress extends Component{
 
     getDeadline(item){
         if(item.completionState === 1){
-            return "";
+            return "success";
         }
         else if(item.completionExpected === null){
             return "";
@@ -503,6 +227,20 @@ class GadgetCourseProgress extends Component{
         }
         else{
             return "";
+        }
+    }
+
+    getProgressColor(item){
+        let threshold = 0.02; // 2%
+
+        if(item.pctTime < item.pctWork){
+            return "success";
+        }
+        else if(item.pctTime + (item.pctTime* threshold) < item.pctWork){
+            return "warning";
+        }
+        else{
+            return "danger";
         }
     }
 
