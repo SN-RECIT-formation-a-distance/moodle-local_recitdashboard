@@ -97,6 +97,8 @@ class Body extends Component {
         
     renderChildren() {
         return React.Children.map(this.props.children, (child, index) => {
+            if(child === null){ return null;}
+            
             return React.cloneElement(child, {
               index: index,
               selected: this.props.selectedIndex === index

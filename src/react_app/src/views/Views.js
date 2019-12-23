@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {Navbar, NavDropdown, Card, ButtonGroup, Button, Badge, OverlayTrigger, Tooltip} from 'react-bootstrap';
+import {Navbar, NavDropdown, Card, ButtonGroup, Button, Badge, OverlayTrigger, Tooltip, DropdownButton, Dropdown, ButtonToolbar} from 'react-bootstrap';
 import { ResponsiveLine } from '@nivo/line'
 import {faSync, faArrowLeft} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -95,8 +95,10 @@ class GadgetCourseProgress extends Component{
         this.getDataResult = this.getDataResult.bind(this);
         this.onBack = this.onBack.bind(this);
         this.onDetails = this.onDetails.bind(this);
+        this.onSelectSection = this.onSelectSection.bind(this);
+        this.onSelectGroup = this.onSelectGroup.bind(this);
 
-        this.state = {userId: 0, overview: [], details: []};
+        this.state = {userId: 0, overview: [], details: [], sectionList: [], selectedSectionIndex: -1, groupList: [], selectedGroupIndex: -1};
     }
 
     componentDidMount(){
@@ -116,7 +118,17 @@ class GadgetCourseProgress extends Component{
 
     getDataResult(result){         
         if(result.success){
-            this.setState({userId: 0, overview: result.data});
+            let overview = result.data;
+            let groupList = [];
+
+            for(let item of overview){
+                let tmp = item.groups.split(",");
+                for(let item2 of tmp){
+                    JsNx.singlePush(groupList, item2);
+                }
+            }
+
+            this.setState({userId: 0, overview: overview, sectionList: [], selectedSectionIndex: -1, groupList: groupList, selectedGroupIndex: -1});
         }
         else{
             $glVars.feedback.showError($glVars.i18n.tags.appname, result.msg);
@@ -136,10 +148,46 @@ class GadgetCourseProgress extends Component{
                 <Card.Body>
                     <Card.Title style={{display: "flex", justifyContent: "space-between"}}>
                         {cardTitle}
-                        <ButtonGroup  >
-                            {this.state.userId > 0 && <Button variant="outline-secondary" size="sm" onClick={this.onBack}><FontAwesomeIcon icon={faArrowLeft}/></Button>}
-                            <Button  variant="outline-secondary" size="sm" onClick={this.getData}><FontAwesomeIcon icon={faSync}/></Button>
-                        </ButtonGroup>
+                        <ButtonToolbar aria-label="Toolbar with Buttons">
+                            {this.state.userId > 0 &&
+                                <ButtonGroup className="mr-2">
+                                    <Button variant="outline-secondary" size="sm" onClick={this.onBack}><FontAwesomeIcon icon={faArrowLeft}/></Button>                                    
+                                </ButtonGroup>
+                            }
+
+                            {this.state.userId > 0 &&
+                                <ButtonGroup className="mr-2">
+                                    <DropdownButton as={ButtonGroup} title={(this.state.selectedSectionIndex >= 0 ? this.state.sectionList[this.state.selectedSectionIndex].text : "Filtrez par section")} 
+                                                   size="sm" variant="outline-secondary" onSelect={this.onSelectSection}>
+                                        <Dropdown.Item key={-1} eventKey={-1}>{"Toutes"}</Dropdown.Item>
+                                        <Dropdown.Divider />
+                                        {this.state.sectionList.map((item, index) => {
+                                            return <Dropdown.Item key={index} eventKey={index}>{item.text}</Dropdown.Item>
+                                        })}
+                                    </DropdownButton>
+                                </ButtonGroup>
+                            }   
+                                
+                            {this.state.userId === 0 &&
+                                    <ButtonGroup className="mr-2">
+                                        <DropdownButton as={ButtonGroup} title={(this.state.selectedGroupIndex >= 0 ? this.state.groupList[this.state.selectedGroupIndex] : "Filtrez par groupe")} 
+                                                    size="sm" variant="outline-secondary" onSelect={this.onSelectGroup}>
+                                            <Dropdown.Item key={-1} eventKey={-1}>{"Tous"}</Dropdown.Item>
+                                            <Dropdown.Divider />
+                                            {this.state.groupList.map((item, index) => {
+                                                return <Dropdown.Item key={index} eventKey={index}>{item}</Dropdown.Item>
+                                            })}
+                                        </DropdownButton>
+                                    </ButtonGroup>
+                            }
+
+                            {this.state.userId === 0 &&
+                                <ButtonGroup className="mr-2">
+                                    <Button  variant="outline-secondary" size="sm" onClick={this.getData}><FontAwesomeIcon icon={faSync}/></Button>
+                                </ButtonGroup>
+                            }
+                            
+                        </ButtonToolbar>                        
                     </Card.Title>
 
                     <div style={bodyContent}>
@@ -156,6 +204,11 @@ class GadgetCourseProgress extends Component{
                                 <DataGrid.Body>
                                     {this.state.overview.map((item, index) => {
                                       //<ProgressBar striped min={0} max={100} variant="primary" now={item.pctWork} label={`${item.pctWork}%`}/>
+                                            if(this.state.selectedGroupIndex >= 0){
+                                                if(!item.groups.includes(this.state.groupList[this.state.selectedGroupIndex])){
+                                                    return null;
+                                                }
+                                            }
                                             let row = 
                                                 <DataGrid.Body.Row key={index} onDbClick={() => this.onDetails(item.userId)}>
                                                     <DataGrid.Body.Cell>{index + 1}</DataGrid.Body.Cell>
@@ -187,6 +240,11 @@ class GadgetCourseProgress extends Component{
                                 </DataGrid.Header>
                                 <DataGrid.Body>
                                     {this.state.details.map((item, index) => {
+                                            if(this.state.selectedSectionIndex >= 0){
+                                                if(item.sectionId !== this.state.sectionList[this.state.selectedSectionIndex].value){
+                                                    return null;
+                                                }
+                                            }
                                             let row = 
                                                 <DataGrid.Body.Row key={index} alert={this.getDeadline(item)} >
                                                     <DataGrid.Body.Cell>{index + 1}</DataGrid.Body.Cell>
@@ -244,6 +302,14 @@ class GadgetCourseProgress extends Component{
         }
     }
 
+    onSelectSection(index){
+        this.setState({selectedSectionIndex: index});
+    }
+
+    onSelectGroup(index){
+        this.setState({selectedGroupIndex: index});
+    }
+
     getDeadlineInDays(item){
         if(item.completionState === 1){ return "";}
         return (item.daysDeadline < 0 ? `(${Math.abs(item.daysDeadline)} jours en retard)` : "");
@@ -253,7 +319,15 @@ class GadgetCourseProgress extends Component{
         let that = this;
         let callback = function(result){
             if(result.success){
-                that.setState({userId: parseInt(userId, 10), details: result.data});
+                let details = result.data;
+                let sectionList = [];
+                for(let item of details){
+                    if(JsNx.getItem(sectionList, 'value', item.sectionId, null) === null){
+                        sectionList.push({value: item.sectionId, text: item.sectionName});
+                    }
+                }
+
+                that.setState({userId: parseInt(userId, 10), details: result.data, sectionList: sectionList, selectedSectionIndex: -1});
             }
             else{
                 $glVars.feedback.showError($glVars.i18n.tags.appname, result.msg);

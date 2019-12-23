@@ -52,6 +52,20 @@ export class JsNx{
     };
 
     /**
+     * Add the item to the array only if it does not exists
+     * @param {*} item
+     * @returns {boolean}
+     */
+    static singlePush = function(arr, item){
+        if(!arr.includes(item)){
+            arr.push(item);
+            return true;
+        }
+        else{
+            return false;
+        }
+    };
+    /**
      * Remove an element from the array. If the element does not exists then do nothing.
      * @param {number} index
      * @returns {object}
