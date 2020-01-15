@@ -1,6 +1,6 @@
 
 import React, { Component } from 'react';
-import { Card, ButtonGroup, Button} from 'react-bootstrap';
+import { Card, ButtonGroup, ButtonToolbar, Button, DropdownButton, Dropdown} from 'react-bootstrap';
 import { ResponsiveLine } from '@nivo/line'
 import {faSync} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -17,8 +17,10 @@ export class GadgetAttendance extends Component{
 
         this.getData = this.getData.bind(this);
         this.getDataResult = this.getDataResult.bind(this);
+        this.onSelectGroup = this.onSelectGroup.bind(this);
+        this.prepareChartData = this.prepareChartData.bind(this);
 
-        this.state = {dataProvider:[]};
+        this.state = {dataProvider:[], groupList: [], selectedGroupIndex: -1};
     }
 
     componentDidMount(){
@@ -38,14 +40,14 @@ export class GadgetAttendance extends Component{
 
     getDataResult(result){         
         if(result.success){
-            this.setState({dataProvider: this.prepareChartData(result.data)});
+            this.setState({dataProvider: result.data, groupList: this.prepareGroup(result.data), selectedGroupIndex: -1});
         }
         else{
             $glVars.feedback.showError($glVars.i18n.tags.appname, result.msg);
         }
     }
 
-    /*prepareGroup(dataProvider){
+    prepareGroup(dataProvider){
         let result = [];
 
         for(let users of dataProvider){
@@ -63,7 +65,7 @@ export class GadgetAttendance extends Component{
         }
 
         return result;
-    }*/
+    }
 
     prepareChartData(dataProvider){
         let result = [];
@@ -72,6 +74,12 @@ export class GadgetAttendance extends Component{
             for(let courseId in users){
                 let course = users[courseId];
                 for(let weekNumber in course){
+                    if(this.state.selectedGroupIndex >= 0){                        
+                        if(!course[weekNumber].groups.includes(this.state.groupList[this.state.selectedGroupIndex])){
+                            continue;
+                        }
+                    }
+
                     let chartItem = JsNx.getItem(result, "id", course[weekNumber].username, null);
                     if(chartItem === null){
                         chartItem = {id: course[weekNumber].username, color: "", data: []};
@@ -89,19 +97,33 @@ export class GadgetAttendance extends Component{
     render(){
         let bodyContent = {height: 400};
 
+        let dataProvider = this.prepareChartData(this.state.dataProvider);        
+
         let main =
-            <Card>
+            <Card style={{flexGrow: 1, margin: 5}}>
                 <Card.Body>
                     <Card.Title style={{display: "flex", justifyContent: "space-between"}}>
                         {"Assiduité des élèves"}
-                        <ButtonGroup  >
-                            <Button  variant="outline-secondary" size="sm" onClick={this.getData}><FontAwesomeIcon icon={faSync}/></Button>
-                        </ButtonGroup>
+                        <ButtonToolbar aria-label="Toolbar with Buttons">
+                            <ButtonGroup className="mr-2">
+                            <DropdownButton as={ButtonGroup} title={(this.state.selectedGroupIndex >= 0 ? this.state.groupList[this.state.selectedGroupIndex] : "Filtrez par groupe")} 
+                                            size="sm" variant="outline-secondary" onSelect={this.onSelectGroup}>
+                                    <Dropdown.Item key={-1} eventKey={-1}>{"Tous"}</Dropdown.Item>
+                                    <Dropdown.Divider />
+                                    {this.state.groupList.map((item, index) => {
+                                        return <Dropdown.Item key={index} eventKey={index}>{item}</Dropdown.Item>
+                                    })}
+                                </DropdownButton>
+                            </ButtonGroup>
+                            <ButtonGroup  >
+                                <Button  variant="outline-secondary" size="sm" onClick={this.getData}><FontAwesomeIcon icon={faSync}/></Button>
+                            </ButtonGroup>
+                        </ButtonToolbar>                              
                     </Card.Title>
 
                     <div style={bodyContent}>
                         <ResponsiveLine
-                            data={this.state.dataProvider}
+                            data={dataProvider}
                             margin={{ top: 50, right: 160, bottom: 50, left: 60 }}
                             xScale={{ type: 'point' }}
                             yScale={{ type: 'linear', min: 0, max: 'auto', stacked: false, reverse: false }}
@@ -168,5 +190,9 @@ export class GadgetAttendance extends Component{
 //
 //enablePointLabel={true}
         return main;
+    }
+
+    onSelectGroup(index){
+        this.setState({selectedGroupIndex: index});
     }
 }

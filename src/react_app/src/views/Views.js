@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
-import {Navbar, NavDropdown} from 'react-bootstrap';
+import {Navbar, Nav} from 'react-bootstrap';
+import {faTachometerAlt} from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {$glVars} from '../common/common';
 import {GadgetAttendance} from './GadgetAttendance';
-import {GadgetCourseProgress} from './GadgetCourseProgress';
+import {GadgetCourseProgressOverview, GadgetCourseProgressDetailled} from './GadgetCourseProgress';
 
 export class TeacherView extends Component {
     constructor(props) {
@@ -37,21 +39,27 @@ export class TeacherView extends Component {
 
     render() {       
         let that = this;
-        let main = 
-            <div>
-                <Navbar>
-                    <Navbar.Brand href="#">{"Tableau de bord"}</Navbar.Brand>
-                    <Navbar.Collapse id="basic-navbar-nav">
-                        <NavDropdown  variant="primary" title={(this.state.selectedCourse !== null ? `Cours: ${this.state.selectedCourse.courseName}` : "Sélectionnez le cours")} id="basic-nav-dropdown" >
+        /*<NavDropdown  variant="primary" title={(this.state.selectedCourse !== null ? `Cours: ${this.state.selectedCourse.courseName}` : "Sélectionnez le cours")} id="basic-nav-dropdown" >
                             {this.state.courseList.map(function(item, index){
                                 return <NavDropdown.Item key={index} href="#" onClick={() => that.onSelectCourse(item)}>{item.courseName}</NavDropdown.Item>;
                             })}
-                        </NavDropdown>
-                    </Navbar.Collapse>
+                        </NavDropdown>*/
+        let main = 
+            <div>
+                <Navbar>
+                    <Navbar.Brand href="#"><FontAwesomeIcon icon={faTachometerAlt}/>{" Tableau de bord"}</Navbar.Brand>
+                    <Nav className="mr-auto">
+                    </Nav>
+                    <Nav>
+                        {this.state.courseList.map(function(item, index){
+                            return  <Nav.Link key={index} href={"#c"+index} onClick={() => that.onSelectCourse(item)}>{item.courseName}</Nav.Link>
+                        })}
+                    </Nav>
                 </Navbar>
                 {this.state.selectedCourse !== null ?
-                    <div style={{marginTop: 15}}>
-                        <GadgetCourseProgress courseId={this.state.selectedCourse.courseId}/>
+                    <div style={{marginTop: 15, display: "flex", flexWrap: "wrap"}}>
+                        <GadgetCourseProgressOverview courseId={this.state.selectedCourse.courseId}/>
+                        <GadgetCourseProgressDetailled courseId={this.state.selectedCourse.courseId}/>
                         <br/>
                         <GadgetAttendance courseId={this.state.selectedCourse.courseId}/>
                     </div>
