@@ -1,8 +1,8 @@
 
 import React, { Component } from 'react';
-import { Card, ButtonGroup, ButtonToolbar, Button, DropdownButton, Dropdown} from 'react-bootstrap';
+import { Card, ButtonGroup, ButtonToolbar, Button, DropdownButton, Dropdown, OverlayTrigger, Tooltip} from 'react-bootstrap';
 import { ResponsiveLine } from '@nivo/line'
-import {faSync} from '@fortawesome/free-solid-svg-icons';
+import {faSync, faInfo} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {$glVars} from '../common/common';
 import { JsNx } from '../libs/utils/Utils';
@@ -103,7 +103,13 @@ export class GadgetAttendance extends Component{
             <Card style={{flexGrow: 1, margin: 5}}>
                 <Card.Body>
                     <Card.Title style={{display: "flex", justifyContent: "space-between"}}>
-                        {"Assiduité des élèves"}
+                        <div>
+                            {"Assiduité des élèves "}
+                            <OverlayTrigger placement="right" delay={{ show: 250, hide: 400 }} overlay={<Tooltip>{`Le graphique affiche l'année et le numéro de la semaine dans l'axis X et la quantité d'heures mesurée dans le cours dans l'axis Y. Le calcul d'heures est fait selon chaque action prise par l'élève dans le cours en question. Un seuil de 5 minutes est utilisé pour compter le temps.`}</Tooltip>}>
+                                <Button size="sm" variant="outline-secondary"><FontAwesomeIcon icon={faInfo}/></Button>
+                            </OverlayTrigger>
+                        </div>
+                        
                         <ButtonToolbar aria-label="Toolbar with Buttons">
                             <ButtonGroup className="mr-2">
                             <DropdownButton as={ButtonGroup} title={(this.state.selectedGroupIndex >= 0 ? this.state.groupList[this.state.selectedGroupIndex] : "Filtrez par groupe")} 

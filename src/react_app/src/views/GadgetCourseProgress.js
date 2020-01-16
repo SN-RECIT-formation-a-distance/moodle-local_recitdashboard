@@ -93,7 +93,6 @@ export class GadgetCourseProgressOverview extends Component{
                             </DataGrid.Header>
                             <DataGrid.Body>
                                 {this.state.dataProvider.map((item, index) => {
-                                    //
                                         if(this.state.selectedGroupIndex >= 0){
                                             if(!item.groups.includes(this.state.groupList[this.state.selectedGroupIndex])){
                                                 return null;
