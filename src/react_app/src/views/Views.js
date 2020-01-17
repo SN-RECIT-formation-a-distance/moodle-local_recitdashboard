@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {Navbar, Nav} from 'react-bootstrap';
+import {Navbar, NavDropdown} from 'react-bootstrap';
 import {faTachometerAlt} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {$glVars} from '../common/common';
@@ -40,22 +40,22 @@ export class TeacherView extends Component {
 
     render() {       
         let that = this;
-        /*<NavDropdown  variant="primary" title={(this.state.selectedCourse !== null ? `Cours: ${this.state.selectedCourse.courseName}` : "Sélectionnez le cours")} id="basic-nav-dropdown" >
-                            {this.state.courseList.map(function(item, index){
-                                return <NavDropdown.Item key={index} href="#" onClick={() => that.onSelectCourse(item)}>{item.courseName}</NavDropdown.Item>;
-                            })}
-                        </NavDropdown>*/
-        let main = 
-            <div>
-                <Navbar>
-                    <Navbar.Brand href="#"><FontAwesomeIcon icon={faTachometerAlt}/>{" Tableau de bord"}</Navbar.Brand>
-                    <Nav className="mr-auto">
-                    </Nav>
+       /*<Nav className="mr-auto"></Nav>
                     <Nav>
                         {this.state.courseList.map(function(item, index){
                             return  <Nav.Link key={index} href={"#c"+index} onClick={() => that.onSelectCourse(item)}>{item.courseName}</Nav.Link>
                         })}
-                    </Nav>
+                    </Nav>*/
+        let main = 
+            <div>
+                <Navbar>
+                    <Navbar.Brand href="#"><FontAwesomeIcon icon={faTachometerAlt}/>{" Tableau de bord"}</Navbar.Brand>
+                    <NavDropdown  variant="primary" title={(this.state.selectedCourse !== null ? `Cours: ${this.state.selectedCourse.courseName}` : "Sélectionnez le cours")} id="basic-nav-dropdown" >
+                            {this.state.courseList.map(function(item, index){
+                                return <NavDropdown.Item key={index} href="#" onClick={() => that.onSelectCourse(item)}>{item.courseName}</NavDropdown.Item>;
+                            })}
+                    </NavDropdown>
+                    
                 </Navbar>
                 {this.state.selectedCourse !== null ?
                     <div style={{marginTop: 15, display: "flex", flexWrap: "wrap"}}>

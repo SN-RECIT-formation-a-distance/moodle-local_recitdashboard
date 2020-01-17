@@ -80,6 +80,11 @@ export class GadgetDiagnosticTags extends Component{
             }
 
             let item = {studentName: `${student.firstName} ${student.lastName}`};
+
+            if(JsNx.getItem(result, "studentName", item.studentName, null) !== null){
+                continue;
+            }
+
             for(let tagName of tagList){
                 let tag = JsNx.getItem(student.tags, 'tagName', tagName, {});
                 item[tagName] = JsNx.get(tag, 'value', 0);
@@ -112,33 +117,27 @@ export class GadgetDiagnosticTags extends Component{
     }
 
     render(){
-        let bodyContent = {height: 400};
-
         let tagList = this.prepareTagList(this.state.data);
         let data = this.prepareChartData(this.state.data, tagList);
 
-        // make sure parent container have a defined height when using
-        // responsive component, otherwise height will be 0 and
-        // no chart will be rendered.
-        // website examples showcase many properties,
-        // you'll often use just a few of them.
+        let bodyContent = {height: Math.max(400, data.length * 50)}; // make sure parent container have a defined height when using responsive component
 
-        const CustomCell = ({value, x, y, width, height, color, opacity, borderWidth, borderColor, textColor, onHover, onLeave}) => (            
-        <g transform={`translate(${x}, ${y})`}>
-            <path onMouseEnter={onHover} onMouseMove={onHover} onMouseLeave={onLeave}            
-                fill={this.getCellContext(value)}
-                fillOpacity={opacity}
-                strokeWidth={borderWidth}
-                stroke={borderColor}
-                d={`
-                    M${Math.round(width / 2)} -${Math.round(height / 2)}
-                    L${Math.round(width / 2)} ${Math.round(height / 2)}
-                    L-${Math.round(width / 2)} ${Math.round(height / 2)}
-                    L-${Math.round(width / 2)} -${Math.round(height / 2)}
-                `}
-            />
-            <text dominantBaseline="central" textAnchor="middle" style={{ fill: textColor, fontWeight: 500, opacity: 0.5, color: "#555" }} dy={value < 50 ? -6 : 6}>{value}</text>
-        </g>
+        const CustomCell = ({value, x, y, width, height, color, opacity, borderWidth, borderColor, textColor, onHover, onLeave}) => (
+             <g transform={`translate(${x}, ${y})`}>
+                <path onMouseEnter={onHover} onMouseMove={onHover} onMouseLeave={onLeave}            
+                    fill={this.getCellContext(value)}
+                    fillOpacity={opacity}
+                    strokeWidth={borderWidth}
+                    stroke={borderColor}
+                    d={`
+                        M${Math.round(width / 2)} -${Math.round(height / 2)}
+                        L${Math.round(width / 2)} ${Math.round(height / 2)}
+                        L-${Math.round(width / 2)} ${Math.round(height / 2)}
+                        L-${Math.round(width / 2)} -${Math.round(height / 2)}
+                    `}
+                />
+                <text dominantBaseline="central" textAnchor="middle" style={{ fill: textColor, fontWeight: 500, opacity: 0.5, color: "#555" }}>{value}</text>
+            </g>
     )
 
     
@@ -167,7 +166,7 @@ export class GadgetDiagnosticTags extends Component{
                     <div style={bodyContent}>
                         <ResponsiveHeatMap
                             cellShape={CustomCell}
-                            forceSquare={false}
+                            forceSquare={false}                            
                             data={data}
                             keys={tagList}
                             indexBy="studentName"
