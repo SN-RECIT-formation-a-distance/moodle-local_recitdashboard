@@ -6,6 +6,7 @@ import {$glVars} from '../common/common';
 import {GadgetAttendance} from './GadgetAttendance';
 import {GadgetCourseProgressOverview, GadgetCourseProgressDetailled} from './GadgetCourseProgress';
 import {GadgetDiagnosticTags} from './GadgetDiagnosticTags';
+import {GadgetGroupsOverview} from './GadgetGroupsOverview';
 
 export class TeacherView extends Component {
     constructor(props) {
@@ -59,18 +60,19 @@ export class TeacherView extends Component {
                 </Navbar>
                 {this.state.selectedCourse !== null ?
                     <div style={{marginTop: 15, display: "flex", flexWrap: "wrap"}}>
-                       <GadgetCourseProgressOverview courseId={this.state.selectedCourse.courseId}/>
-                        <GadgetCourseProgressDetailled courseId={this.state.selectedCourse.courseId}/>
-                        <br/>
-                        <GadgetAttendance courseId={this.state.selectedCourse.courseId}/>
-                        <br/>
-                        <GadgetDiagnosticTags courseId={this.state.selectedCourse.courseId}/>
+                        <GadgetGroupsOverview  courseId={this.state.selectedCourse.courseId}/>                       
+                        
                     </div>
                 :
                     null
                 }
             </div>;
-            
+            /*<GadgetCourseProgressOverview courseId={this.state.selectedCourse.courseId}/>
+                        <GadgetCourseProgressDetailled courseId={this.state.selectedCourse.courseId}/>
+                        <br/>
+                        <GadgetAttendance courseId={this.state.selectedCourse.courseId}/>
+                        <br/>
+                        <GadgetDiagnosticTags courseId={this.state.selectedCourse.courseId}/>*/
         return (main);
     }
 

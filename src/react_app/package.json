@@ -17,6 +17,7 @@
     "@fortawesome/react-fontawesome": "0.1.7",
     "@nivo/heatmap": "0.61.0",
     "@nivo/line": "0.60.1",
+    "@nivo/pie": "0.61.1",
     "bootstrap": "4.3.1",
     "date-fns": "2.7.0",
     "prop-types": "15.7.2",

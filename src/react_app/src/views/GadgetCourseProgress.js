@@ -123,12 +123,12 @@ export class GadgetCourseProgressOverview extends Component{
     }
 
     getProgressColor(item){
-        let threshold = 0.02; // 2%
+        let threshold = 0.05;
 
         if(item.pctTime < item.pctWork){
             return "success";
         }
-        else if(item.pctTime + (item.pctTime* threshold) < item.pctWork){
+        else if(item.pctTime < item.pctWork + (item.pctWork * threshold)){
             return "warning";
         }
         else{
