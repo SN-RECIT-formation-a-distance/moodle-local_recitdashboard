@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {Navbar, NavDropdown} from 'react-bootstrap';
+import {Navbar, NavDropdown, Nav} from 'react-bootstrap';
 import {faTachometerAlt} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {$glVars} from '../common/common';
@@ -15,8 +15,10 @@ export class TeacherView extends Component {
         this.getData = this.getData.bind(this);
         this.getDataResult = this.getDataResult.bind(this);
         this.onSelectCourse = this.onSelectCourse.bind(this);
+        this.onSelectGroup = this.onSelectGroup.bind(this);
+        this.onUnselectGroup = this.onUnselectGroup.bind(this);
 
-        this.state = {courseList: [], selectedCourse: null};
+        this.state = {courseList: [], selectedCourse: null, selectedGroup: null};
     }
 
     componentDidMount(){
@@ -56,28 +58,41 @@ export class TeacherView extends Component {
                                 return <NavDropdown.Item key={index} href="#" onClick={() => that.onSelectCourse(item)}>{item.courseName}</NavDropdown.Item>;
                             })}
                     </NavDropdown>
-                    
+                    {this.state.selectedGroup !== null && <Nav.Link style={{color: "#dc3545"}} href="#" onClick={this.onUnselectGroup}>{`Groupe: ${this.state.selectedGroup} (x)`}</Nav.Link>}
                 </Navbar>
                 {this.state.selectedCourse !== null ?
-                    <div style={{marginTop: 15, display: "flex", flexWrap: "wrap"}}>
-                        <GadgetGroupsOverview  courseId={this.state.selectedCourse.courseId}/>                       
-                        
-                    </div>
+                    
+                    this.state.selectedGroup === null ? 
+                        <div style={{marginTop: 15, display: "flex", flexWrap: "wrap"}}>
+                            <GadgetGroupsOverview  courseId={this.state.selectedCourse.courseId} onSelectGroup={this.onSelectGroup}/> 
+                        </div>
+                    :
+                        <div style={{marginTop: 15, display: "flex", flexFlow: "column"}}>
+                            <GadgetCourseProgressOverview courseId={this.state.selectedCourse.courseId} group={this.state.selectedGroup}/>
+                            <br/><br/>
+                            <GadgetAttendance courseId={this.state.selectedCourse.courseId} group={this.state.selectedGroup}/>
+                            <br/><br/>
+                            <GadgetDiagnosticTags courseId={this.state.selectedCourse.courseId} group={this.state.selectedGroup}/>
+                        </div>
                 :
                     null
                 }
             </div>;
-            /*<GadgetCourseProgressOverview courseId={this.state.selectedCourse.courseId}/>
-                        <GadgetCourseProgressDetailled courseId={this.state.selectedCourse.courseId}/>
-                        <br/>
-                        <GadgetAttendance courseId={this.state.selectedCourse.courseId}/>
-                        <br/>
-                        <GadgetDiagnosticTags courseId={this.state.selectedCourse.courseId}/>*/
+            /*<GadgetCourseProgressDetailled courseId={this.state.selectedCourse.courseId}/>*/
+
         return (main);
     }
 
+    onUnselectGroup(){
+        this.setState({selectedGroup: null});
+    }
+
+    onSelectGroup(groupName){
+        this.setState({selectedGroup: groupName});
+    }
+
     onSelectCourse(item){
-        this.setState({selectedCourse: item});
+        this.setState({selectedCourse: item, selectedGroup: null});
     }
 }
 

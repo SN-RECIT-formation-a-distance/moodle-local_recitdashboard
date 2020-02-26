@@ -9,7 +9,8 @@ import { JsNx } from '../libs/utils/Utils';
 
 export class GadgetAttendance extends Component{
     static defaultProps = {        
-        courseId: 0
+        courseId: 0,
+        group: ""
     };
 
     constructor(props) {
@@ -17,10 +18,9 @@ export class GadgetAttendance extends Component{
 
         this.getData = this.getData.bind(this);
         this.getDataResult = this.getDataResult.bind(this);
-        this.onSelectGroup = this.onSelectGroup.bind(this);
         this.prepareChartData = this.prepareChartData.bind(this);
 
-        this.state = {dataProvider:[], groupList: [], selectedGroupIndex: -1};
+        this.state = {dataProvider:[]};
     }
 
     componentDidMount(){
@@ -40,31 +40,11 @@ export class GadgetAttendance extends Component{
 
     getDataResult(result){         
         if(result.success){
-            this.setState({dataProvider: result.data, groupList: this.prepareGroup(result.data), selectedGroupIndex: -1});
+            this.setState({dataProvider: result.data});
         }
         else{
             $glVars.feedback.showError($glVars.i18n.tags.appname, result.msg);
         }
-    }
-
-    prepareGroup(dataProvider){
-        let result = [];
-
-        for(let users of dataProvider){
-            for(let courseId in users){
-                let course = users[courseId];
-                for(let weekNumber in course){
-                    let tmp = course[weekNumber].groups.split(",");
-                    for(let item of tmp){
-                        JsNx.singlePush(result, item);
-                    }                 
-                    break;
-                }
-                break;
-            }
-        }
-
-        return result;
     }
 
     prepareChartData(dataProvider){
@@ -75,7 +55,7 @@ export class GadgetAttendance extends Component{
                 let course = users[courseId];
                 for(let weekNumber in course){
                     if(this.state.selectedGroupIndex >= 0){                        
-                        if(!course[weekNumber].groups.includes(this.state.groupList[this.state.selectedGroupIndex])){
+                        if(!course[weekNumber].groups.includes(this.props.group)){
                             continue;
                         }
                     }
@@ -111,16 +91,6 @@ export class GadgetAttendance extends Component{
                         </div>
                         
                         <ButtonToolbar aria-label="Toolbar with Buttons">
-                            <ButtonGroup className="mr-2">
-                            <DropdownButton as={ButtonGroup} title={(this.state.selectedGroupIndex >= 0 ? this.state.groupList[this.state.selectedGroupIndex] : "Filtrez par groupe")} 
-                                            size="sm" variant="outline-secondary" onSelect={this.onSelectGroup}>
-                                    <Dropdown.Item key={-1} eventKey={-1}>{"Tous"}</Dropdown.Item>
-                                    <Dropdown.Divider />
-                                    {this.state.groupList.map((item, index) => {
-                                        return <Dropdown.Item key={index} eventKey={index}>{item}</Dropdown.Item>
-                                    })}
-                                </DropdownButton>
-                            </ButtonGroup>
                             <ButtonGroup  >
                                 <Button  variant="outline-secondary" size="sm" onClick={this.getData}><FontAwesomeIcon icon={faSync}/></Button>
                             </ButtonGroup>
@@ -196,9 +166,5 @@ export class GadgetAttendance extends Component{
 //
 //enablePointLabel={true}
         return main;
-    }
-
-    onSelectGroup(index){
-        this.setState({selectedGroupIndex: index});
     }
 }

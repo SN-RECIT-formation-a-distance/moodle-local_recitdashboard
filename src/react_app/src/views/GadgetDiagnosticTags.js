@@ -9,7 +9,8 @@ import { JsNx } from '../libs/utils/Utils';
 
 export class GadgetDiagnosticTags extends Component{
     static defaultProps = {        
-        courseId: 0
+        courseId: 0,
+        group: ""
     };
 
     constructor(props) {
@@ -17,11 +18,10 @@ export class GadgetDiagnosticTags extends Component{
 
         this.getData = this.getData.bind(this);
         this.getDataResult = this.getDataResult.bind(this);
-        this.onSelectGroup = this.onSelectGroup.bind(this);
         this.prepareChartData = this.prepareChartData.bind(this);
         this.getCellContext = this.getCellContext.bind(this);
 
-        this.state = {data: null, cellContext: null, groupList: [], selectedGroupIndex: -1};
+        this.state = {data: null, cellContext: null};
     }
 
     componentDidMount(){
@@ -41,15 +41,11 @@ export class GadgetDiagnosticTags extends Component{
 
     getDataResult(result){         
         if(result.success){
-            this.setState({data: result.data, cellContext: result.data.htmlCellContext, groupList: this.prepareGroup(result.data), selectedGroupIndex: -1});
+            this.setState({data: result.data, cellContext: result.data.htmlCellContext});
         }
         else{
             $glVars.feedback.showError($glVars.i18n.tags.appname, result.msg);
         }
-    }
-
-    prepareGroup(dataProvider){
-        return dataProvider.groupList;
     }
 
     prepareTagList(data){
@@ -74,7 +70,7 @@ export class GadgetDiagnosticTags extends Component{
         for(let student of data.students){
             
             if(this.state.selectedGroupIndex >= 0){                        
-                if(!student.groupName.includes(this.state.groupList[this.state.selectedGroupIndex])){
+                if(!student.groupName.includes(this.props.group)){
                     continue;
                 }
             }
@@ -147,16 +143,6 @@ export class GadgetDiagnosticTags extends Component{
                     <Card.Title style={{display: "flex", justifyContent: "space-between"}}>
                         {"Diagnostic de tags"}
                         <ButtonToolbar aria-label="Toolbar with Buttons">
-                            <ButtonGroup className="mr-2">
-                            <DropdownButton as={ButtonGroup} title={(this.state.selectedGroupIndex >= 0 ? this.state.groupList[this.state.selectedGroupIndex] : "Filtrez par groupe")} 
-                                            size="sm" variant="outline-secondary" onSelect={this.onSelectGroup}>
-                                    <Dropdown.Item key={-1} eventKey={-1}>{"Tous"}</Dropdown.Item>
-                                    <Dropdown.Divider />
-                                    {this.state.groupList.map((item, index) => {
-                                        return <Dropdown.Item key={index} eventKey={index}>{item}</Dropdown.Item>
-                                    })}
-                                </DropdownButton>
-                            </ButtonGroup>
                             <ButtonGroup  >
                                 <Button  variant="outline-secondary" size="sm" onClick={this.getData}><FontAwesomeIcon icon={faSync}/></Button>
                             </ButtonGroup>

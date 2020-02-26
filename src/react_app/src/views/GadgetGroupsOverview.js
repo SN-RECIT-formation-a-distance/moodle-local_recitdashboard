@@ -2,14 +2,15 @@
 import React, { Component } from 'react';
 import { Card, ButtonGroup, ButtonToolbar, Button, OverlayTrigger, Tooltip} from 'react-bootstrap';
 import { ResponsivePie } from '@nivo/pie';
-import {faSync, faInfo} from '@fortawesome/free-solid-svg-icons';
+import {faSync, faInfo, faSearchPlus} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {$glVars} from '../common/common';
 //import { JsNx } from '../libs/utils/Utils';
 
 export class GadgetGroupsOverview extends Component{
     static defaultProps = {        
-        courseId: 0
+        courseId: 0,
+        onSelectGroup: null
     };
 
     constructor(props) {
@@ -67,9 +68,7 @@ export class GadgetGroupsOverview extends Component{
 
                     <div style={{display: "grid", gridTemplateColumns: "auto auto auto auto", gridGap: "1rem"}}>
                         {this.state.dataProvider.map((item, index) => {
-                            let groupName = (item.grades ? item.grades.groupName : item.progress.groupName);
-                            let title = (groupName.length > 0 ? `Groupe ${groupName}` : `Pas de groupe`)
-                            return <GroupChart title={title} key={index} data={item} />;
+                            return <PieChart key={index} data={item}  onSelectGroup={this.props.onSelectGroup} />;
                         })}
                     </div>
                 </Card.Body>
@@ -78,16 +77,21 @@ export class GadgetGroupsOverview extends Component{
     }
 }
 
-class GroupChart extends Component{
+class PieChart extends Component{
     static defaultProps = {        
-        title: "",
-        data: []
+        data: null,
+        onSelectGroup: null
     };
 
     render(){
+        let groupName = (this.props.data.grades ? this.props.data.grades.groupName : this.props.data.progress.groupName);
+        let title = (groupName.length > 0 ? `Groupe ${groupName}` : `Pas de groupe`)
+
         let main = 
             <div style={{border: "1px solid #efefef"}}>
-                <h5 style={{marginTop: 10, marginLeft: 10}}>{this.props.title}</h5>
+                <h5 style={{marginTop: 10, marginLeft: 10}}>{title}<Button  size="sm" variant="link" onClick={() => this.props.onSelectGroup(groupName)}>
+                    <FontAwesomeIcon icon={faSearchPlus}/></Button>
+                </h5>
                 {this.getChart(this.props.data.progress)}
                 {this.getChart(this.props.data.grades)}
                 <div style={{textAlign: "center", fontWeight: 500}}>Progrès / Notes</div>
