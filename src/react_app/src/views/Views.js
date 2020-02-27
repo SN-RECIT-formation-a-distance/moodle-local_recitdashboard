@@ -4,9 +4,10 @@ import {faTachometerAlt} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {$glVars} from '../common/common';
 import {GadgetAttendance} from './GadgetAttendance';
-import {GadgetCourseProgressOverview, GadgetCourseProgressDetailled} from './GadgetCourseProgress';
+import {GadgetCourseProgressOverview} from './GadgetCourseProgress';
 import {GadgetDiagnosticTags} from './GadgetDiagnosticTags';
 import {GadgetGroupsOverview} from './GadgetGroupsOverview';
+import {GadgetStudentRadar} from './GadgetStudentRadar';
 
 export class TeacherView extends Component {
     constructor(props) {
@@ -65,6 +66,7 @@ export class TeacherView extends Component {
                     this.state.selectedGroup === null ? 
                         <div style={{marginTop: 15, display: "flex", flexWrap: "wrap"}}>
                             <GadgetGroupsOverview  courseId={this.state.selectedCourse.courseId} onSelectGroup={this.onSelectGroup}/> 
+                            <GadgetStudentRadar  courseId={this.state.selectedCourse.courseId} onSelectGroup={this.onSelectGroup}/> 
                         </div>
                     :
                         <div style={{marginTop: 15, display: "flex", flexFlow: "column"}}>

@@ -126,6 +126,10 @@ class PieChart extends Component{
         return result;
     }
 
+    formatValue(v){
+        return `${v.value.toFixed(1)}%`;
+    }
+
     getChart(data){
         data = data || null;
 
@@ -151,6 +155,8 @@ class PieChart extends Component{
         radialLabelsLinkColor={{ from: 'color' }}
         slicesLabelsSkipAngle={10}
         slicesLabelsTextColor="#333333"
+        enableSlicesLabels={true}
+        sliceLabel={this.formatValue}
         animate={true}
         motionStiffness={90}
         motionDamping={15}
