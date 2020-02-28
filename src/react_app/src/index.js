@@ -8,7 +8,7 @@ import {UtilsMoodle} from "./libs/utils/Utils";
 import {TeacherView, StudentView} from "./views/Views";
 import {$glVars} from "./common/common";
 export * from "./common/i18n";
- 
+
 class App extends Component {
     static defaultProps = {
         signedUser: null
