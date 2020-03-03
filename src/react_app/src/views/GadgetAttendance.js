@@ -10,7 +10,7 @@ import { JsNx } from '../libs/utils/Utils';
 export class GadgetAttendance extends Component{
     static defaultProps = {        
         courseId: 0,
-        group: ""
+        groupId: ""
     };
 
     constructor(props) {
@@ -28,14 +28,14 @@ export class GadgetAttendance extends Component{
     }
 
     componentDidUpdate(prevProps){
-       // Typical usage (don't forget to compare props):
-       if (this.props.courseId !== prevProps.courseId) {
+        // Typical usage (don't forget to compare props):
+        if((this.props.courseId !== prevProps.courseId) || (this.props.groupId !== prevProps.groupId)){
             this.getData();
         }
     }
 
     getData(){
-        $glVars.webApi.getCourseAttendance(this.props.courseId, this.getDataResult);        
+        $glVars.webApi.getCourseAttendance(this.props.courseId, this.props.groupId, this.getDataResult);        
     }
 
     getDataResult(result){         

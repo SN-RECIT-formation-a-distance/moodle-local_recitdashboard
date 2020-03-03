@@ -9,7 +9,8 @@ import {$glVars} from '../common/common';
 export class GadgetStudentRadar extends Component{
     static defaultProps = {        
         courseId: 0,
-        onSelectGroup: null
+        onSelectGroup: null,
+        onSelectUser: null
     };
 
     constructor(props) {
@@ -67,7 +68,7 @@ export class GadgetStudentRadar extends Component{
 
                     <div style={{display: "grid", gridTemplateColumns: "auto auto auto", gridGap: "1rem"}}>
                         {this.state.dataProvider.map((item, index) => {
-                            return <GroupItem key={index} data={item}  onSelectGroup={this.props.onSelectGroup} />;
+                            return <GroupItem key={index} data={item}  onSelectGroup={this.props.onSelectGroup} onSelectUser={this.props.onSelectUser} />;
                         })}
                     </div>
                 </Card.Body>
@@ -80,7 +81,8 @@ export class GadgetStudentRadar extends Component{
 class GroupItem extends Component{
     static defaultProps = {        
         data: null,
-        onSelectGroup: null
+        onSelectGroup: null,
+        onSelectUser: null
     };
 
     render(){
@@ -88,12 +90,12 @@ class GroupItem extends Component{
 
         let main = 
             <div style={{border: "1px solid #efefef"}}>
-                <h5 style={{marginTop: 10, marginLeft: 10}}>{title}<Button  size="sm" variant="link" onClick={() => this.props.onSelectGroup(this.props.data.groupName)}>
+                <h5 style={{marginTop: 10, marginLeft: 10}}>{title}<Button  size="sm" variant="link" onClick={() => this.props.onSelectGroup({id: this.props.data.groupId, name: this.props.data.groupName})}>
                     <FontAwesomeIcon icon={faSearchPlus}/></Button>
                 </h5>
                 {this.props.data.students.map((item, index) => {
                     let row = <div key={index} style={{display: "grid", gridTemplateColumns: "50% auto auto auto auto auto", marginBottom: ".2rem", padding: ".5rem"}}>
-                                <div>{item.studentName}</div>
+                                <div><a href="#" onClick={() => this.props.onSelectUser({id: item.userId, name: item.studentName})}>{item.studentName}</a></div>
                                 <div><Button size="sm" variant={(item.contractSigned === 1 ? 'outline-success' : 'outline-danger')} title='Signature du contrat'><FontAwesomeIcon icon={faFileSignature}/></Button></div>
                                 <div><Button size="sm" variant={(item.newStudent === 0 ? 'outline-success' : 'outline-danger')} title="Nouveau élève"><FontAwesomeIcon icon={faUserPlus}/></Button></div>
                                 <div><Button size="sm" variant={(item.extendedAbsence === 0 ? 'outline-success' : 'outline-danger')} title="Absence prolongée (dernier accès plus de 5 jours)"><FontAwesomeIcon icon={faUserClock}/></Button></div>

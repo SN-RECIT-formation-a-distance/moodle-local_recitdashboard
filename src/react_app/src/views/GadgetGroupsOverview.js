@@ -84,12 +84,12 @@ class PieChart extends Component{
     };
 
     render(){
-        let groupName = (this.props.data.grades ? this.props.data.grades.groupName : this.props.data.progress.groupName);
-        let title = (groupName.length > 0 ? `Groupe ${groupName}` : `Pas de groupe`)
+        let item = this.props.data.grades || this.props.data.progress;
+        let title = (item.group.name.length > 0 ? `Groupe ${item.group.name}` : `Pas de groupe`)
 
         let main = 
             <div style={{border: "1px solid #efefef"}}>
-                <h5 style={{marginTop: 10, marginLeft: 10}}>{title}<Button  size="sm" variant="link" onClick={() => this.props.onSelectGroup(groupName)}>
+                <h5 style={{marginTop: 10, marginLeft: 10}}>{title}<Button  size="sm" variant="link" onClick={() => this.props.onSelectGroup({id: item.group.id, name: item.group.name})}>
                     <FontAwesomeIcon icon={faSearchPlus}/></Button>
                 </h5>
                 {this.getChart(this.props.data.progress)}

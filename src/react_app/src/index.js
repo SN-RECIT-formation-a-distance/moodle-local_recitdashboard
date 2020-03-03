@@ -35,10 +35,10 @@ class App extends Component {
     }
 
     render() {  
-        //{this.state.mode  === 't' ? <TeacherView/> : <StudentView/>}     
+        
         let main =
             <div>
-                 <TeacherView/>
+                {this.state.mode  === 't' ? <TeacherView/> : <StudentView/>}     
                 {$glVars.feedback.msg.map((item, index) => {  
                     return (<VisualFeedback key={index} id={index} msg={item.msg} type={item.type} title={item.title} timeout={item.timeout}/>);                                    
                 })}

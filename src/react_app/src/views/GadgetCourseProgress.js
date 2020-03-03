@@ -9,7 +9,8 @@ import {$glVars} from '../common/common';
 export class GadgetCourseProgressOverview extends Component{
     static defaultProps = {        
         courseId: 0,
-        group: ""
+        groupId: 0,
+        onSelectUser: null
     };
 
     constructor(props) {
@@ -17,10 +18,8 @@ export class GadgetCourseProgressOverview extends Component{
 
         this.getData = this.getData.bind(this);
         this.getDataResult = this.getDataResult.bind(this);
-        this.onSelectUser = this.onSelectUser.bind(this);
-        this.onUnselectUser = this.onUnselectUser.bind(this);
 
-        this.state = {dataProvider: [], selectedStudentId: 0};
+        this.state = {dataProvider: []};
     }
 
     componentDidMount(){
@@ -29,20 +28,18 @@ export class GadgetCourseProgressOverview extends Component{
 
     componentDidUpdate(prevProps){
        // Typical usage (don't forget to compare props):
-       if (this.props.courseId !== prevProps.courseId) {
+        if((this.props.courseId !== prevProps.courseId) || (this.props.groupId !== prevProps.groupId)){
             this.getData();
         }
     }
 
     getData(){
-        $glVars.webApi.getCourseProgressionOverview(this.props.courseId, this.getDataResult);        
+        $glVars.webApi.getCourseProgressionOverview(this.props.courseId, this.props.groupId, this.getDataResult);        
     }
 
     getDataResult(result){         
         if(result.success){
-            let dataProvider = result.data;
-
-            this.setState({dataProvider: dataProvider});
+            this.setState({dataProvider: result.data});
         }
         else{
             $glVars.feedback.showError($glVars.i18n.tags.appname, result.msg);
@@ -76,13 +73,10 @@ export class GadgetCourseProgressOverview extends Component{
                             </DataGrid.Header>
                             <DataGrid.Body>
                                 {this.state.dataProvider.map((item, index) => {
-                                        if(!item.groups.includes(this.props.group)){
-                                            return null;
-                                        }
                                         let row = 
-                                            <DataGrid.Body.Row key={index} onDbClick={() => this.onSelectUser(item.userId)}>
+                                            <DataGrid.Body.Row key={index} onDbClick={() => this.props.onSelectUser({id: item.userId, name: item.studentName})}>
                                                 <DataGrid.Body.Cell>{index + 1}</DataGrid.Body.Cell>
-                                                <DataGrid.Body.Cell sortValue={item.studentName}><Button variant='link' onClick={() => this.onSelectUser(item.userId)}>{item.studentName}</Button></DataGrid.Body.Cell>
+                                                <DataGrid.Body.Cell sortValue={item.studentName}><Button variant='link' onClick={() => this.props.onSelectUser({id: item.userId, name: item.studentName})}>{item.studentName}</Button></DataGrid.Body.Cell>
                                                 <DataGrid.Body.Cell sortValue={item.pctWork.toString()} style={{textAlign: "center"}}>
                                                 <OverlayTrigger placement="right" delay={{ show: 250, hide: 400 }}
                                                     overlay={<Tooltip>{`Temps: ${item.pctTime}%  | Travail: ${item.pctWork}%`}</Tooltip>}>
@@ -118,21 +112,12 @@ export class GadgetCourseProgressOverview extends Component{
             return "danger";
         }
     }
-
-    onUnselectUser(){
-        this.setState({selectedStudentId: 0})
-    }
-
-    onSelectUser(studentId){
-        this.setState({selectedStudentId: studentId})
-    }
 }
 
 export class GadgetCourseProgressDetailled extends Component{
     static defaultProps = {        
         courseId: 0,
-        studentId: 0,
-        onUnselectUser: null
+        userId: 0
     };
 
     constructor(props) {
@@ -172,7 +157,7 @@ export class GadgetCourseProgressDetailled extends Component{
                 $glVars.feedback.showError($glVars.i18n.tags.appname, result.msg);
             }
         }
-        $glVars.webApi.getCourseProgressionDetails(this.props.courseId, this.props.studentId, callback);     
+        $glVars.webApi.getCourseProgressionDetails(this.props.courseId, this.props.userId, callback);     
     }
 
     render() {    
@@ -188,7 +173,6 @@ export class GadgetCourseProgressDetailled extends Component{
                         <span>{`Détails de la progression: ${studentName}`}</span>
                         <ButtonToolbar aria-label="Toolbar with Buttons">
                             <ButtonGroup className="mr-2">
-                                <Button size='sm' variant='outline-secondary' onClick={this.props.onUnselectUser}> <FontAwesomeIcon icon={faArrowLeft}/></Button>
                                 <DropdownButton as={ButtonGroup} title={(this.state.selectedSectionIndex >= 0 ? this.state.sectionList[this.state.selectedSectionIndex].text : "Filtrez par section")} 
                                                 size="sm" variant="outline-secondary" onSelect={this.onSelectSection}>
                                     <Dropdown.Item key={-1} eventKey={-1}>{"Toutes"}</Dropdown.Item>
