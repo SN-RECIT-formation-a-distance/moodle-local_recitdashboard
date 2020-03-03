@@ -170,7 +170,7 @@ export class GadgetCourseProgressDetailled extends Component{
             <Card style={{flexGrow: 1, margin: 5}}>
                 <Card.Body>
                     <Card.Title style={{display: "flex", justifyContent: "space-between"}}>
-                        <span>{`Détails de la progression: ${studentName}`}</span>
+                        <span>{`Détails de la progression`}</span>
                         <ButtonToolbar aria-label="Toolbar with Buttons">
                             <ButtonGroup className="mr-2">
                                 <DropdownButton as={ButtonGroup} title={(this.state.selectedSectionIndex >= 0 ? this.state.sectionList[this.state.selectedSectionIndex].text : "Filtrez par section")} 
