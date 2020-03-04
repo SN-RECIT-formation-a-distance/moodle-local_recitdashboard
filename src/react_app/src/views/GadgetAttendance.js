@@ -10,7 +10,7 @@ import { JsNx } from '../libs/utils/Utils';
 export class GadgetAttendance extends Component{
     static defaultProps = {        
         courseId: 0,
-        groupId: ""
+        groupId: 0
     };
 
     constructor(props) {

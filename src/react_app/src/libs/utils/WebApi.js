@@ -76,8 +76,10 @@ export class HttpRequest
     }
 
     onLoad(event){
+        let statusList = [200, 500];
+
         if (event.target.readyState === 4) {
-            if (event.target.status === 200) {
+            if (statusList.includes(event.target.status)) {
                 let result = null;
         
                 try{               
@@ -134,7 +136,7 @@ export class WebApi
         this.onComplete = this.onComplete.bind(this);
     }
     
-    onError = function (jqXHR, textStatus) {
+    onError(jqXHR, textStatus) {
         alert("Error on server communication ("+ textStatus +").\n\nSee console for more details");
         console.log(jqXHR);
     };

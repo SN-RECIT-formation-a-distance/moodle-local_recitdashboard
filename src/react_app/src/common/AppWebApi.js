@@ -50,9 +50,9 @@ export class AppWebApi extends WebApi
         this.post(this.gateway, data, onSuccess);
     }
 
-    getReportDiagTag(courseId, groupId, onSuccess){
+    getReportDiagTag(courseId, groupId, userId, onSuccess){
         groupId = groupId || 0;
-        let data = {courseId: courseId, cmId: 0, userId:0, groupId: groupId, service: "getReportDiagTag"};
+        let data = {courseId: courseId, cmId: 0, userId:userId, groupId: groupId, service: "getReportDiagTag"};
         this.post(this.gateway, data, onSuccess);
     }
 
@@ -66,8 +66,9 @@ export class AppWebApi extends WebApi
         this.post(this.gateway, data, onSuccess);
     }
 
-    getStudentRadar(courseId, onSuccess){
-        let data = {courseId: courseId, service: "getStudentRadar"};
+    getStudentRadar(courseId, userId, onSuccess){
+        userId = userId || 0;
+        let data = {courseId: courseId, userId: userId, service: "getStudentRadar"};
         this.post(this.gateway, data, onSuccess);
     }
     

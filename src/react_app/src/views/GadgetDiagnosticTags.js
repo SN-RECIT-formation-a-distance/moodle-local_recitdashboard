@@ -10,7 +10,8 @@ import { JsNx } from '../libs/utils/Utils';
 export class GadgetDiagnosticTags extends Component{
     static defaultProps = {        
         courseId: 0,
-        groupId: 0
+        groupId: 0,
+        userId: 0
     };
 
     constructor(props) {
@@ -36,7 +37,7 @@ export class GadgetDiagnosticTags extends Component{
     }
 
     getData(){
-        $glVars.webApi.getReportDiagTag(this.props.courseId, this.props.groupId, this.getDataResult);        
+        $glVars.webApi.getReportDiagTag(this.props.courseId, this.props.groupId, this.props.userId, this.getDataResult);        
     }
 
     getDataResult(result){         
