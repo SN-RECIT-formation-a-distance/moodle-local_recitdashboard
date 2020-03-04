@@ -57,7 +57,7 @@ export class GadgetStudentRadar extends Component{
 
         if(this.props.userId === 0){
             result = 
-                <Card.Title style={{display: "flex", justifyContent: "space-between"}}>
+                <Card.Title>
                     <div>
                         {"Élèves requèrant attention particulière "}
                         <OverlayTrigger placement="right" delay={{ show: 250, hide: 400 }} overlay={<Tooltip>{`En cliquant sur le groupe on obtient une vue détaillée des données du group`}</Tooltip>}>
@@ -82,10 +82,10 @@ export class GadgetStudentRadar extends Component{
 
         if(this.props.userId === 0){
             result = 
-            <Card style={{flexGrow: 1, margin: 5}}>
+            <Card className='gadget-student-radar'>
                 <Card.Body>
                     {this.getTitle()}
-                    <div style={{display: "grid", gridTemplateColumns: "auto auto auto", gridGap: "1rem"}}>
+                    <div className='content'>
                         {this.state.dataProvider.map((item, index) => {
                             return <GroupView key={index} data={item}  onSelectGroup={this.props.onSelectGroup} onSelectUser={this.props.onSelectUser} />;
                         })}
@@ -166,14 +166,14 @@ class GroupView extends AView{
         let title = (this.props.data.groupName.length > 0 ? `Groupe ${this.props.data.groupName}` : `Pas de groupe`)
 
         let main = 
-            <div style={{border: "1px solid #efefef"}}>
+            <div className='item'>
                 {this.props.onSelectGroup !== null &&
-                    <h5 style={{marginTop: 10, marginLeft: 10}}>{title}<Button  size="sm" variant="link" onClick={() => this.props.onSelectGroup({id: this.props.data.groupId, name: this.props.data.groupName})}>
+                    <h5 className='item-title'>{title}<Button  size="sm" variant="link" onClick={() => this.props.onSelectGroup({id: this.props.data.groupId, name: this.props.data.groupName})}>
                         <FontAwesomeIcon icon={faSearchPlus}/></Button>
                     </h5>
                 }
                 {this.props.data.students.map((item, index) => {
-                    let row = <div key={index} style={{display: "grid", gridTemplateColumns: "50% auto auto auto auto auto", marginBottom: ".2rem", padding: ".5rem"}}>
+                    let row = <div key={index} className='visual-data'>
                                 <div><a href="#" onClick={() => this.props.onSelectUser({id: item.userId, name: item.studentName})}>{item.studentName}</a></div>
                                 {this.getContractSigned(item)}
                                 {this.getNewStudent(item)}

@@ -1,0 +1,95 @@
+.gadget-groups-overview{
+    flex-grow: 1; margin: 5px;
+    .card-title{display: flex; justify-content: space-between;}
+    .content{
+        display: grid; grid-template-columns: auto auto auto; grid-gap: 1rem;
+        .item{
+            border: 1px solid #efefef;
+            .item-title{margin-top: 10px; margin-left: 10px}
+            .charts{
+                display: flex; justify-content: space-around;
+                .item-chart{height: 180px; width: 180px;}
+            }
+            .item-desc{text-align: center; font-weight: 500}
+        }
+    }
+}
+
+.gadget-student-radar{
+    flex-grow: 1; margin: 5px;
+    .card-title{display: flex; justify-content: space-between;}
+    .content{
+        display: grid; grid-template-columns: auto auto auto; grid-gap: 1rem;
+        .item{
+            border: 1px solid #efefef;
+            .item-title{margin-top: 10px; margin-left: 10px}
+            .visual-data{
+                display: grid; grid-template-columns: 45% auto auto auto auto auto; margin-bottom: .2rem; padding: .5rem;
+            }
+        }
+    }
+}
+
+/**********************************************************
+/ tablets layout
+/*********************************************************/
+@media screen and (min-width: 868px) and (max-width: 1215px){
+    .gadget-groups-overview{
+        .content{
+            grid-template-columns: auto auto;
+        }
+    }
+
+    .gadget-student-radar{
+        .content{
+            grid-template-columns: auto auto;
+        }
+    }
+}
+
+/**********************************************************
+/ tablets layout
+/*********************************************************/
+@media screen and (min-width: 500px) and (max-width: 867px){
+    .gadget-groups-overview{
+        .content{
+            grid-template-columns: auto;
+        }
+    }
+
+    .gadget-student-radar{
+        .content{
+            grid-template-columns: auto;
+        }
+    }
+}
+
+/**********************************************************
+/ Smartphone layout
+/*********************************************************/
+@media screen and (max-width: 499px){
+    .gadget-groups-overview{
+        .content{
+            grid-template-columns: auto;
+            .item{
+                .charts{
+                    display: flex; align-items: center; flex-direction: column;
+                }
+            }
+        }
+    }
+
+    .gadget-student-radar{
+        .content{
+            grid-template-columns: auto;
+            .item{
+                .visual-data{
+                    grid-template-columns: auto auto auto auto auto auto; grid-template-rows: auto auto;
+                }
+
+                .visual-data div:first-child{grid-column-start: 1; grid-column-end: 7;}
+            }
+        }
+    }
+}
+

@@ -157,19 +157,19 @@ export class GadgetDiagnosticTags extends Component{
                             data={data}
                             keys={tagList}
                             indexBy="studentName"
-                            margin={{ top: 150, right: 0, bottom: 0, left: 150 }}
+                            margin={{ top: 20, right: 0, bottom: 0, left: 20 }}
                             padding={5}
-                            axisTop={{ orient: 'top', tickSize: 5, tickPadding: 5, tickRotation: -90, legend: '', legendOffset: 36 }}
+                            axisTop={{ orient: 'top', tickSize: 5, tickPadding: 5, tickRotation: 0, legend: '', legendOffset: 0 }}
                             axisRight={null}
                             axisBottom={null}
                             axisLeft={{
-                                orient: 'left',
+                                orient: 'top',
                                 tickSize: 5,
                                 tickPadding: 5,
-                                tickRotation: 0,
+                                tickRotation: -90,
                                 legend: '',
                                 legendPosition: 'middle',
-                                legendOffset: -40
+                                legendOffset: 0
                             }}
                             cellOpacity={1}
                             cellBorderColor={{ from: 'color', modifiers: [ [ 'darker', 0.4 ] ] }}

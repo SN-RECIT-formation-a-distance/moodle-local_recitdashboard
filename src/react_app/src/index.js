@@ -7,6 +7,7 @@ import {VisualFeedback, Loading} from "./libs/components/Components";
 import {UtilsMoodle} from "./libs/utils/Utils";
 import {TeacherView, StudentView} from "./views/Views";
 import {$glVars} from "./common/common";
+import "./common/style.scss";
 export * from "./common/i18n";
 
 class App extends Component {

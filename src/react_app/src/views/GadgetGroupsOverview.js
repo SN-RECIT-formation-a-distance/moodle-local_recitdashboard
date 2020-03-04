@@ -49,9 +49,9 @@ export class GadgetGroupsOverview extends Component{
     render(){
         
         let main =
-            <Card style={{flexGrow: 1, margin: 5}}>
+            <Card className="gadget-groups-overview">
                 <Card.Body>
-                    <Card.Title style={{display: "flex", justifyContent: "space-between"}}>
+                    <Card.Title>
                         <div>
                             {"Aperçu rapide de mes groupes "}
                             <OverlayTrigger placement="right" delay={{ show: 250, hide: 400 }} overlay={<Tooltip>{`En cliquant sur le groupe on obtient une vue détaillée des données du group`}</Tooltip>}>
@@ -66,7 +66,7 @@ export class GadgetGroupsOverview extends Component{
                         </ButtonToolbar>                              
                     </Card.Title>
 
-                    <div style={{display: "grid", gridTemplateColumns: "auto auto auto auto", gridGap: "1rem"}}>
+                    <div className="content">
                         {this.state.dataProvider.map((item, index) => {
                             return <PieChart key={index} data={item}  onSelectGroup={this.props.onSelectGroup} />;
                         })}
@@ -88,13 +88,15 @@ class PieChart extends Component{
         let title = (item.group.name.length > 0 ? `Groupe ${item.group.name}` : `Pas de groupe`)
 
         let main = 
-            <div style={{border: "1px solid #efefef"}}>
-                <h5 style={{marginTop: 10, marginLeft: 10}}>{title}<Button  size="sm" variant="link" onClick={() => this.props.onSelectGroup({id: item.group.id, name: item.group.name})}>
+            <div className='item'>
+                <h5 className='item-title'>{title}<Button  size="sm" variant="link" onClick={() => this.props.onSelectGroup({id: item.group.id, name: item.group.name})}>
                     <FontAwesomeIcon icon={faSearchPlus}/></Button>
                 </h5>
-                {this.getChart(this.props.data.progress)}
-                {this.getChart(this.props.data.grades)}
-                <div style={{textAlign: "center", fontWeight: 500}}>Progrès / Notes</div>
+                <div className='charts'>
+                    {this.getChart(this.props.data.progress)}
+                    {this.getChart(this.props.data.grades)}
+                </div>
+                <div className='item-desc'>Progrès / Notes</div>
             </div>;
         return main;
     }
@@ -212,6 +214,6 @@ class PieChart extends Component{
         legends={[]}
         />;
 
-        return <div style={{height: 180, width: 180, display: 'inline-flex'}}>{result}</div>;
+        return <div className='item-chart'>{result}</div>;
     }
 }
