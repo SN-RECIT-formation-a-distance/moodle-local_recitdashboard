@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import {Navbar, NavDropdown, Nav, Form, FormControl, InputGroup} from 'react-bootstrap';
 import {faTachometerAlt, faSearch} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {DataGrid} from '../libs/components/Components';
 import {$glVars} from '../common/common';
 import {GadgetAttendance} from './GadgetAttendance';
 import {GadgetCourseProgressOverview, GadgetCourseProgressDetailled} from './GadgetCourseProgress';
@@ -18,10 +19,10 @@ export class TeacherView extends Component {
         this.onUnselectGroup = this.onUnselectGroup.bind(this);
         this.onSelectUser = this.onSelectUser.bind(this);
         this.onUnselectUser = this.onUnselectUser.bind(this);
-       // this.onChangeSearch = this.onChangeSearch.bind(this);
-       // this.onSearch = this.onSearch.bind(this);
+        this.onChangeSearch = this.onChangeSearch.bind(this);
+        this.onSearch = this.onSearch.bind(this);
 
-        this.state = {courseList: [], selectedCourse: null, selectedGroup: null, selectedUser: null}; //querySearch: ""};
+        this.state = {courseList: [], selectedCourse: null, selectedGroup: null, selectedUser: null, querySearch: "", queryResult: null};
     }
 
     render() {       
@@ -29,70 +30,93 @@ export class TeacherView extends Component {
             <div>
                 <DashboardNavBar course={this.state.selectedCourse} onSelectCourse={this.onSelectCourse}>
                     {this.state.selectedGroup !== null && <Nav.Link style={{color: "#dc3545"}} href="#" onClick={this.onUnselectGroup}>{`Groupe: ${this.state.selectedGroup.name} (x)`}</Nav.Link>}
-                    {this.state.selectedUser !== null && <Nav.Link style={{color: "#dc3545"}} href="#" onClick={this.onUnselectUser}>{`Élève: ${this.state.selectedUser.name} (x)`}</Nav.Link>}                   
+                    {this.state.selectedUser !== null && <Nav.Link style={{color: "#dc3545"}} href="#" onClick={this.onUnselectUser}>{`Élève: ${this.state.selectedUser.name} (x)`}</Nav.Link>}
+                    <Form inline>
+                        <InputGroup className="mb-0">
+                            <FormControl placeholder="Recherchez un élève..." aria-label="Recherchez un élève..." aria-describedby="search" value={this.state.querySearch} 
+                                            onChange={this.onChangeSearch} onKeyPress={this.onSearch} disabled={this.state.selectedCourse === null}/>
+                            <InputGroup.Append>
+                                <InputGroup.Text id="basic-addon2"> <FontAwesomeIcon icon={faSearch}/></InputGroup.Text>
+                            </InputGroup.Append>
+                        </InputGroup>
+                    </Form>
                 </DashboardNavBar>
                 
-                {this.state.selectedCourse !== null ?
-                    
-                    this.state.selectedUser !== null ? 
-                        <StudentGadgets courseId={this.state.selectedCourse.courseId} userId={this.state.selectedUser.id}/> 
+                {this.state.queryResult !== null ?
+                    <DataGrid orderBy={true}>
+                        <DataGrid.Header>
+                            <DataGrid.Header.Row>
+                                <DataGrid.Header.Cell style={{width: 70}}>{"#"}</DataGrid.Header.Cell>
+                                <DataGrid.Header.Cell style={{width: 70}}>{"ID"}</DataGrid.Header.Cell>
+                                <DataGrid.Header.Cell>{"Élève"}</DataGrid.Header.Cell>
+                            </DataGrid.Header.Row>
+                        </DataGrid.Header>
+                        <DataGrid.Body>
+                            {this.state.queryResult.map((item, index) => {
+                                    let row = 
+                                        <DataGrid.Body.Row key={index}>
+                                            <DataGrid.Body.Cell>{index + 1}</DataGrid.Body.Cell>
+                                            <DataGrid.Body.Cell>{item.userId}</DataGrid.Body.Cell>
+                                            <DataGrid.Body.Cell sortValue={item.username}><a href='#' onClick={() => this.onSelectUser({id: item.userId, name: item.username})}>{item.username}</a></DataGrid.Body.Cell>
+                                        </DataGrid.Body.Row>
+                                    return (row);                                    
+                                }
+                            )}
+                        </DataGrid.Body>
+                    </DataGrid>
                     :
-                        this.state.selectedGroup === null ? 
-                            <TeacherCourseView courseId={this.state.selectedCourse.courseId} onSelectGroup={this.onSelectGroup} onSelectUser={this.onSelectUser}/>
+                    this.state.selectedCourse !== null ?
+                    
+                        this.state.selectedUser !== null ? 
+                            <StudentGadgets courseId={this.state.selectedCourse.courseId} userId={this.state.selectedUser.id}/> 
                         :
-                            <TeacherGroupView  courseId={this.state.selectedCourse.courseId} groupId={this.state.selectedGroup.id} onSelectUser={this.onSelectUser}/>
-                :
-                    null
-                }
+                            this.state.selectedGroup === null ? 
+                                <TeacherCourseView courseId={this.state.selectedCourse.courseId} onSelectGroup={this.onSelectGroup} onSelectUser={this.onSelectUser}/>
+                            :
+                                <TeacherGroupView  courseId={this.state.selectedCourse.courseId} groupId={this.state.selectedGroup.id} onSelectUser={this.onSelectUser}/>
+                    :
+                        null
+                }                
             </div>;
 
         return (main);
     }
 
-    /* <Form inline>
-                        <InputGroup className="mb-0">
-                            <FormControl placeholder="Recherchez un élève..." aria-label="Recherchez un élève..." aria-describedby="search" value={this.state.querySearch} 
-                                            onChange={this.onChangeSearch} onKeyPress={this.onSearch}/>
-                            <InputGroup.Append>
-                                <InputGroup.Text id="basic-addon2"> <FontAwesomeIcon icon={faSearch}/></InputGroup.Text>
-                            </InputGroup.Append>
-                        </InputGroup>
-                    </Form>*/
-
     onSelectCourse(item){
-        this.setState({selectedCourse: item, selectedGroup: null});
+        this.setState({selectedCourse: item, selectedGroup: null, querySearch: "", queryResult: null});
     }
     
     onUnselectGroup(){
-        this.setState({selectedGroup: null});
+        this.setState({selectedGroup: null, querySearch: "", queryResult: null});
     }
 
     onSelectGroup(group){
-        this.setState({selectedGroup: group});
+        this.setState({selectedGroup: group, querySearch: "", queryResult: null});
     }
 
     onSelectUser(user){
-        this.setState({selectedUser: user});
+        this.setState({selectedUser: user, querySearch: "", queryResult: null});
     }
 
     onUnselectUser(){
-        this.setState({selectedUser: null});
+        this.setState({selectedUser: null, querySearch: "", queryResult: null});
     }
 
-    /*onChangeSearch(event){
+    onChangeSearch(event){
         this.setState({querySearch: event.target.value});
     }
 
     onSearch(event){
+        let that = this;
         let callback = function(result){
-            console.log(result);
+            that.setState({querySearch: "", queryResult: result.data});
         }
 
         if(event.key === 'Enter'){
-            $glVars.webApi.searchUser(this.state.querySearch, callback);        
+            $glVars.webApi.searchUser(this.state.querySearch, this.state.selectedCourse.courseId, callback);        
             event.preventDefault();
         }
-    }*/
+    }
 }
 
 class DashboardNavBar extends Component{
@@ -139,7 +163,7 @@ class DashboardNavBar extends Component{
                     <Nav className="mr-auto">
                         <NavDropdown  variant="primary" title={(this.props.course !== null ? `Cours: ${this.props.course.courseName}` : "Sélectionnez le cours")} id="basic-nav-dropdown" >
                                 {this.state.courseList.map(function(item, index){
-                                    return <NavDropdown.Item key={index} href="#" onClick={() => that.props.onSelectCourse(item)}>{item.courseName}</NavDropdown.Item>;
+                                    return <NavDropdown.Item key={index} href={`#${index}`} onClick={() => that.props.onSelectCourse(item)}>{item.courseName}</NavDropdown.Item>;
                                 })}
                         </NavDropdown>
                     </Nav>

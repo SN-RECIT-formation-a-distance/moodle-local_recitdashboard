@@ -76,4 +76,10 @@ export class AppWebApi extends WebApi
         let data = {courseId: courseId, userId: userId, service: "getUserProfile"};
         this.post(this.gateway, data, onSuccess);
     }
+
+    searchUser(queryStr, courseId, onSuccess){
+        let data = {queryStr: queryStr, courseId: courseId || 0, service: "searchUser"};
+        this.post(this.gateway, data, onSuccess);
+    }
+    
 };

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {Card, ButtonGroup, Button, Badge, OverlayTrigger, Tooltip, DropdownButton, Dropdown, ButtonToolbar, ProgressBar} from 'react-bootstrap';
-import {faSync, faArrowLeft} from '@fortawesome/free-solid-svg-icons';
+import {faSync} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {DataGrid} from '../libs/components/Components';
 import {UtilsMoodle, JsNx} from '../libs/utils/Utils';
