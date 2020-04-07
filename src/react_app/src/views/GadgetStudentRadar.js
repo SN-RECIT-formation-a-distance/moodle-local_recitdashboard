@@ -1,7 +1,7 @@
 
 import React, { Component } from 'react';
 import { Card, ButtonGroup, ButtonToolbar, Button, OverlayTrigger, Tooltip} from 'react-bootstrap';
-import {faSync, faInfo, faSearchPlus, faFileSignature, faUserPlus, faUserClock, faComments, faTasks} from '@fortawesome/free-solid-svg-icons';
+import {faSync, faInfo, faSearchPlus, faFileSignature, faUserPlus, faUserClock, faBell, faTasks} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {$glVars} from '../common/common';
 //import { JsNx } from '../libs/utils/Utils';
@@ -133,7 +133,7 @@ class AView extends Component{
     }
          
     getPendingMessages(item){
-        return this.getVisualItem(item, 'pendingMessages', 0, "Courriel en attente", faComments, `${item.pendingMessages} `);
+        return this.getVisualItem(item, 'pendingMessages', 0, "Courriel en attente", faBell, `${item.pendingMessages} `);
     }
 }
 
