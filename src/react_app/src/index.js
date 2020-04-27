@@ -1,6 +1,11 @@
 import React, { Component } from 'react';
 import ReactDOM from "react-dom";
-import 'bootstrap/dist/css/bootstrap.min.css';
+
+/**************************************************************************************
+ *  il ne faut pas charger le bootstrap de base car il est déjà chargé dans le thème
+ * //import 'bootstrap/dist/css/bootstrap.min.css';  
+ **************************************************************************************/ 
+
 import {faSync} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {VisualFeedback, Loading} from "./libs/components/Components";
@@ -58,7 +63,7 @@ document.addEventListener('DOMContentLoaded', function(){
     const domContainer = document.getElementById('recit_dashboard');
     let signedUser = {userId: domContainer.getAttribute('data-student-id'), roles: domContainer.getAttribute('data-roles').split(",")};
     ReactDOM.render(<App signedUser={signedUser}/>, domContainer);
-	document.body.style.backgroundColor = 'transparent';
+	//document.body.style.backgroundColor = 'inherit';
 }, false);
 
 

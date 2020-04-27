@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {Navbar, NavDropdown, Nav, Form, FormControl, InputGroup} from 'react-bootstrap';
+import {Navbar, NavDropdown, Nav, Form, FormControl, InputGroup, Card, ProgressBar} from 'react-bootstrap';
 import {faTachometerAlt, faSearch} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {DataGrid} from '../libs/components/Components';
@@ -10,11 +10,65 @@ import {GadgetDiagnosticTags} from './GadgetDiagnosticTags';
 import {GadgetGroupsOverview} from './GadgetGroupsOverview';
 import {GadgetStudentRadar} from './GadgetStudentRadar';
 
+class GadgetCourseList extends Component{
+    static defaultProps = {        
+        onSelectCourse: null
+    };
+
+    constructor(props) {
+        super(props);
+
+        this.getData = this.getData.bind(this);
+        this.getDataResult = this.getDataResult.bind(this);
+
+        this.state = {courseList: []};
+    }
+
+    componentDidMount(){
+        this.getData();
+    }
+
+    getData(){
+        $glVars.webApi.getEnrolledCourseList($glVars.signedUser.userId, this.getDataResult);        
+    }
+
+    getDataResult(result){         
+        if(result.success){
+            this.setState({courseList: result.data});
+        }
+        else{
+            $glVars.feedback.showError($glVars.i18n.tags.appname, result.msg);
+        }
+    }
+
+    render(){
+        let that = this;
+
+        let main = 
+            <div className='gadget-course-list'>
+                {this.state.courseList.map(function(item, index){
+                    let result =
+                        <Card style={{ width: '18rem', margin: "1rem" }} key={index}>
+                            <Card.Img variant="top" src={item.imageUrl} />
+                            <Card.Body>
+                                <Card.Title><a href="#" onClick={() => that.props.onSelectCourse(item)}>{item.courseName}</a></Card.Title>
+                                <ProgressBar animated now={item.pctProgress}  label={`${item.pctProgress}%`}/>
+                            </Card.Body>
+                        </Card>
+                    return result;
+                })}
+            </div>
+
+        return main;
+    }
+}
+
 export class TeacherView extends Component {
     constructor(props) {
         super(props);
 
         this.onSelectCourse = this.onSelectCourse.bind(this);
+        this.onUnselectCourse = this.onUnselectCourse.bind(this);
         this.onSelectGroup = this.onSelectGroup.bind(this);
         this.onUnselectGroup = this.onUnselectGroup.bind(this);
         this.onSelectUser = this.onSelectUser.bind(this);
@@ -22,13 +76,20 @@ export class TeacherView extends Component {
         this.onChangeSearch = this.onChangeSearch.bind(this);
         this.onSearch = this.onSearch.bind(this);
 
-        this.state = {courseList: [], selectedCourse: null, selectedGroup: null, selectedUser: null, querySearch: "", queryResult: null};
+        this.state = {selectedCourse: null, selectedGroup: null, selectedUser: null, querySearch: "", queryResult: null};
     }
 
     render() {       
+        let links = [];
+        
+        if(this.state.selectedCourse !== null){
+            links.push({url: `${M.cfg.wwwroot}/grade/report/grader/index.php?id=${this.state.selectedCourse.courseId}`, text: "Rapport de l'évaluateur"});
+        }
+
         let main = 
-            <div>
-                <DashboardNavBar course={this.state.selectedCourse} onSelectCourse={this.onSelectCourse}>
+            <div>                
+                <DashboardNavBar course={this.state.selectedCourse} links={links}>
+                    {this.state.selectedCourse !== null && <Nav.Link style={{color: "#dc3545"}} href="#" onClick={this.onUnselectCourse}>{`Groupe: ${this.state.selectedCourse.courseName} (x)`}</Nav.Link>}
                     {this.state.selectedGroup !== null && <Nav.Link style={{color: "#dc3545"}} href="#" onClick={this.onUnselectGroup}>{`Groupe: ${this.state.selectedGroup.name} (x)`}</Nav.Link>}
                     {this.state.selectedUser !== null && <Nav.Link style={{color: "#dc3545"}} href="#" onClick={this.onUnselectUser}>{`Élève: ${this.state.selectedUser.name} (x)`}</Nav.Link>}
                     <Form inline>
@@ -41,6 +102,8 @@ export class TeacherView extends Component {
                         </InputGroup>
                     </Form>
                 </DashboardNavBar>
+
+                {this.state.selectedCourse === null && <GadgetCourseList onSelectCourse={this.onSelectCourse}/>}
                 
                 {this.state.queryResult !== null ?
                     <DataGrid orderBy={true}>
@@ -86,6 +149,10 @@ export class TeacherView extends Component {
         this.setState({selectedCourse: item, selectedGroup: null, querySearch: "", queryResult: null});
     }
     
+    onUnselectCourse(){
+        this.setState({selectedCourse: null, querySearch: "", queryResult: null});
+    }
+
     onUnselectGroup(){
         this.setState({selectedGroup: null, querySearch: "", queryResult: null});
     }
@@ -120,22 +187,23 @@ export class TeacherView extends Component {
 }
 
 class DashboardNavBar extends Component{
-    static defaultProps = {        
+    static defaultProps = {
+        links:[],
         children: null,
-        course: null,
-        onSelectCourse: null
+        //course: null,
+        //onSelectCourse: null
     };
 
     constructor(props) {
         super(props);
 
-        this.getData = this.getData.bind(this);
-        this.getDataResult = this.getDataResult.bind(this);
+        //this.getData = this.getData.bind(this);
+        //this.getDataResult = this.getDataResult.bind(this);
 
-        this.state = {courseList: [], selectedCourse: null};
+        //this.state = {courseList: [], selectedCourse: null};
     }
 
-    componentDidMount(){
+    /*componentDidMount(){
         this.getData();
     }
 
@@ -150,22 +218,27 @@ class DashboardNavBar extends Component{
         else{
             $glVars.feedback.showError($glVars.i18n.tags.appname, result.msg);
         }
-    }
+    }*/
 
     render(){
-        let that = this;
+        //let that = this;
 
+        /* <Nav className="mr-auto">
+                        <NavDropdown  variant="primary" title={(this.props.course !== null ? `Cours: ${this.props.course.courseName}` : "Sélectionnez le cours")} id="basic-nav-dropdown" >
+                                {this.state.courseList.map(function(item, index){
+                                    return <NavDropdown.Item key={index} href={`#${index}`} onClick={() => that.props.onSelectCourse(item)}>{item.courseName}</NavDropdown.Item>;
+                                })}
+                        </NavDropdown>
+                    </Nav>*/
         let main = 
             <Navbar>
                 <Navbar.Brand href="#"><FontAwesomeIcon icon={faTachometerAlt}/>{" Tableau de bord"}</Navbar.Brand>
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav">
                     <Nav className="mr-auto">
-                        <NavDropdown  variant="primary" title={(this.props.course !== null ? `Cours: ${this.props.course.courseName}` : "Sélectionnez le cours")} id="basic-nav-dropdown" >
-                                {this.state.courseList.map(function(item, index){
-                                    return <NavDropdown.Item key={index} href={`#${index}`} onClick={() => that.props.onSelectCourse(item)}>{item.courseName}</NavDropdown.Item>;
-                                })}
-                        </NavDropdown>
+                        {this.props.links.map(function(item, index){
+                            return <Nav.Link key={index} href={`${item.url}`} target="_blank">{item.text}</Nav.Link>;
+                        })}
                     </Nav>
                     {this.props.children}
                 </Navbar.Collapse>
@@ -222,13 +295,14 @@ export class StudentView extends Component{
 
         this.onSelectCourse = this.onSelectCourse.bind(this);
 
-        this.state = {courseList: [], selectedCourse: null};
+        this.state = {selectedCourse: null};
     }
 
     render() {       
         let main = 
             <div>
-                <DashboardNavBar course={this.state.selectedCourse} onSelectCourse={this.onSelectCourse}></DashboardNavBar>
+                <DashboardNavBar></DashboardNavBar>
+                {this.state.selectedCourse === null && <GadgetCourseList onSelectCourse={this.onSelectCourse}/>}
                 {this.state.selectedCourse !== null && <StudentGadgets courseId={this.state.selectedCourse.courseId} userId={this.props.userId}/>}
             </div>;
 

@@ -355,7 +355,7 @@ class HCell extends ACell{
             glyph = <FontAwesomeIcon icon={faSortAmountDownAlt} />;//<Glyphicon glyph="sort-by-attributes-alt"/>;
         }
 
-        return <Button className='BtnSort' size='sm' variant="default" onClick={() => this.onSort(direction)}>{glyph}</Button>;
+        return <Button className='BtnSort' size='sm' variant="link" onClick={() => this.onSort(direction)}>{glyph}</Button>;
     }
 
     onSort(direction){
