@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
-import {Navbar, NavDropdown, Nav, Form, FormControl, InputGroup, Card, ProgressBar} from 'react-bootstrap';
-import {faTachometerAlt, faSearch} from '@fortawesome/free-solid-svg-icons';
+import {Navbar, Nav, Form, FormControl, InputGroup, Card, ProgressBar, ButtonGroup, Button} from 'react-bootstrap';
+import {faTachometerAlt, faSearch, faBookOpen, faFileAlt} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {DataGrid} from '../libs/components/Components';
+import {UtilsString} from '../libs/utils/Utils';
 import {$glVars} from '../common/common';
-import {GadgetAttendance} from './GadgetAttendance';
+//import {GadgetAttendance} from './GadgetAttendance';
 import {GadgetCourseProgressOverview, GadgetCourseProgressDetailled} from './GadgetCourseProgress';
 import {GadgetDiagnosticTags} from './GadgetDiagnosticTags';
 import {GadgetGroupsOverview} from './GadgetGroupsOverview';
@@ -46,14 +47,19 @@ class GadgetCourseList extends Component{
 
         let main = 
             <div className='gadget-course-list'>
+                {this.state.courseList.length === 0 && <h4>Pas de cours</h4>}
                 {this.state.courseList.map(function(item, index){
                     let result =
                         <Card style={{ width: '18rem', margin: "1rem" }} key={index}>
                             <Card.Img variant="top" src={item.imageUrl} />
                             <Card.Body>
-                                <Card.Title><a href="#" onClick={() => that.props.onSelectCourse(item)}>{item.courseName}</a></Card.Title>
+                                <Card.Title>{item.courseName}</Card.Title>
                                 <ProgressBar animated now={item.pctProgress}  label={`${item.pctProgress}%`}/>
                             </Card.Body>
+                            <Card.Footer>
+                                <Card.Link href={`${M.cfg.wwwroot}/course/view.php?id=${item.courseId}`}>Accéder</Card.Link>
+                                <Card.Link href="#" onClick={() => that.props.onSelectCourse(item)}>Indicateurs</Card.Link>
+                            </Card.Footer>
                         </Card>
                     return result;
                 })}
@@ -80,18 +86,35 @@ export class TeacherView extends Component {
     }
 
     render() {       
-        let links = [];
-        
-        if(this.state.selectedCourse !== null){
-            links.push({url: `${M.cfg.wwwroot}/grade/report/grader/index.php?id=${this.state.selectedCourse.courseId}`, text: "Rapport de l'évaluateur"});
-        }
-
         let main = 
             <div>                
-                <DashboardNavBar course={this.state.selectedCourse} links={links}>
-                    {this.state.selectedCourse !== null && <Nav.Link style={{color: "#dc3545"}} href="#" onClick={this.onUnselectCourse}>{`Groupe: ${this.state.selectedCourse.courseName} (x)`}</Nav.Link>}
-                    {this.state.selectedGroup !== null && <Nav.Link style={{color: "#dc3545"}} href="#" onClick={this.onUnselectGroup}>{`Groupe: ${this.state.selectedGroup.name} (x)`}</Nav.Link>}
-                    {this.state.selectedUser !== null && <Nav.Link style={{color: "#dc3545"}} href="#" onClick={this.onUnselectUser}>{`Élève: ${this.state.selectedUser.name} (x)`}</Nav.Link>}
+                <DashboardNavBar course={this.state.selectedCourse}>   
+                    <Nav className="mr-auto">
+                        {this.state.selectedCourse !== null && 
+                            <Nav.Link style={{color: "#dc3545"}} href="#" onClick={this.onUnselectCourse} title={this.state.selectedCourse.courseName}>
+                                {`Course: ${UtilsString.slice(this.state.selectedCourse.courseName, 15)} (x)`}
+                            </Nav.Link>
+                        }
+                        {this.state.selectedGroup !== null && 
+                            <Nav.Link style={{color: "#dc3545"}} href="#" onClick={this.onUnselectGroup} title={this.state.selectedGroup.name}>
+                                {`Groupe: ${UtilsString.slice(this.state.selectedGroup.name, 15)} (x)`}
+                            </Nav.Link>
+                        }
+                        {this.state.selectedUser !== null && 
+                            <Nav.Link style={{color: "#dc3545"}} href="#" onClick={this.onUnselectUser} title={this.state.selectedUser.name}>
+                                {`Élève: ${UtilsString.slice(this.state.selectedUser.name, 25)} (x)`}
+                            </Nav.Link>
+                        }
+                    </Nav>                 
+                    
+                    <Nav>
+                        {this.state.selectedCourse && 
+                            <Nav.Link href={`${M.cfg.wwwroot}/grade/report/grader/index.php?id=${this.state.selectedCourse.courseId}`} target="_blank">
+                               <FontAwesomeIcon icon={faFileAlt}/> {" Rapport de l'évaluateur"}
+                            </Nav.Link>
+                        }
+                    </Nav>
+
                     <Form inline>
                         <InputGroup className="mb-0">
                             <FormControl placeholder="Recherchez un élève..." aria-label="Recherchez un élève..." aria-describedby="search" value={this.state.querySearch} 
@@ -231,15 +254,10 @@ class DashboardNavBar extends Component{
                         </NavDropdown>
                     </Nav>*/
         let main = 
-            <Navbar>
+            <Navbar className="justify-content-between">
                 <Navbar.Brand href="#"><FontAwesomeIcon icon={faTachometerAlt}/>{" Tableau de bord"}</Navbar.Brand>
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
-                <Navbar.Collapse id="basic-navbar-nav">
-                    <Nav className="mr-auto">
-                        {this.props.links.map(function(item, index){
-                            return <Nav.Link key={index} href={`${item.url}`} target="_blank">{item.text}</Nav.Link>;
-                        })}
-                    </Nav>
+                <Navbar.Collapse id="basic-navbar-nav">                   
                     {this.props.children}
                 </Navbar.Collapse>
             </Navbar>
@@ -272,12 +290,11 @@ class TeacherGroupView extends Component{
         onSelectUser: null
     };
 
+    //<GadgetAttendance  courseId={this.props.courseId} groupId={this.props.groupId}/>
     render(){
         let main = 
             <div style={{marginTop: 15, display: "flex", flexFlow: "column"}}>
                 <GadgetCourseProgressOverview courseId={this.props.courseId} groupId={this.props.groupId} onSelectUser={this.props.onSelectUser}/>
-                <br/><br/>
-                <GadgetAttendance  courseId={this.props.courseId} groupId={this.props.groupId}/>
                 <br/><br/>
                 <GadgetDiagnosticTags  courseId={this.props.courseId} groupId={this.props.groupId}/>
             </div>
@@ -294,14 +311,26 @@ export class StudentView extends Component{
         super(props);
 
         this.onSelectCourse = this.onSelectCourse.bind(this);
+        this.onUnselectCourse = this.onUnselectCourse.bind(this);
 
         this.state = {selectedCourse: null};
     }
-
+    
     render() {       
         let main = 
             <div>
-                <DashboardNavBar></DashboardNavBar>
+                <DashboardNavBar>                    
+                    <Nav className="mr-auto">
+                        {this.state.selectedCourse !== null && <Nav.Link style={{color: "#dc3545"}} href="#" onClick={this.onUnselectCourse}>{`Course: ${this.state.selectedCourse.courseName} (x)`}</Nav.Link>}
+                    </Nav>
+                    <Nav>
+                        {this.state.selectedCourse && 
+                            <Nav.Link href={`${M.cfg.wwwroot}/course/user.php?mode=grade&id=${this.state.selectedCourse.courseId}&user=${this.props.userId}`} target="_blank">
+                                <FontAwesomeIcon icon={faBookOpen}/>{" Notes"}
+                            </Nav.Link>
+                        }
+                    </Nav>
+                </DashboardNavBar>
                 {this.state.selectedCourse === null && <GadgetCourseList onSelectCourse={this.onSelectCourse}/>}
                 {this.state.selectedCourse !== null && <StudentGadgets courseId={this.state.selectedCourse.courseId} userId={this.props.userId}/>}
             </div>;
@@ -311,6 +340,10 @@ export class StudentView extends Component{
 
     onSelectCourse(item){
         this.setState({selectedCourse: item});
+    }
+
+    onUnselectCourse(){
+        this.setState({selectedCourse: null, querySearch: "", queryResult: null});
     }
 }
 

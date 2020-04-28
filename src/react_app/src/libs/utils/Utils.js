@@ -248,6 +248,15 @@ export class UtilsString
     
         return true;
     }
+
+    static slice(str, end){
+        if(str.length > end){
+            return `${str.slice(0, end)}...`;
+        }
+        else{
+            return str;
+        }
+    }
 }
 
 export class UtilsDateTime
