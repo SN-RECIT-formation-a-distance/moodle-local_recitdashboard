@@ -1,5 +1,5 @@
 echo off
-set pluginPath=..\moodle\local\recitdashboard
+set pluginPath=..\moodledev2\local\recitdashboard
 
 rem remove the current link
 ..\outils\junction -d src
