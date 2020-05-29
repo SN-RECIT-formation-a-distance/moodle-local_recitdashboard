@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {$glVars} from '../common/common';
 //import { JsNx } from '../libs/utils/Utils';
 
-export class GadgetStudentRadar extends Component{
+export class GadgetStudentTracking extends Component{
     static defaultProps = {        
         courseId: 0,
         onSelectGroup: null,
@@ -35,7 +35,7 @@ export class GadgetStudentRadar extends Component{
     }
 
     getData(){
-        $glVars.webApi.getStudentRadar(this.props.courseId, this.props.userId, this.getDataResult);        
+        $glVars.webApi.getStudentTracking(this.props.courseId, this.props.userId, this.getDataResult);        
     }
 
     getDataResult(result){         
@@ -82,7 +82,7 @@ export class GadgetStudentRadar extends Component{
 
         if(this.props.userId === 0){
             result = 
-            <Card className='gadget-student-radar'>
+            <Card className='gadget-student-tracking'>
                 <Card.Body>
                     {this.getTitle()}
                     <div className='content'>
@@ -168,9 +168,9 @@ class GroupView extends AView{
         let main = 
             <div className='item'>
                 {this.props.onSelectGroup !== null &&
-                    <h5 className='item-title'>{title}<Button  size="sm" variant="link" onClick={() => this.props.onSelectGroup({id: this.props.data.groupId, name: this.props.data.groupName})}>
-                        <FontAwesomeIcon icon={faSearchPlus}/></Button>
-                    </h5>
+                    <Button  size="sm" variant="link" onClick={() => this.props.onSelectGroup({id: this.props.data.groupId, name: this.props.data.groupName})}>
+                        <h5 className='item-title'>{title}</h5>
+                    </Button>
                 }
                 {this.props.data.students.map((item, index) => {
                     let row = <div key={index} className='visual-data'>

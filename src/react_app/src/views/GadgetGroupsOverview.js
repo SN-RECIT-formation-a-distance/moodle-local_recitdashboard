@@ -5,7 +5,6 @@ import { ResponsivePie } from '@nivo/pie';
 import {faSync, faInfo, faSearchPlus} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {$glVars} from '../common/common';
-//import { JsNx } from '../libs/utils/Utils';
 
 export class GadgetGroupsOverview extends Component{
     static defaultProps = {        
@@ -89,14 +88,14 @@ class PieChart extends Component{
 
         let main = 
             <div className='item'>
-                <h5 className='item-title'>{title}<Button  size="sm" variant="link" onClick={() => this.props.onSelectGroup({id: item.group.id, name: item.group.name})}>
-                    <FontAwesomeIcon icon={faSearchPlus}/></Button>
-                </h5>
+                <Button  size="sm" variant="link" onClick={() => this.props.onSelectGroup({id: item.group.id, name: item.group.name})}>
+                    <h5 className='item-title'>{title}</h5>
+                </Button>
+                
                 <div className='charts'>
-                    {this.getChart(this.props.data.progress)}
-                    {this.getChart(this.props.data.grades)}
+                    {this.getChart(this.props.data.progress, 'Progrès')}
+                    {this.getChart(this.props.data.grades, 'Notes')}
                 </div>
-                <div className='item-desc'>Progrès / Notes</div>
             </div>;
         return main;
     }
@@ -106,20 +105,20 @@ class PieChart extends Component{
         [
             {
               "id": "g",
-              "label": "g",
-              "value": data.g,
+              "label": data.gDesc,
+              "value": Math.round(data.g,2),
               "color": 'hsl(83, 63%, 59%)'
             },
             {
               "id": "y",
-              "label": "y",
-              "value": data.y,
+              "label": data.yDesc,
+              "value":  Math.round(data.y,2),
               "color": "hsl(49, 100%, 59%)"
             },
             {
               "id": "r",
-              "label": "r",
-              "value": data.r,
+              "label": data.rDesc,
+              "value": Math.round(data.r,2),
               "color": "hsl(323, 66%, 72%)"
             }
           ]
@@ -132,7 +131,7 @@ class PieChart extends Component{
         return `${v.value.toFixed(1)}%`;
     }
 
-    getChart(data){
+    getChart(data, desc){
         data = data || null;
 
         if(data === null){ return null;}
@@ -214,6 +213,6 @@ class PieChart extends Component{
         legends={[]}
         />;
 
-        return <div className='item-chart'>{result}</div>;
+        return <div className='item-chart'><strong>{desc}</strong>{result}</div>;
     }
 }

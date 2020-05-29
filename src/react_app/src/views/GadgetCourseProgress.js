@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {Card, ButtonGroup, Button, Badge, OverlayTrigger, Tooltip, DropdownButton, Dropdown, ButtonToolbar, ProgressBar} from 'react-bootstrap';
-import {faSync} from '@fortawesome/free-solid-svg-icons';
+import {faSync, faCheck} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {DataGrid} from '../libs/components/Components';
 import {UtilsMoodle, JsNx} from '../libs/utils/Utils';
@@ -50,9 +50,9 @@ export class GadgetCourseProgressOverview extends Component{
         let bodyContent = {maxHeight: 400, overflowY: "auto"};
         
         let main = 
-            <Card style={{flexGrow: 1, margin: 5}}>
+            <Card className='gadget'>
                 <Card.Body>
-                    <Card.Title style={{display: "flex", justifyContent: "space-between"}}>
+                    <Card.Title>
                         <span>{"Aperçu de la progression"}</span>
                         <ButtonToolbar aria-label="Toolbar with Buttons">
                             <ButtonGroup className="mr-2">
@@ -163,13 +163,13 @@ export class GadgetCourseProgressDetailled extends Component{
     render() {    
         let bodyContent = {maxHeight: 400, overflowY: "auto"};
         
-        let studentName = (this.state.dataProvider.length > 0 ? this.state.dataProvider[0].studentName : "");
+        //let studentName = (this.state.dataProvider.length > 0 ? this.state.dataProvider[0].studentName : "");
 
         //<Card.Header>{cardTitle}</Card.Header>
         let main = 
-            <Card style={{flexGrow: 1, margin: 5}}>
+            <Card className='gadget'>
                 <Card.Body>
-                    <Card.Title style={{display: "flex", justifyContent: "space-between"}}>
+                    <Card.Title>
                         <span>{`Détails de la progression`}</span>
                         <ButtonToolbar aria-label="Toolbar with Buttons">
                             <ButtonGroup className="mr-2">
@@ -181,6 +181,7 @@ export class GadgetCourseProgressDetailled extends Component{
                                         return <Dropdown.Item key={index} eventKey={index} dangerouslySetInnerHTML={{__html:item.text}}></Dropdown.Item>
                                     })}
                                 </DropdownButton>
+                                <Button  variant="outline-secondary" size="sm" onClick={this.getData}><FontAwesomeIcon icon={faSync}/></Button>
                             </ButtonGroup>
                         </ButtonToolbar>                        
                     </Card.Title>
@@ -191,8 +192,11 @@ export class GadgetCourseProgressDetailled extends Component{
                                 <DataGrid.Header.Row>
                                     <DataGrid.Header.Cell style={{width: 70}}>{"#"}</DataGrid.Header.Cell>
                                     <DataGrid.Header.Cell >{"Activité"}</DataGrid.Header.Cell>
-                                    <DataGrid.Header.Cell style={{width: 110}}>{"Grade"}</DataGrid.Header.Cell>
+                                    <DataGrid.Header.Cell style={{width: 130}}>{"Module Terminé"}</DataGrid.Header.Cell>
+                                    <DataGrid.Header.Cell style={{width: 130}}>{"Grade"}</DataGrid.Header.Cell>
                                     <DataGrid.Header.Cell style={{width: 300}}>{"Date d'échéance"}</DataGrid.Header.Cell>
+                                    <DataGrid.Header.Cell style={{width: 200}}>{"Dernière mise à jour"}</DataGrid.Header.Cell>
+                                    <DataGrid.Header.Cell>{"Description"}</DataGrid.Header.Cell>
                                 </DataGrid.Header.Row>
                             </DataGrid.Header>
                             <DataGrid.Body>
@@ -203,16 +207,21 @@ export class GadgetCourseProgressDetailled extends Component{
                                             }
                                         }
                                         let row = 
-                                            <DataGrid.Body.Row key={index} alert={this.getDeadline(item)} >
+                                            <DataGrid.Body.Row key={index} >
                                                 <DataGrid.Body.Cell>{index + 1}</DataGrid.Body.Cell>
                                                 <DataGrid.Body.Cell sortValue={item.activity.name}>
                                                     <img className="activityicon" alt="activity icon" role="presentation" aria-hidden="true" src={UtilsMoodle.getActivityIconUrl(item.module)}/>
                                                     {` ${item.activity.name}`}
-                                                    </DataGrid.Body.Cell>
-                                                <DataGrid.Body.Cell style={{textAlign: "center"}}>{item.activity.grade}</DataGrid.Body.Cell>
+                                                </DataGrid.Body.Cell>
+                                                <DataGrid.Body.Cell style={{textAlign: "center"}}>
+                                                    {item.completionState === 1 ? <FontAwesomeIcon icon={faCheck}/> : null }
+                                                    </DataGrid.Body.Cell>    
+                                                <DataGrid.Body.Cell style={{textAlign: "center"}}>{this.getGradeDesc(item)}</DataGrid.Body.Cell>
                                                 <DataGrid.Body.Cell sortValue={item.completionExpected}>
                                                     {item.completionExpected}{" "}<span style={{fontSize: ".7rem"}}>{this.getDeadlineInDays(item)}</span>
                                                 </DataGrid.Body.Cell>
+                                                <DataGrid.Body.Cell>{item.activity.timeModified}</DataGrid.Body.Cell>
+                                                <DataGrid.Body.Cell>{this.getDesc(item)}</DataGrid.Body.Cell>
                                             </DataGrid.Body.Row>
                                         return (row);                                    
                                     }
@@ -226,7 +235,29 @@ export class GadgetCourseProgressDetailled extends Component{
         return (main);
     }
 
-    getDeadline(item){
+    getDesc(item){
+        let result = "";
+       
+        if(item.activity.completed === 0){
+            result = "La leçon a été commencée, mais n'est pas terminée.";
+        }
+        else if(item.activity.completed === 1){
+            result = 'Terminé';
+        }
+        else if(item.activity.nbViews > 0){
+            result = `${item.activity.nbViews} vues`;
+        }
+
+        return result;
+    }
+
+    getGradeDesc(item){
+        if(item.activity.studentGrade < 0){ return "";}
+
+        return `${item.activity.studentGrade.toFixed(2)} / ${item.activity.maxGrade.toFixed(2)}`;
+    }    
+
+   /* getDeadline(item){
         if(item.completionState === 1){
             return "success";
         }
@@ -242,7 +273,7 @@ export class GadgetCourseProgressDetailled extends Component{
         else{
             return "";
         }
-    }
+    }*/
 
     onSelectSection(index){
         this.setState({selectedSectionIndex: index});

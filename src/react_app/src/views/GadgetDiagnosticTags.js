@@ -139,9 +139,9 @@ export class GadgetDiagnosticTags extends Component{
 
     
         let main =
-            <Card style={{flexGrow: 1, margin: 5}}>
+            <Card className='gadget'>
                 <Card.Body>
-                    <Card.Title style={{display: "flex", justifyContent: "space-between"}}>
+                    <Card.Title>
                         {"Diagnostic de tags"}
                         <ButtonToolbar aria-label="Toolbar with Buttons">
                             <ButtonGroup  >
@@ -150,6 +150,7 @@ export class GadgetDiagnosticTags extends Component{
                         </ButtonToolbar>                              
                     </Card.Title>
 
+                {tagList.length > 0 ?
                     <div style={bodyContent}>
                         <ResponsiveHeatMap
                             cellShape={CustomCell}
@@ -193,6 +194,9 @@ export class GadgetDiagnosticTags extends Component{
                             cellHoverOthersOpacity={0.25}
                         />
                     </div>
+                    :
+                    <strong>Aucune information à afficher.</strong>
+                }
                 </Card.Body>
             </Card>;
 //

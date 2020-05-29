@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {Navbar, Nav, Form, FormControl, InputGroup, Card, ProgressBar, ButtonGroup, Button} from 'react-bootstrap';
+import {Navbar, Nav, Form, FormControl, InputGroup, Card, ProgressBar, NavDropdown} from 'react-bootstrap';
 import {faTachometerAlt, faSearch, faBookOpen, faFileAlt} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {DataGrid} from '../libs/components/Components';
@@ -9,7 +9,7 @@ import {$glVars} from '../common/common';
 import {GadgetCourseProgressOverview, GadgetCourseProgressDetailled} from './GadgetCourseProgress';
 import {GadgetDiagnosticTags} from './GadgetDiagnosticTags';
 import {GadgetGroupsOverview} from './GadgetGroupsOverview';
-import {GadgetStudentRadar} from './GadgetStudentRadar';
+import {GadgetStudentTracking} from './GadgetStudentTracking';
 
 class GadgetCourseList extends Component{
     static defaultProps = {        
@@ -107,13 +107,17 @@ export class TeacherView extends Component {
                         }
                     </Nav>                 
                     
-                    <Nav>
-                        {this.state.selectedCourse && 
-                            <Nav.Link href={`${M.cfg.wwwroot}/grade/report/grader/index.php?id=${this.state.selectedCourse.courseId}`} target="_blank">
-                               <FontAwesomeIcon icon={faFileAlt}/> {" Rapport de l'évaluateur"}
-                            </Nav.Link>
-                        }
-                    </Nav>
+                    {this.state.selectedCourse && 
+                        <NavDropdown title={<span><FontAwesomeIcon icon={faFileAlt}/>{" Rapports"}</span>} id="menu-reports">
+                            <NavDropdown.Item href={`${M.cfg.wwwroot}/grade/report/grader/index.php?id=${this.state.selectedCourse.courseId}`} target="_blank">
+                                {" Rapport de l'évaluateur"}
+                            </NavDropdown.Item>                        
+                            <NavDropdown.Item href={`${M.cfg.wwwroot}/report/embedquestion/index.php?courseid=${this.state.selectedCourse.courseId}`} target="_blank">
+                                {" Questions intégrées"}
+                            </NavDropdown.Item>                        
+                            
+                        </NavDropdown>
+                    }   
 
                     <Form inline>
                         <InputGroup className="mb-0">
@@ -212,49 +216,12 @@ export class TeacherView extends Component {
 class DashboardNavBar extends Component{
     static defaultProps = {
         links:[],
-        children: null,
-        //course: null,
-        //onSelectCourse: null
+        children: null
     };
 
-    constructor(props) {
-        super(props);
-
-        //this.getData = this.getData.bind(this);
-        //this.getDataResult = this.getDataResult.bind(this);
-
-        //this.state = {courseList: [], selectedCourse: null};
-    }
-
-    /*componentDidMount(){
-        this.getData();
-    }
-
-    getData(){
-        $glVars.webApi.getEnrolledCourseList($glVars.signedUser.userId, this.getDataResult);        
-    }
-
-    getDataResult(result){         
-        if(result.success){
-            this.setState({courseList: result.data, selectedCourse: null});
-        }
-        else{
-            $glVars.feedback.showError($glVars.i18n.tags.appname, result.msg);
-        }
-    }*/
-
     render(){
-        //let that = this;
-
-        /* <Nav className="mr-auto">
-                        <NavDropdown  variant="primary" title={(this.props.course !== null ? `Cours: ${this.props.course.courseName}` : "Sélectionnez le cours")} id="basic-nav-dropdown" >
-                                {this.state.courseList.map(function(item, index){
-                                    return <NavDropdown.Item key={index} href={`#${index}`} onClick={() => that.props.onSelectCourse(item)}>{item.courseName}</NavDropdown.Item>;
-                                })}
-                        </NavDropdown>
-                    </Nav>*/
         let main = 
-            <Navbar className="justify-content-between">
+            <Navbar className="justify-content-between mb-3">
                 <Navbar.Brand href="#"><FontAwesomeIcon icon={faTachometerAlt}/>{" Tableau de bord"}</Navbar.Brand>
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav">                   
@@ -275,9 +242,9 @@ class TeacherCourseView extends Component{
 
     render(){
         let main = 
-            <div style={{marginTop: 15, display: "flex", flexWrap: "wrap"}}>
+            <div>
                 <GadgetGroupsOverview  courseId={this.props.courseId} onSelectGroup={this.props.onSelectGroup}/> 
-                <GadgetStudentRadar  courseId={this.props.courseId} onSelectGroup={this.props.onSelectGroup} onSelectUser={this.props.onSelectUser}/> 
+                <GadgetStudentTracking  courseId={this.props.courseId} onSelectGroup={this.props.onSelectGroup} onSelectUser={this.props.onSelectUser}/> 
             </div>
         return main;
     }
@@ -293,9 +260,8 @@ class TeacherGroupView extends Component{
     //<GadgetAttendance  courseId={this.props.courseId} groupId={this.props.groupId}/>
     render(){
         let main = 
-            <div style={{marginTop: 15, display: "flex", flexFlow: "column"}}>
+            <div>
                 <GadgetCourseProgressOverview courseId={this.props.courseId} groupId={this.props.groupId} onSelectUser={this.props.onSelectUser}/>
-                <br/><br/>
                 <GadgetDiagnosticTags  courseId={this.props.courseId} groupId={this.props.groupId}/>
             </div>
         return main;
@@ -323,13 +289,13 @@ export class StudentView extends Component{
                     <Nav className="mr-auto">
                         {this.state.selectedCourse !== null && <Nav.Link style={{color: "#dc3545"}} href="#" onClick={this.onUnselectCourse}>{`Course: ${this.state.selectedCourse.courseName} (x)`}</Nav.Link>}
                     </Nav>
-                    <Nav>
-                        {this.state.selectedCourse && 
-                            <Nav.Link href={`${M.cfg.wwwroot}/course/user.php?mode=grade&id=${this.state.selectedCourse.courseId}&user=${this.props.userId}`} target="_blank">
+                    {this.state.selectedCourse && 
+                        <NavDropdown title={<span><FontAwesomeIcon icon={faFileAlt}/>{" Rapports"}</span>} id="menu-reports">
+                            <NavDropdown.Item href={`${M.cfg.wwwroot}/course/user.php?mode=grade&id=${this.state.selectedCourse.courseId}&user=${this.props.userId}`} target="_blank">
                                 <FontAwesomeIcon icon={faBookOpen}/>{" Notes"}
-                            </Nav.Link>
-                        }
-                    </Nav>
+                            </NavDropdown.Item>                        
+                        </NavDropdown>
+                    }   
                 </DashboardNavBar>
                 {this.state.selectedCourse === null && <GadgetCourseList onSelectCourse={this.onSelectCourse}/>}
                 {this.state.selectedCourse !== null && <StudentGadgets courseId={this.state.selectedCourse.courseId} userId={this.props.userId}/>}
@@ -382,11 +348,11 @@ class StudentGadgets extends Component {
         if(this.state.profile === null) {return null;}
         let main = 
             <div>
-                <div style={{padding: "1rem", backgroundColor: "#efefef"}}>
+                <div style={{padding: "1rem", backgroundColor: "#fafafa"}}>
                     <img src={this.state.profile.avatar} style={{borderRadius: "50%", marginRight: "1rem", float: "left"}}/>
                     <h2>{this.state.profile.name}</h2>
                     <p><small className="text-muted">{this.state.profile.email}</small><small className="text-muted">{` | Dernière connexion: ${this.state.profile.lastLogin}`}</small></p>
-                    <GadgetStudentRadar  courseId={this.props.courseId} userId={this.props.userId}/> 
+                    <GadgetStudentTracking  courseId={this.props.courseId} userId={this.props.userId}/> 
                 </div>
                 <GadgetCourseProgressDetailled courseId={this.props.courseId} userId={this.props.userId}/>
                 <GadgetDiagnosticTags  courseId={this.props.courseId} userId={this.props.userId}/>

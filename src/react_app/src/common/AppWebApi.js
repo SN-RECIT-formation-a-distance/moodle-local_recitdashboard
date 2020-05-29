@@ -66,9 +66,9 @@ export class AppWebApi extends WebApi
         this.post(this.gateway, data, onSuccess);
     }
 
-    getStudentRadar(courseId, userId, onSuccess){
+    getStudentTracking(courseId, userId, onSuccess){
         userId = userId || 0;
-        let data = {courseId: courseId, userId: userId, service: "getStudentRadar"};
+        let data = {courseId: courseId, userId: userId, service: "getStudentTracking"};
         this.post(this.gateway, data, onSuccess);
     }
     
