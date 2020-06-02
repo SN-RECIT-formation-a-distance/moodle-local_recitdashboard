@@ -195,7 +195,6 @@ export class GadgetCourseProgressDetailled extends Component{
                                     <DataGrid.Header.Cell style={{width: 130}}>{"Module Terminé"}</DataGrid.Header.Cell>
                                     <DataGrid.Header.Cell style={{width: 130}}>{"Grade"}</DataGrid.Header.Cell>
                                     <DataGrid.Header.Cell style={{width: 300}}>{"Date d'échéance"}</DataGrid.Header.Cell>
-                                    <DataGrid.Header.Cell style={{width: 200}}>{"Dernière mise à jour"}</DataGrid.Header.Cell>
                                     <DataGrid.Header.Cell>{"Description"}</DataGrid.Header.Cell>
                                 </DataGrid.Header.Row>
                             </DataGrid.Header>
@@ -219,8 +218,7 @@ export class GadgetCourseProgressDetailled extends Component{
                                                 <DataGrid.Body.Cell style={{textAlign: "center"}}>{this.getGradeDesc(item)}</DataGrid.Body.Cell>
                                                 <DataGrid.Body.Cell sortValue={item.completionExpected}>
                                                     {item.completionExpected}{" "}<span style={{fontSize: ".7rem"}}>{this.getDeadlineInDays(item)}</span>
-                                                </DataGrid.Body.Cell>
-                                                <DataGrid.Body.Cell>{item.activity.timeModified}</DataGrid.Body.Cell>
+                                                </DataGrid.Body.Cell>                                                
                                                 <DataGrid.Body.Cell>{this.getDesc(item)}</DataGrid.Body.Cell>
                                             </DataGrid.Body.Row>
                                         return (row);                                    
@@ -238,14 +236,27 @@ export class GadgetCourseProgressDetailled extends Component{
     getDesc(item){
         let result = "";
        
-        if(item.activity.completed === 0){
-            result = "La leçon a été commencée, mais n'est pas terminée.";
-        }
-        else if(item.activity.completed === 1){
-            result = 'Terminé';
-        }
-        else if(item.activity.nbViews > 0){
-            result = `${item.activity.nbViews} vues`;
+        switch(item.module){
+            case 'quiz':
+            case 'assign':
+                if(item.activity.extra.timeModified !== null){
+                    result = item.activity.extra.timeModified;  
+                    result += this.getDateDiffFromNow(item.activity.extra.timeModified, ' (', ')');
+                }
+                break;
+            case 'lesson':
+                result = (item.activity.extra.completed === 1 ? 'Terminé' : "La leçon a été commencée, mais n'est pas terminée.") + ` | ${item.activity.extra.timeModified}`; 
+                result += this.getDateDiffFromNow(item.activity.extra.timeModified, ' (', ')');
+                break;
+            case 'page':
+                if(item.activity.extra.nbViews > 0){
+                    result = `${item.activity.extra.nbViews} vues | ${item.activity.extra.timeCreated}`;
+                    result += this.getDateDiffFromNow(item.activity.extra.timeCreated, ' (', ')');
+                }
+                
+                break;
+            default:
+                result = '';
         }
 
         return result;
@@ -282,5 +293,14 @@ export class GadgetCourseProgressDetailled extends Component{
     getDeadlineInDays(item){
         if(item.completionState === 1){ return "";}
         return (item.daysDeadline < 0 ? `(${Math.abs(item.daysDeadline)} jours en retard)` : "");
+    }
+
+    getDateDiffFromNow(dateRef, sepBef, sepAft){
+        dateRef = (dateRef instanceof Date ? dateRef : new Date(dateRef));
+        let now = new Date();
+        let diff = now.getTime() - dateRef.getTime()
+        
+        let nbDays = Math.round(diff / 1000 / 60 / 60 / 24, 0);
+        return (nbDays > 0 ? `${sepBef}${nbDays} jours${sepAft}` : '');
     }
 }

@@ -10,6 +10,7 @@ import {GadgetCourseProgressOverview, GadgetCourseProgressDetailled} from './Gad
 import {GadgetDiagnosticTags} from './GadgetDiagnosticTags';
 import {GadgetGroupsOverview} from './GadgetGroupsOverview';
 import {GadgetStudentTracking} from './GadgetStudentTracking';
+import {GadgetStudentAssiduity} from './GadgetStudentAssiduity';
 
 class GadgetCourseList extends Component{
     static defaultProps = {        
@@ -356,6 +357,7 @@ class StudentGadgets extends Component {
                 </div>
                 <GadgetCourseProgressDetailled courseId={this.props.courseId} userId={this.props.userId}/>
                 <GadgetDiagnosticTags  courseId={this.props.courseId} userId={this.props.userId}/>
+                <GadgetStudentAssiduity  courseId={this.props.courseId} userId={this.props.userId}/>
             </div>;
 
         return (main);
