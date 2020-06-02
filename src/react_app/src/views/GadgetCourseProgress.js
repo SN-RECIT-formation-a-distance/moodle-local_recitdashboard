@@ -67,7 +67,7 @@ export class GadgetCourseProgressOverview extends Component{
                                 <DataGrid.Header.Row>
                                     <DataGrid.Header.Cell style={{width: 70}}>{"#"}</DataGrid.Header.Cell>
                                     <DataGrid.Header.Cell >{"Élève"}</DataGrid.Header.Cell>
-                                    <DataGrid.Header.Cell style={{width: 150}}>{"Progression"}</DataGrid.Header.Cell>
+                                    <DataGrid.Header.Cell style={{width: 270}}>{"Progression"}</DataGrid.Header.Cell>
                                     <DataGrid.Header.Cell style={{width: 180}}>{"Mise à jour"}</DataGrid.Header.Cell>
                                 </DataGrid.Header.Row>
                             </DataGrid.Header>
