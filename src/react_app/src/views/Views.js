@@ -12,8 +12,47 @@ import {GadgetGroupsOverview} from './GadgetGroupsOverview';
 import {GadgetStudentTracking} from './GadgetStudentTracking';
 import {GadgetStudentAssiduity} from './GadgetStudentAssiduity';
 
-class GadgetCourseList extends Component{
+export class DashboardView extends Component{
     static defaultProps = {        
+        mode: 's',
+        selectCourseId: 0
+    };
+
+    constructor(props) {
+        super(props);
+
+        this.onSelectCourse = this.onSelectCourse.bind(this);
+        this.onUnselectCourse = this.onUnselectCourse.bind(this);
+
+        this.state = {selectedCourse: null, selectCourseId: props.selectCourseId};
+    }
+
+    render() {  
+        let main =
+            <div>
+                {this.props.mode  === 't' ? 
+                    <TeacherView selectedCourse={this.state.selectedCourse} onUnselectCourse={this.onUnselectCourse}/> 
+                : 
+                    <StudentView selectedCourse={this.state.selectedCourse} onUnselectCourse={this.onUnselectCourse} userId={$glVars.signedUser.userId}/>
+                }     
+                {this.state.selectedCourse === null && <GadgetCourseList selectCourseId={this.state.selectCourseId} onSelectCourse={this.onSelectCourse}/>}
+            </div>
+
+        return (main);
+    }
+
+    onSelectCourse(item){
+        this.setState({selectedCourse: item});
+    }
+
+    onUnselectCourse(){
+        this.setState({selectedCourse: null, selectCourseId: 0});
+    }
+}
+
+class GadgetCourseList extends Component{
+    static defaultProps = {
+        selectCourseId: 0,        
         onSelectCourse: null
     };
 
@@ -22,6 +61,7 @@ class GadgetCourseList extends Component{
 
         this.getData = this.getData.bind(this);
         this.getDataResult = this.getDataResult.bind(this);
+        this.selectCourse = this.selectCourse.bind(this);
 
         this.state = {courseList: []};
     }
@@ -36,10 +76,18 @@ class GadgetCourseList extends Component{
 
     getDataResult(result){         
         if(result.success){
-            this.setState({courseList: result.data});
+            this.setState({courseList: result.data}, this.selectCourse);
         }
         else{
             $glVars.feedback.showError($glVars.i18n.tags.appname, result.msg);
+        }
+    }
+
+    selectCourse(){
+        for(let item of this.state.courseList){
+            if(item.courseId === this.props.selectCourseId){
+                this.props.onSelectCourse(item);
+            }
         }
     }
 
@@ -55,7 +103,7 @@ class GadgetCourseList extends Component{
                             <Card.Img variant="top" src={item.imageUrl} />
                             <Card.Body>
                                 <Card.Title>{item.courseName}</Card.Title>
-                                <ProgressBar animated now={item.pctProgress}  label={`${item.pctProgress}%`}/>
+                                <ProgressBar animated now={item.pctProgress}  label={`${item.pctProgress.toFixed(0)}%`}/>
                             </Card.Body>
                             <Card.Footer>
                                 <Card.Link href={`${M.cfg.wwwroot}/course/view.php?id=${item.courseId}`}>Accéder</Card.Link>
@@ -70,12 +118,15 @@ class GadgetCourseList extends Component{
     }
 }
 
-export class TeacherView extends Component {
+class TeacherView extends Component {
+    static defaultProps = {        
+        selectedCourse: null,
+        onUnselectCourse: null
+    };
+
     constructor(props) {
         super(props);
 
-        this.onSelectCourse = this.onSelectCourse.bind(this);
-        this.onUnselectCourse = this.onUnselectCourse.bind(this);
         this.onSelectGroup = this.onSelectGroup.bind(this);
         this.onUnselectGroup = this.onUnselectGroup.bind(this);
         this.onSelectUser = this.onSelectUser.bind(this);
@@ -83,17 +134,17 @@ export class TeacherView extends Component {
         this.onChangeSearch = this.onChangeSearch.bind(this);
         this.onSearch = this.onSearch.bind(this);
 
-        this.state = {selectedCourse: null, selectedGroup: null, selectedUser: null, querySearch: "", queryResult: null};
+        this.state = {selectedGroup: null, selectedUser: null, querySearch: "", queryResult: null};
     }
 
     render() {       
         let main = 
             <div>                
-                <DashboardNavBar course={this.state.selectedCourse}>   
+                <DashboardNavBar course={this.props.selectedCourse}>   
                     <Nav className="mr-auto">
-                        {this.state.selectedCourse !== null && 
-                            <Nav.Link style={{color: "#dc3545"}} href="#" onClick={this.onUnselectCourse} title={this.state.selectedCourse.courseName}>
-                                {`Course: ${UtilsString.slice(this.state.selectedCourse.courseName, 15)} (x)`}
+                        {this.props.selectedCourse !== null && 
+                            <Nav.Link style={{color: "#dc3545"}} href="#" onClick={this.props.onUnselectCourse} title={this.props.selectedCourse.courseName}>
+                                {`Course: ${UtilsString.slice(this.props.selectedCourse.courseName, 15)} (x)`}
                             </Nav.Link>
                         }
                         {this.state.selectedGroup !== null && 
@@ -108,12 +159,12 @@ export class TeacherView extends Component {
                         }
                     </Nav>                 
                     
-                    {this.state.selectedCourse && 
+                    {this.props.selectedCourse && 
                         <NavDropdown title={<span><FontAwesomeIcon icon={faFileAlt}/>{" Rapports"}</span>} id="menu-reports">
-                            <NavDropdown.Item href={`${M.cfg.wwwroot}/grade/report/grader/index.php?id=${this.state.selectedCourse.courseId}`} target="_blank">
+                            <NavDropdown.Item href={`${M.cfg.wwwroot}/grade/report/grader/index.php?id=${this.props.selectedCourse.courseId}`} target="_blank">
                                 {" Rapport de l'évaluateur"}
                             </NavDropdown.Item>                        
-                            <NavDropdown.Item href={`${M.cfg.wwwroot}/report/embedquestion/index.php?courseid=${this.state.selectedCourse.courseId}`} target="_blank">
+                            <NavDropdown.Item href={`${M.cfg.wwwroot}/report/embedquestion/index.php?courseid=${this.props.selectedCourse.courseId}`} target="_blank">
                                 {" Questions intégrées"}
                             </NavDropdown.Item>                        
                             
@@ -123,15 +174,13 @@ export class TeacherView extends Component {
                     <Form inline>
                         <InputGroup className="mb-0">
                             <FormControl placeholder="Recherchez un élève..." aria-label="Recherchez un élève..." aria-describedby="search" value={this.state.querySearch} 
-                                            onChange={this.onChangeSearch} onKeyPress={this.onSearch} disabled={this.state.selectedCourse === null}/>
+                                            onChange={this.onChangeSearch} onKeyPress={this.onSearch} disabled={this.props.selectedCourse === null}/>
                             <InputGroup.Append>
                                 <InputGroup.Text id="basic-addon2"> <FontAwesomeIcon icon={faSearch}/></InputGroup.Text>
                             </InputGroup.Append>
                         </InputGroup>
                     </Form>
-                </DashboardNavBar>
-
-                {this.state.selectedCourse === null && <GadgetCourseList onSelectCourse={this.onSelectCourse}/>}
+                </DashboardNavBar>               
                 
                 {this.state.queryResult !== null ?
                     <DataGrid orderBy={true}>
@@ -156,29 +205,21 @@ export class TeacherView extends Component {
                         </DataGrid.Body>
                     </DataGrid>
                     :
-                    this.state.selectedCourse !== null ?
+                    this.props.selectedCourse !== null ?
                     
                         this.state.selectedUser !== null ? 
-                            <StudentGadgets courseId={this.state.selectedCourse.courseId} userId={this.state.selectedUser.id}/> 
+                            <StudentGadgets courseId={this.props.selectedCourse.courseId} userId={this.state.selectedUser.id}/> 
                         :
                             this.state.selectedGroup === null ? 
-                                <TeacherCourseView courseId={this.state.selectedCourse.courseId} onSelectGroup={this.onSelectGroup} onSelectUser={this.onSelectUser}/>
+                                <TeacherCourseView courseId={this.props.selectedCourse.courseId} onSelectGroup={this.onSelectGroup} onSelectUser={this.onSelectUser}/>
                             :
-                                <TeacherGroupView  courseId={this.state.selectedCourse.courseId} groupId={this.state.selectedGroup.id} onSelectUser={this.onSelectUser}/>
+                                <TeacherGroupView  courseId={this.props.selectedCourse.courseId} groupId={this.state.selectedGroup.id} onSelectUser={this.onSelectUser}/>
                     :
                         null
                 }                
             </div>;
 
         return (main);
-    }
-
-    onSelectCourse(item){
-        this.setState({selectedCourse: item, selectedGroup: null, querySearch: "", queryResult: null});
-    }
-    
-    onUnselectCourse(){
-        this.setState({selectedCourse: null, querySearch: "", queryResult: null});
     }
 
     onUnselectGroup(){
@@ -208,7 +249,7 @@ export class TeacherView extends Component {
         }
 
         if(event.key === 'Enter'){
-            $glVars.webApi.searchUser(this.state.querySearch, this.state.selectedCourse.courseId, callback);        
+            $glVars.webApi.searchUser(this.state.querySearch, this.props.selectedCourse.courseId, callback);        
             event.preventDefault();
         }
     }
@@ -269,48 +310,32 @@ class TeacherGroupView extends Component{
     }
 }
 
-export class StudentView extends Component{
+class StudentView extends Component{
     static defaultProps = {        
-        userId: 0,
+        selectedCourse: null,
+        onUnselectCourse: null,
+        userId: 0
     };
 
-    constructor(props) {
-        super(props);
-
-        this.onSelectCourse = this.onSelectCourse.bind(this);
-        this.onUnselectCourse = this.onUnselectCourse.bind(this);
-
-        this.state = {selectedCourse: null};
-    }
-    
     render() {       
         let main = 
             <div>
                 <DashboardNavBar>                    
                     <Nav className="mr-auto">
-                        {this.state.selectedCourse !== null && <Nav.Link style={{color: "#dc3545"}} href="#" onClick={this.onUnselectCourse}>{`Course: ${this.state.selectedCourse.courseName} (x)`}</Nav.Link>}
+                        {this.props.selectedCourse !== null && <Nav.Link style={{color: "#dc3545"}} href="#" onClick={this.props.onUnselectCourse}>{`Course: ${this.props.selectedCourse.courseName} (x)`}</Nav.Link>}
                     </Nav>
-                    {this.state.selectedCourse && 
+                    {this.props.selectedCourse && 
                         <NavDropdown title={<span><FontAwesomeIcon icon={faFileAlt}/>{" Rapports"}</span>} id="menu-reports">
-                            <NavDropdown.Item href={`${M.cfg.wwwroot}/course/user.php?mode=grade&id=${this.state.selectedCourse.courseId}&user=${this.props.userId}`} target="_blank">
+                            <NavDropdown.Item href={`${M.cfg.wwwroot}/course/user.php?mode=grade&id=${this.props.selectedCourse.courseId}&user=${this.props.userId}`} target="_blank">
                                 <FontAwesomeIcon icon={faBookOpen}/>{" Notes"}
                             </NavDropdown.Item>                        
                         </NavDropdown>
                     }   
                 </DashboardNavBar>
-                {this.state.selectedCourse === null && <GadgetCourseList onSelectCourse={this.onSelectCourse}/>}
-                {this.state.selectedCourse !== null && <StudentGadgets courseId={this.state.selectedCourse.courseId} userId={this.props.userId}/>}
+                {this.props.selectedCourse !== null && <StudentGadgets courseId={this.props.selectedCourse.courseId} userId={this.props.userId}/>}
             </div>;
 
         return (main);
-    }
-
-    onSelectCourse(item){
-        this.setState({selectedCourse: item});
-    }
-
-    onUnselectCourse(){
-        this.setState({selectedCourse: null, querySearch: "", queryResult: null});
     }
 }
 

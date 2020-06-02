@@ -31,28 +31,28 @@ class RecitDashboard{
     public $user = null;
     public $page = null;
     public $output = null;
+    public $selectedCourseId = 0;
 
-    public function __construct($cfg, $page, $user, $output){
+    public function __construct($cfg, $page, $user, $output, $selectedCourseId){
         $this->cfg = $cfg;
         $this->user = $user;
         $this->page = $page;
         $this->output = $output;
+        $this->selectedCourseId = $selectedCourseId;
     }
 
     public function display(){       
         $roles = Utils::getUserRolesOnContext(context_system::instance(), $this->user->id);
         //$studentId = (in_array('ad', $roles) ? 0 : $this->user->id);
         $studentId = $this->user->id;
-        
-        echo sprintf("<div id='recit_dashboard' data-student-id='%ld' data-roles='%s'></div>", $studentId, implode(",", $roles));
+        $selectedCourseId = ($this->selectedCourseId > 1 ? $this->selectedCourseId : 0);
+        echo sprintf("<div id='recit_dashboard' data-student-id='%ld' data-course-id='%ld' data-roles='%s'></div>", $studentId, $selectedCourseId, implode(",", $roles));
     }
 }
 
 require_login();
 
 // Globals.
-global $PAGE, $OUTPUT;
-
 $PAGE->set_url("/local/recitdashboard/view.php");
 $PAGE->requires->css(new moodle_url($CFG->wwwroot . '/local/recitdashboard/react_app/build/index.css'), true);
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/local/recitdashboard/react_app/build/index.js'), true);
@@ -67,7 +67,8 @@ $PAGE->set_title(get_string('pluginname', 'local_recitdashboard'));
 $PAGE->set_heading(get_string('pluginname', 'local_recitdashboard'));
 
 echo $OUTPUT->header();
-$recitDashboard = new RecitDashboard($CFG, $PAGE, $USER, $OUTPUT);
+$courseId = (isset($_GET['courseId']) ? $_GET['courseId'] : 0);
+$recitDashboard = new RecitDashboard($CFG, $PAGE, $USER, $OUTPUT, $courseId);
 $recitDashboard->display();
 
 echo $OUTPUT->footer();

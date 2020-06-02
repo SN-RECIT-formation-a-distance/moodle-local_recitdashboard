@@ -80,7 +80,6 @@ export class GadgetStudentAssiduity extends Component{
         }*/
         
         for(let item of result){
-            console.log(item);
             item.dateRef = item.dateRef.toDateString();
         }
         /*let result = [

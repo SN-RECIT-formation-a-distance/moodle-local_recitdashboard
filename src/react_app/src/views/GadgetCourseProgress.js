@@ -80,7 +80,7 @@ export class GadgetCourseProgressOverview extends Component{
                                                 <DataGrid.Body.Cell sortValue={item.pctWork.toString()} style={{textAlign: "center"}}>
                                                 <OverlayTrigger placement="right" delay={{ show: 250, hide: 400 }}
                                                     overlay={<Tooltip>{`Temps: ${item.pctTime}%  | Travail: ${item.pctWork}%`}</Tooltip>}>
-                                                    <ProgressBar striped min={0} max={100} variant={this.getProgressColor(item)} now={item.pctWork} label={`${item.pctWork}%`}/>
+                                                    <ProgressBar striped min={0} max={100} variant={this.getProgressColor(item)} now={item.pctWork} label={`${item.pctWork.toFixed(0)}%`}/>
                                                 </OverlayTrigger>
                                                 </DataGrid.Body.Cell>                                            
                                                 <DataGrid.Body.Cell>{item.lastUpdate}</DataGrid.Body.Cell>
