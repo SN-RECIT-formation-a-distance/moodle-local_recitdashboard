@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
-import {Navbar, Nav, Form, FormControl, InputGroup, Card, ProgressBar, NavDropdown} from 'react-bootstrap';
-import {faTachometerAlt, faSearch, faBookOpen, faFileAlt} from '@fortawesome/free-solid-svg-icons';
+import {Navbar, Nav, Form, FormControl, InputGroup, Card, ProgressBar, NavDropdown, Button, ButtonGroup, Jumbotron} from 'react-bootstrap';
+import {faTachometerAlt, faSearch, faBookOpen, faFileAlt, faUsers} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {DataGrid} from '../libs/components/Components';
-import {UtilsString} from '../libs/utils/Utils';
+import {UtilsString, JsNx} from '../libs/utils/Utils';
 import {$glVars} from '../common/common';
 //import {GadgetAttendance} from './GadgetAttendance';
 import {GadgetCourseProgressOverview, GadgetCourseProgressDetailled} from './GadgetCourseProgress';
@@ -31,9 +31,9 @@ export class DashboardView extends Component{
         let main =
             <div>
                 {this.props.mode  === 't' ? 
-                    <TeacherView selectedCourse={this.state.selectedCourse} onUnselectCourse={this.onUnselectCourse}/> 
+                    <TeacherView options={{selectedCourse: this.state.selectedCourse, userId: 0}} onUnselectCourse={this.onUnselectCourse}/> 
                 : 
-                    <StudentView selectedCourse={this.state.selectedCourse} onUnselectCourse={this.onUnselectCourse} userId={$glVars.signedUser.userId}/>
+                    <StudentView options={{selectedCourse: this.state.selectedCourse, userId: $glVars.signedUser.userId}} onUnselectCourse={this.onUnselectCourse} />
                 }     
                 {this.state.selectedCourse === null && <GadgetCourseList selectCourseId={this.state.selectCourseId} onSelectCourse={this.onSelectCourse}/>}
             </div>
@@ -120,7 +120,7 @@ class GadgetCourseList extends Component{
 
 class TeacherView extends Component {
     static defaultProps = {        
-        selectedCourse: null,
+        options: null,
         onUnselectCourse: null
     };
 
@@ -133,54 +133,72 @@ class TeacherView extends Component {
         this.onUnselectUser = this.onUnselectUser.bind(this);
         this.onChangeSearch = this.onChangeSearch.bind(this);
         this.onSearch = this.onSearch.bind(this);
+        this.onMyGroupsOn = this.onMyGroupsOn.bind(this);
 
-        this.state = {selectedGroup: null, selectedUser: null, querySearch: "", queryResult: null};
+        this.state = {selectedGroup: null, selectedUser: null, querySearch: "", queryResult: null, onlyMyGroups: true };
     }
 
     render() {       
-        let main = 
-            <div>                
-                <DashboardNavBar course={this.props.selectedCourse}>   
-                    <Nav className="mr-auto">
-                        {this.props.selectedCourse !== null && 
-                            <Nav.Link style={{color: "#dc3545"}} href="#" onClick={this.props.onUnselectCourse} title={this.props.selectedCourse.courseName}>
-                                {`Course: ${UtilsString.slice(this.props.selectedCourse.courseName, 15)} (x)`}
-                            </Nav.Link>
-                        }
-                        {this.state.selectedGroup !== null && 
-                            <Nav.Link style={{color: "#dc3545"}} href="#" onClick={this.onUnselectGroup} title={this.state.selectedGroup.name}>
-                                {`Groupe: ${UtilsString.slice(this.state.selectedGroup.name, 15)} (x)`}
-                            </Nav.Link>
-                        }
-                        {this.state.selectedUser !== null && 
-                            <Nav.Link style={{color: "#dc3545"}} href="#" onClick={this.onUnselectUser} title={this.state.selectedUser.name}>
-                                {`Élève: ${UtilsString.slice(this.state.selectedUser.name, 25)} (x)`}
-                            </Nav.Link>
-                        }
-                    </Nav>                 
-                    
-                    {this.props.selectedCourse && 
-                        <NavDropdown title={<span><FontAwesomeIcon icon={faFileAlt}/>{" Rapports"}</span>} id="menu-reports">
-                            <NavDropdown.Item href={`${M.cfg.wwwroot}/grade/report/grader/index.php?id=${this.props.selectedCourse.courseId}`} target="_blank">
-                                {" Rapport de l'évaluateur"}
-                            </NavDropdown.Item>                        
-                            <NavDropdown.Item href={`${M.cfg.wwwroot}/report/embedquestion/index.php?courseid=${this.props.selectedCourse.courseId}`} target="_blank">
-                                {" Questions intégrées"}
-                            </NavDropdown.Item>                        
-                            
-                        </NavDropdown>
-                    }   
+        let selectedCourse = this.props.options.selectedCourse;
+        let options = JsNx.clone(this.props.options);
+        options.onlyMyGroups = this.state.onlyMyGroups;
+        options.userId = (this.state.selectedUser ? this.state.selectedUser.id : options.userId);
 
-                    <Form inline>
-                        <InputGroup className="mb-0">
-                            <FormControl placeholder="Recherchez un élève..." aria-label="Recherchez un élève..." aria-describedby="search" value={this.state.querySearch} 
-                                            onChange={this.onChangeSearch} onKeyPress={this.onSearch} disabled={this.props.selectedCourse === null}/>
-                            <InputGroup.Append>
-                                <InputGroup.Text id="basic-addon2"> <FontAwesomeIcon icon={faSearch}/></InputGroup.Text>
-                            </InputGroup.Append>
-                        </InputGroup>
-                    </Form>
-                </DashboardNavBar>               
+        let main = 
+            <div>   
+                {selectedCourse === null ?
+                    <DashboardIntro/>
+                    :
+                    <DashboardNavBar>
+                        <Nav className="mr-auto"></Nav>
+                        <Nav>
+                            <NavDropdown title={<span><FontAwesomeIcon icon={faFileAlt}/>{" Rapports"}</span>} id="menu-reports">
+                                <NavDropdown.Item href={`${M.cfg.wwwroot}/grade/report/grader/index.php?id=${selectedCourse.courseId}`} target="_blank">
+                                    {" Rapport de l'évaluateur"}
+                                </NavDropdown.Item>                        
+                                <NavDropdown.Item href={`${M.cfg.wwwroot}/report/embedquestion/index.php?courseid=${selectedCourse.courseId}`} target="_blank">
+                                    {" Questions intégrées"}
+                                </NavDropdown.Item>                        
+                                
+                            </NavDropdown>
+                        </Nav>
+                    
+                        <Form inline>
+                            <InputGroup className="mb-0">
+                                <FormControl placeholder="Recherchez un élève..." aria-label="Recherchez un élève..." aria-describedby="search" value={this.state.querySearch} 
+                                                onChange={this.onChangeSearch} onKeyPress={this.onSearch} disabled={selectedCourse === null}/>
+                                <InputGroup.Append>
+                                    <InputGroup.Text id="basic-addon2"> <FontAwesomeIcon icon={faSearch}/></InputGroup.Text>
+                                </InputGroup.Append>
+                            </InputGroup>
+                        </Form>   
+                    </DashboardNavBar>   
+                }   
+                
+                {selectedCourse !== null && 
+                    <div style={{display: "flex"}}>
+                        <ButtonGroup toggle={true}>
+                            <Button variant={(this.state.onlyMyGroups ? "secondary" : "outline-secondary")} onClick={this.onMyGroupsOn}><FontAwesomeIcon icon={faUsers}/>{' Afficher uniquement mes groupes'}</Button>
+                        </ButtonGroup>
+                        <Nav className="mr-auto">
+                            {selectedCourse !== null && 
+                                <Nav.Link style={{color: "#dc3545"}} href="#" onClick={this.props.onUnselectCourse} title={selectedCourse.courseName}>
+                                    {`Course: ${UtilsString.slice(selectedCourse.courseName, 15)} (x)`}
+                                </Nav.Link>
+                            }
+                            {this.state.selectedGroup !== null && 
+                                <Nav.Link style={{color: "#dc3545"}} href="#" onClick={this.onUnselectGroup} title={this.state.selectedGroup.name}>
+                                    {`Groupe: ${UtilsString.slice(this.state.selectedGroup.name, 15)} (x)`}
+                                </Nav.Link>
+                            }
+                            {this.state.selectedUser !== null && 
+                                <Nav.Link style={{color: "#dc3545"}} href="#" onClick={this.onUnselectUser} title={this.state.selectedUser.name}>
+                                    {`Élève: ${UtilsString.slice(this.state.selectedUser.name, 25)} (x)`}
+                                </Nav.Link>
+                            }
+                        </Nav>
+                    </div>            
+                }
                 
                 {this.state.queryResult !== null ?
                     <DataGrid orderBy={true}>
@@ -205,21 +223,25 @@ class TeacherView extends Component {
                         </DataGrid.Body>
                     </DataGrid>
                     :
-                    this.props.selectedCourse !== null ?
+                    selectedCourse !== null ?
                     
                         this.state.selectedUser !== null ? 
-                            <StudentGadgets courseId={this.props.selectedCourse.courseId} userId={this.state.selectedUser.id}/> 
+                            <StudentGadgets options={options}/> 
                         :
                             this.state.selectedGroup === null ? 
-                                <TeacherCourseView courseId={this.props.selectedCourse.courseId} onSelectGroup={this.onSelectGroup} onSelectUser={this.onSelectUser}/>
+                                <TeacherCourseView options={options} onSelectGroup={this.onSelectGroup} onSelectUser={this.onSelectUser}/>
                             :
-                                <TeacherGroupView  courseId={this.props.selectedCourse.courseId} groupId={this.state.selectedGroup.id} onSelectUser={this.onSelectUser}/>
+                                <TeacherGroupView  courseId={selectedCourse.courseId} groupId={this.state.selectedGroup.id} onSelectUser={this.onSelectUser}/>
                     :
                         null
                 }                
             </div>;
 
         return (main);
+    }
+
+    onMyGroupsOn(){
+        this.setState({onlyMyGroups: !this.state.onlyMyGroups});
     }
 
     onUnselectGroup(){
@@ -249,22 +271,35 @@ class TeacherView extends Component {
         }
 
         if(event.key === 'Enter'){
-            $glVars.webApi.searchUser(this.state.querySearch, this.props.selectedCourse.courseId, callback);        
+            $glVars.webApi.searchUser(this.state.querySearch, this.props.options.selectedCourse.courseId, callback);        
             event.preventDefault();
         }
     }
 }
 
+class DashboardIntro extends Component{
+    render(){
+        let main = 
+            <Jumbotron style={{padding: "2rem 2rem", marginTop: "1rem"}}>
+                <h1>Tableau de bord RÉCIT</h1>
+                <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s...</p>
+            </Jumbotron>;
+        return main;
+    }
+}
+
 class DashboardNavBar extends Component{
     static defaultProps = {
-        links:[],
+        brandDesc: null,
         children: null
     };
 
     render(){
+        let brandDesc = this.props.brandDesc || <span><FontAwesomeIcon icon={faTachometerAlt}/>{" Tableau de bord RÉCIT"}</span>;
+
         let main = 
             <Navbar className="justify-content-between mb-3">
-                <Navbar.Brand href="#"><FontAwesomeIcon icon={faTachometerAlt}/>{" Tableau de bord"}</Navbar.Brand>
+                <Navbar.Brand href="#">{brandDesc}</Navbar.Brand>
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav">                   
                     {this.props.children}
@@ -277,7 +312,7 @@ class DashboardNavBar extends Component{
 
 class TeacherCourseView extends Component{
     static defaultProps = {        
-        courseId: 0,
+        options: null,
         onSelectGroup: null,
         onSelectUser: null
     };
@@ -285,8 +320,8 @@ class TeacherCourseView extends Component{
     render(){
         let main = 
             <div>
-                <GadgetGroupsOverview  courseId={this.props.courseId} onSelectGroup={this.props.onSelectGroup}/> 
-                <GadgetStudentTracking  courseId={this.props.courseId} onSelectGroup={this.props.onSelectGroup} onSelectUser={this.props.onSelectUser}/> 
+                <GadgetGroupsOverview options={this.props.options} onSelectGroup={this.props.onSelectGroup}/> 
+                <GadgetStudentTracking options={this.props.options} onSelectGroup={this.props.onSelectGroup} onSelectUser={this.props.onSelectUser}/> 
             </div>
         return main;
     }
@@ -304,7 +339,7 @@ class TeacherGroupView extends Component{
         let main = 
             <div>
                 <GadgetCourseProgressOverview courseId={this.props.courseId} groupId={this.props.groupId} onSelectUser={this.props.onSelectUser}/>
-                <GadgetDiagnosticTags  courseId={this.props.courseId} groupId={this.props.groupId}/>
+                <GadgetDiagnosticTags courseId={this.props.courseId} groupId={this.props.groupId}/>
             </div>
         return main;
     }
@@ -312,27 +347,33 @@ class TeacherGroupView extends Component{
 
 class StudentView extends Component{
     static defaultProps = {        
-        selectedCourse: null,
-        onUnselectCourse: null,
-        userId: 0
+        options: null,
+        onUnselectCourse: null
     };
 
-    render() {       
+    render() {     
+        let selectedCourse = this.props.options.selectedCourse;
+        let userId = this.props.options.userId;
+
         let main = 
             <div>
-                <DashboardNavBar>                    
-                    <Nav className="mr-auto">
-                        {this.props.selectedCourse !== null && <Nav.Link style={{color: "#dc3545"}} href="#" onClick={this.props.onUnselectCourse}>{`Course: ${this.props.selectedCourse.courseName} (x)`}</Nav.Link>}
-                    </Nav>
-                    {this.props.selectedCourse && 
-                        <NavDropdown title={<span><FontAwesomeIcon icon={faFileAlt}/>{" Rapports"}</span>} id="menu-reports">
-                            <NavDropdown.Item href={`${M.cfg.wwwroot}/course/user.php?mode=grade&id=${this.props.selectedCourse.courseId}&user=${this.props.userId}`} target="_blank">
-                                <FontAwesomeIcon icon={faBookOpen}/>{" Notes"}
-                            </NavDropdown.Item>                        
-                        </NavDropdown>
-                    }   
-                </DashboardNavBar>
-                {this.props.selectedCourse !== null && <StudentGadgets courseId={this.props.selectedCourse.courseId} userId={this.props.userId}/>}
+                {selectedCourse === null ?
+                    <DashboardIntro/>
+                    :
+                    <DashboardNavBar>                    
+                        <Nav className="mr-auto">
+                            {selectedCourse !== null && <Nav.Link style={{color: "#dc3545"}} href="#" onClick={this.props.onUnselectCourse}>{`Course: ${selectedCourse.courseName} (x)`}</Nav.Link>}
+                        </Nav>
+                        {selectedCourse && 
+                            <NavDropdown title={<span><FontAwesomeIcon icon={faFileAlt}/>{" Rapports"}</span>} id="menu-reports">
+                                <NavDropdown.Item href={`${M.cfg.wwwroot}/course/user.php?mode=grade&id=${selectedCourse.courseId}&user=${userId}`} target="_blank">
+                                    <FontAwesomeIcon icon={faBookOpen}/>{" Notes"}
+                                </NavDropdown.Item>                        
+                            </NavDropdown>
+                        }   
+                    </DashboardNavBar>
+                }
+                {selectedCourse !== null && <StudentGadgets options={this.props.options}/>}
             </div>;
 
         return (main);
@@ -341,8 +382,7 @@ class StudentView extends Component{
 
 class StudentGadgets extends Component {
     static defaultProps = {        
-        courseId: 0,
-        userId: 0
+        options: null,
     };
 
     constructor(props) {
@@ -358,7 +398,7 @@ class StudentGadgets extends Component {
     }
 
     getData(){
-        $glVars.webApi.getUserProfile(this.props.courseId, this.props.userId, this.getDataResult);        
+        $glVars.webApi.getUserProfile(this.props.options.selectedCourse.courseId, this.props.options.userId, this.getDataResult);        
     }
 
     getDataResult(result){         
@@ -370,19 +410,22 @@ class StudentGadgets extends Component {
         }
     }
 
-    render() {     
+    render() {   
         if(this.state.profile === null) {return null;}
+        let courseId = this.props.options.selectedCourse.courseId;
+        let userId = this.props.options.userId;
+
         let main = 
             <div>
                 <div style={{padding: "1rem", backgroundColor: "#fafafa"}}>
                     <img src={this.state.profile.avatar} style={{borderRadius: "50%", marginRight: "1rem", float: "left"}}/>
                     <h2>{this.state.profile.name}</h2>
                     <p><small className="text-muted">{this.state.profile.email}</small><small className="text-muted">{` | Dernière connexion: ${this.state.profile.lastLogin}`}</small></p>
-                    <GadgetStudentTracking  courseId={this.props.courseId} userId={this.props.userId}/> 
+                    <GadgetStudentTracking options={this.props.options}/> 
                 </div>
-                <GadgetCourseProgressDetailled courseId={this.props.courseId} userId={this.props.userId}/>
-                <GadgetDiagnosticTags  courseId={this.props.courseId} userId={this.props.userId}/>
-                <GadgetStudentAssiduity  courseId={this.props.courseId} userId={this.props.userId}/>
+                <GadgetCourseProgressDetailled courseId={courseId} userId={userId}/>
+                <GadgetDiagnosticTags  courseId={courseId} userId={userId}/>
+                <GadgetStudentAssiduity  courseId={courseId} userId={userId}/>
             </div>;
 
         return (main);

@@ -4,6 +4,7 @@ import { Card, ButtonGroup, ButtonToolbar, Button} from 'react-bootstrap';
 import { ResponsiveBar } from '@nivo/bar'
 import {faSync} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {UtilsDateTime} from '../libs/utils/Utils';
 import {$glVars} from '../common/common';
 
 export class GadgetStudentAssiduity extends Component{
@@ -80,7 +81,7 @@ export class GadgetStudentAssiduity extends Component{
         }*/
         
         for(let item of result){
-            item.dateRef = item.dateRef.toDateString();
+            item.dateRef = UtilsDateTime.format(item.dateRef);
         }
         /*let result = [
             {
@@ -129,7 +130,7 @@ export class GadgetStudentAssiduity extends Component{
         let dataProvider = this.prepareChartData(this.state.dataProvider);        
         
         let main =
-            <Card style={{flexGrow: 1, margin: 5}}>
+            <Card style={{flexGrow: 1, margin: 5}} className="gadget">
                 <Card.Body>
                     <Card.Title style={{display: "flex", justifyContent: "space-between"}}>
                         <div>
@@ -148,7 +149,7 @@ export class GadgetStudentAssiduity extends Component{
                         data={dataProvider}
                         keys={[ 'nbRequest']}
                         indexBy="dateRef"
-                        margin={{ top: 50, right: 130, bottom: 50, left: 60 }}
+                        margin={{ top: 50, right: 50, bottom: 50, left: 60 }}
                         padding={0.3}
                         colors={{ scheme: 'nivo' }}
                         defs={[
@@ -175,7 +176,7 @@ export class GadgetStudentAssiduity extends Component{
                         axisRight={null}
                         axisBottom={{
                             tickSize: 5,
-                            tickPadding: 5,
+                            tickPadding: 3,
                             tickRotation: 0,
                             legend: 'Date',
                             legendPosition: 'middle',

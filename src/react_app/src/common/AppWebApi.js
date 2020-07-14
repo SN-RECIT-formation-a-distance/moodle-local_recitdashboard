@@ -67,14 +67,14 @@ export class AppWebApi extends WebApi
         this.post(this.gateway, data, onSuccess);
     }
 
-    getGroupsOverview(courseId, onSuccess){
-        let data = {courseId: courseId, service: "getGroupsOverview"};
+    getGroupsOverview(courseId, onlyMyGroups, onSuccess){
+        let data = {courseId: courseId, onlyMyGroups: (onlyMyGroups ? 1 : 0), service: "getGroupsOverview"};
         this.post(this.gateway, data, onSuccess);
     }
 
-    getStudentTracking(courseId, userId, onSuccess){
+    getStudentTracking(courseId, userId, onlyMyGroups, onSuccess){
         userId = userId || 0;
-        let data = {courseId: courseId, userId: userId, service: "getStudentTracking"};
+        let data = {courseId: courseId, userId: userId, onlyMyGroups: (onlyMyGroups ? 1 : 0), service: "getStudentTracking"};
         this.post(this.gateway, data, onSuccess);
     }
     

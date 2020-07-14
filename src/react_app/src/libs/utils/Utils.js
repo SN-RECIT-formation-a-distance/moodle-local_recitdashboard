@@ -187,6 +187,10 @@ export default class Utils{
        // return Moment(strDate).toDate();
     }
 
+    static dateFormat(date){
+
+    }
+
     static formatMoney(value){
         return "$ " + parseFloat(value).toFixed(2);
     }
@@ -323,6 +327,11 @@ export class UtilsDateTime
 
         return (hour * 60) + minutes;
     };
+
+    static format(date){
+        let str = ['Jan', 'Feb', 'Mar', 'Apr', 'May', "Jun", 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+        return `${date.getFullYear()} ${str[date.getMonth()]} ${date.getDate()}`;
+    }
 };
 
 export class UtilsTreeStruct

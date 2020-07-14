@@ -8,7 +8,7 @@ import {$glVars} from '../common/common';
 
 export class GadgetGroupsOverview extends Component{
     static defaultProps = {        
-        courseId: 0,
+        options: null,
         onSelectGroup: null
     };
 
@@ -27,13 +27,14 @@ export class GadgetGroupsOverview extends Component{
 
     componentDidUpdate(prevProps){
        // Typical usage (don't forget to compare props):
-       if (this.props.courseId !== prevProps.courseId) {
+       if ((this.props.options.selectedCourse.courseId !== prevProps.options.selectedCourse.courseId) || 
+            (this.props.options.onlyMyGroups !== prevProps.options.onlyMyGroups)){
             this.getData();
         }
     }
 
     getData(){
-        $glVars.webApi.getGroupsOverview(this.props.courseId, this.getDataResult);        
+        $glVars.webApi.getGroupsOverview(this.props.options.selectedCourse.courseId, this.props.options.onlyMyGroups, this.getDataResult);        
     }
 
     getDataResult(result){         

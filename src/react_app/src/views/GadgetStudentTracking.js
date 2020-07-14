@@ -8,10 +8,9 @@ import {$glVars} from '../common/common';
 
 export class GadgetStudentTracking extends Component{
     static defaultProps = {        
-        courseId: 0,
+        options: null,
         onSelectGroup: null,
-        onSelectUser: null,
-        userId: 0
+        onSelectUser: null
     };
 
     constructor(props) {
@@ -29,13 +28,14 @@ export class GadgetStudentTracking extends Component{
 
     componentDidUpdate(prevProps){
        // Typical usage (don't forget to compare props):
-       if (this.props.courseId !== prevProps.courseId) {
+       if ((this.props.options.selectedCourse.courseId !== prevProps.options.selectedCourse.courseId) || 
+            (this.props.options.onlyMyGroups !== prevProps.options.onlyMyGroups)){
             this.getData();
         }
     }
 
     getData(){
-        $glVars.webApi.getStudentTracking(this.props.courseId, this.props.userId, this.getDataResult);        
+        $glVars.webApi.getStudentTracking(this.props.options.selectedCourse.courseId, this.props.options.userId, this.props.options.onlyMyGroups, this.getDataResult);        
     }
 
     getDataResult(result){         
@@ -55,7 +55,7 @@ export class GadgetStudentTracking extends Component{
     getTitle(){
         let result = null;
 
-        if(this.props.userId === 0){
+        if(this.props.options.userId === 0){
             result = 
                 <Card.Title>
                     <div>
@@ -80,7 +80,7 @@ export class GadgetStudentTracking extends Component{
 
         if(this.state.dataProvider.length === 0){ return result;}
 
-        if(this.props.userId === 0){
+        if(this.props.options.userId === 0){
             result = 
             <Card className='gadget-student-tracking'>
                 <Card.Body>
