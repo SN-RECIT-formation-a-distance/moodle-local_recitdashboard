@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import {Navbar, Nav, Form, FormControl, InputGroup, Card, ProgressBar, NavDropdown, Button, ButtonGroup, Jumbotron} from 'react-bootstrap';
-import {faTachometerAlt, faSearch, faBookOpen, faFileAlt, faUsers} from '@fortawesome/free-solid-svg-icons';
+import {Navbar, Nav, Form, FormControl, InputGroup, Card, ProgressBar, NavDropdown, Jumbotron} from 'react-bootstrap';
+import {faTachometerAlt, faSearch, faBookOpen, faFileAlt} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {DataGrid} from '../libs/components/Components';
 import {UtilsString, JsNx} from '../libs/utils/Utils';
@@ -151,7 +151,6 @@ class TeacherView extends Component {
                     :
                     <DashboardNavBar>
                         <Nav className="mr-auto"></Nav>
-                        <Nav>
                             <NavDropdown title={<span><FontAwesomeIcon icon={faFileAlt}/>{" Rapports"}</span>} id="menu-reports">
                                 <NavDropdown.Item href={`${M.cfg.wwwroot}/grade/report/grader/index.php?id=${selectedCourse.courseId}`} target="_blank">
                                     {" Rapport de l'évaluateur"}
@@ -161,7 +160,6 @@ class TeacherView extends Component {
                                 </NavDropdown.Item>                        
                                 
                             </NavDropdown>
-                        </Nav>
                     
                         <Form inline>
                             <InputGroup className="mb-0">
@@ -175,30 +173,29 @@ class TeacherView extends Component {
                     </DashboardNavBar>   
                 }   
                 
-                {selectedCourse !== null && 
-                    <div style={{display: "flex"}}>
-                        <ButtonGroup toggle={true}>
-                            <Button variant={(this.state.onlyMyGroups ? "secondary" : "outline-secondary")} onClick={this.onMyGroupsOn}><FontAwesomeIcon icon={faUsers}/>{' Afficher uniquement mes groupes'}</Button>
-                        </ButtonGroup>
-                        <Nav className="mr-auto">
-                            {selectedCourse !== null && 
-                                <Nav.Link style={{color: "#dc3545"}} href="#" onClick={this.props.onUnselectCourse} title={selectedCourse.courseName}>
-                                    {`Course: ${UtilsString.slice(selectedCourse.courseName, 15)} (x)`}
-                                </Nav.Link>
-                            }
-                            {this.state.selectedGroup !== null && 
-                                <Nav.Link style={{color: "#dc3545"}} href="#" onClick={this.onUnselectGroup} title={this.state.selectedGroup.name}>
-                                    {`Groupe: ${UtilsString.slice(this.state.selectedGroup.name, 15)} (x)`}
-                                </Nav.Link>
-                            }
-                            {this.state.selectedUser !== null && 
-                                <Nav.Link style={{color: "#dc3545"}} href="#" onClick={this.onUnselectUser} title={this.state.selectedUser.name}>
-                                    {`Élève: ${UtilsString.slice(this.state.selectedUser.name, 25)} (x)`}
-                                </Nav.Link>
-                            }
-                        </Nav>
-                    </div>            
-                }
+                <DashboardFilters show={(selectedCourse !== null)}>
+                        <Form>
+                            <Form.Group controlId="formBasicCheckbox">
+                                <Form.Check type="checkbox" label=" Afficher uniquement mes groupes" checked={this.state.onlyMyGroups} onChange={this.onMyGroupsOn} />
+                            </Form.Group>
+                        </Form>
+                      
+                        {selectedCourse !== null && 
+                            <Nav.Link style={{color: "#dc3545"}} href="#" onClick={this.props.onUnselectCourse} title={selectedCourse.courseName}>
+                                {`Course: ${UtilsString.slice(selectedCourse.courseName, 15)} (x)`}
+                            </Nav.Link>
+                        }
+                        {this.state.selectedGroup !== null && 
+                            <Nav.Link style={{color: "#dc3545"}} href="#" onClick={this.onUnselectGroup} title={this.state.selectedGroup.name}>
+                                {`Groupe: ${UtilsString.slice(this.state.selectedGroup.name, 15)} (x)`}
+                            </Nav.Link>
+                        }
+                        {this.state.selectedUser !== null && 
+                            <Nav.Link style={{color: "#dc3545"}} href="#" onClick={this.onUnselectUser} title={this.state.selectedUser.name}>
+                                {`Élève: ${UtilsString.slice(this.state.selectedUser.name, 25)} (x)`}
+                            </Nav.Link>
+                        }
+                </DashboardFilters>
                 
                 {this.state.queryResult !== null ?
                     <DataGrid orderBy={true}>
@@ -280,11 +277,27 @@ class TeacherView extends Component {
 class DashboardIntro extends Component{
     render(){
         let main = 
-            <Jumbotron style={{padding: "2rem 2rem", marginTop: "1rem"}}>
+            <Jumbotron style={{padding: "2rem 2rem", margin: "1rem"}}>
                 <h1>Tableau de bord RÉCIT</h1>
                 <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s...</p>
             </Jumbotron>;
         return main;
+    }
+}
+
+class DashboardFilters extends Component{
+    static defaultProps = {
+        show: false,
+        children: null
+    };
+
+    render(){
+        let main = 
+            <div style={{display: "flex", marginBottom: "1rem", alignItems: "baseline", padding: "1rem"}} className="bg-light">
+                {this.props.children}
+            </div> 
+                  
+        return (this.props.show ? main : null);
     }
 }
 
@@ -361,18 +374,21 @@ class StudentView extends Component{
                     <DashboardIntro/>
                     :
                     <DashboardNavBar>                    
-                        <Nav className="mr-auto">
-                            {selectedCourse !== null && <Nav.Link style={{color: "#dc3545"}} href="#" onClick={this.props.onUnselectCourse}>{`Course: ${selectedCourse.courseName} (x)`}</Nav.Link>}
-                        </Nav>
-                        {selectedCourse && 
-                            <NavDropdown title={<span><FontAwesomeIcon icon={faFileAlt}/>{" Rapports"}</span>} id="menu-reports">
-                                <NavDropdown.Item href={`${M.cfg.wwwroot}/course/user.php?mode=grade&id=${selectedCourse.courseId}&user=${userId}`} target="_blank">
-                                    <FontAwesomeIcon icon={faBookOpen}/>{" Notes"}
-                                </NavDropdown.Item>                        
-                            </NavDropdown>
-                        }   
+                        <Nav className="mr-auto"></Nav>
+                        <NavDropdown title={<span><FontAwesomeIcon icon={faFileAlt}/>{" Rapports"}</span>} id="menu-reports">
+                            <NavDropdown.Item href={`${M.cfg.wwwroot}/course/user.php?mode=grade&id=${selectedCourse.courseId}&user=${userId}`} target="_blank">
+                                <FontAwesomeIcon icon={faBookOpen}/>{" Notes"}
+                            </NavDropdown.Item>                        
+                        </NavDropdown>
                     </DashboardNavBar>
                 }
+
+                <DashboardFilters show={(selectedCourse !== null)}>
+                    {selectedCourse !== null && 
+                        <Nav.Link style={{color: "#dc3545"}} href="#" onClick={this.props.onUnselectCourse}>{`Course: ${selectedCourse.courseName} (x)`}</Nav.Link>
+                    }
+                </DashboardFilters>
+
                 {selectedCourse !== null && <StudentGadgets options={this.props.options}/>}
             </div>;
 
@@ -417,7 +433,7 @@ class StudentGadgets extends Component {
 
         let main = 
             <div>
-                <div style={{padding: "1rem", backgroundColor: "#fafafa"}}>
+                <div className="gadget" style={{padding: "1rem", backgroundColor: "#fafafa"}}>
                     <img src={this.state.profile.avatar} style={{borderRadius: "50%", marginRight: "1rem", float: "left"}}/>
                     <h2>{this.state.profile.name}</h2>
                     <p><small className="text-muted">{this.state.profile.email}</small><small className="text-muted">{` | Dernière connexion: ${this.state.profile.lastLogin}`}</small></p>

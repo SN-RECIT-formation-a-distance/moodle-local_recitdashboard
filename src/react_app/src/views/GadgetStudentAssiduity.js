@@ -130,7 +130,7 @@ export class GadgetStudentAssiduity extends Component{
         let dataProvider = this.prepareChartData(this.state.dataProvider);        
         
         let main =
-            <Card style={{flexGrow: 1, margin: 5}} className="gadget">
+            <Card className="gadget">
                 <Card.Body>
                     <Card.Title style={{display: "flex", justifyContent: "space-between"}}>
                         <div>
