@@ -11,6 +11,7 @@ import {GadgetDiagnosticTags} from './GadgetDiagnosticTags';
 import {GadgetGroupsOverview} from './GadgetGroupsOverview';
 import {GadgetStudentTracking} from './GadgetStudentTracking';
 import {GadgetStudentAssiduity} from './GadgetStudentAssiduity';
+import {GadgetPendingHomeworks} from './GadgetPendingHomeworks';
 
 export class DashboardView extends Component{
     static defaultProps = {        
@@ -353,6 +354,7 @@ class TeacherGroupView extends Component{
             <div>
                 <GadgetCourseProgressOverview courseId={this.props.courseId} groupId={this.props.groupId} onSelectUser={this.props.onSelectUser}/>
                 <GadgetDiagnosticTags courseId={this.props.courseId} groupId={this.props.groupId}/>
+                <GadgetPendingHomeworks courseId={this.props.courseId} groupId={this.props.groupId} onSelectUser={this.props.onSelectUser}/>
             </div>
         return main;
     }
