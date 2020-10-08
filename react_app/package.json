@@ -1,0 +1,39 @@
+{
+  "name": "recit_dashboard",
+  "version": "1.0.0",
+  "description": "RÉCIT Dashboard",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "parcel ./src/index.js --out-dir ../src/react_app_build",
+    "build": "parcel build ./src/index.js --out-dir ../src/react_app_build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "1.2.25",
+    "@fortawesome/free-solid-svg-icons": "5.11.2",
+    "@fortawesome/react-fontawesome": "0.1.7",
+    "@nivo/bar": "0.62.0",
+    "@nivo/heatmap": "0.61.0",
+    "@nivo/line": "0.60.1",
+    "@nivo/pie": "0.61.1",
+    "bootstrap": "4.3.1",
+    "date-fns": "2.7.0",
+    "prop-types": "15.7.2",
+    "react": "16.13.1",
+    "react-bootstrap": "1.0.0-beta.14",
+    "react-datepicker": "2.9.6",
+    "react-dom": "16.11.0",
+    "react-select": "3.0.8"
+  },
+  "devDependencies": {
+    "babel-core": "6.26.3",
+    "babel-plugin-transform-class-properties": "6.24.1",
+    "babel-preset-env": "1.7.0",
+    "babel-preset-react": "6.24.1",
+    "node-sass": "4.13.0",
+    "parcel-bundler": "1.12.4"
+  }
+}

@@ -1,4 +1,4 @@
 
-src/react_app/.cache
-src/react_app/node_modules
+react_app/.cache
+react_app/node_modules
 local_recitdashboard.zip
