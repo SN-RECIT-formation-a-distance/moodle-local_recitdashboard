@@ -8,6 +8,7 @@ export * from './ComboBox';
 export * from './DataGrid';
 export * from './Feedback';
 export * from './Loading';
+export * from './MultipleSelect';
 
 export default class Components{
     static version = 1.0;

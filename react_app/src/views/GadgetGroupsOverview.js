@@ -8,8 +8,7 @@ import {$glVars} from '../common/common';
 
 export class GadgetGroupsOverview extends Component{
     static defaultProps = {        
-        options: null,
-        onSelectGroup: null
+        options: null
     };
 
     constructor(props) {
@@ -26,15 +25,16 @@ export class GadgetGroupsOverview extends Component{
     }
 
     componentDidUpdate(prevProps){
-       // Typical usage (don't forget to compare props):
-       if ((this.props.options.selectedCourse.courseId !== prevProps.options.selectedCourse.courseId) || 
-            (this.props.options.onlyMyGroups !== prevProps.options.onlyMyGroups)){
+        // Typical usage (don't forget to compare props):
+        if(JSON.stringify(this.props.options) !== JSON.stringify(prevProps.options)){
             this.getData();
         }
     }
 
     getData(){
-        $glVars.webApi.getGroupsOverview(this.props.options.selectedCourse.courseId, this.props.options.onlyMyGroups, this.getDataResult);        
+        if(this.props.options === null){ return; }
+
+        $glVars.webApi.getGroupsOverview(this.props.options.courseId, this.props.options.onlyMyGroups, this.getDataResult);        
     }
 
     getDataResult(result){         
@@ -47,17 +47,13 @@ export class GadgetGroupsOverview extends Component{
     }
 
     render(){
-        
+        if(this.state.dataProvider.length === 0){ return null;}
+
         let main =
             <Card className="gadget-groups-overview">
                 <Card.Body>
                     <Card.Title>
-                        <div>
-                            {"Aperçu rapide de mes groupes "}
-                            <OverlayTrigger placement="right" delay={{ show: 250, hide: 400 }} overlay={<Tooltip>{`En cliquant sur le groupe on obtient une vue détaillée des données du group`}</Tooltip>}>
-                                <Button size="sm" variant="outline-secondary"><FontAwesomeIcon icon={faInfo}/></Button>
-                            </OverlayTrigger>
-                        </div>
+                        <div>{"Aperçu rapide de mes groupes "}</div>
                         
                         <ButtonToolbar aria-label="Toolbar with Buttons">
                             <ButtonGroup  >
@@ -68,7 +64,7 @@ export class GadgetGroupsOverview extends Component{
 
                     <div className="content">
                         {this.state.dataProvider.map((item, index) => {
-                            return <PieChart key={index} data={item}  onSelectGroup={this.props.onSelectGroup} />;
+                            return <PieChart key={index} data={item} />;
                         })}
                     </div>
                 </Card.Body>
@@ -79,8 +75,7 @@ export class GadgetGroupsOverview extends Component{
 
 class PieChart extends Component{
     static defaultProps = {        
-        data: null,
-        onSelectGroup: null
+        data: null
     };
 
     render(){
@@ -89,9 +84,7 @@ class PieChart extends Component{
 
         let main = 
             <div className='item'>
-                <Button  size="sm" variant="link" onClick={() => this.props.onSelectGroup({id: item.group.id, name: item.group.name})}>
-                    <h5 className='item-title'>{title}</h5>
-                </Button>
+                <h5 className='item-title'>{title}</h5>
                 
                 <div className='charts'>
                     {this.getChart(this.props.data.progress, 'Progrès')}

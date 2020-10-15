@@ -8,9 +8,9 @@ import ReactDOM from "react-dom";
 
 import {faSync} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {VisualFeedback, Loading} from "./libs/components/Components";
+import {VisualFeedback, Loading, Components} from "./libs/components/Components";
 import {UtilsMoodle} from "./libs/utils/Utils";
-import {DashboardView} from "./views/Views";
+import {MainView} from "./views/Views";
 import {$glVars} from "./common/common";
 import "./common/style.scss";
 export * from "./common/i18n";
@@ -45,7 +45,7 @@ class App extends Component {
         
         let main =
             <div>
-                <DashboardView mode={this.state.mode} selectCourseId={this.props.selectCourseId}/>
+                <MainView />
                 {$glVars.feedback.msg.map((item, index) => {  
                     return (<VisualFeedback key={index} id={index} msg={item.msg} type={item.type} title={item.title} timeout={item.timeout}/>);                                    
                 })}

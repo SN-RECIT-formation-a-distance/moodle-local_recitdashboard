@@ -33,6 +33,12 @@ export class AppWebApi extends WebApi
         this.post(this.gateway, data, onSuccess);
     }
     
+    getCourseSectionActivityList(enrolled, onSuccess){
+        enrolled = (typeof enrolled === 'boolean' ? enrolled : true);
+        let data = {service: "getCourseSectionActivityList", enrolled: enrolled};
+        this.post(this.gateway, data, onSuccess);
+    }
+
     getCourseProgressionOverview(courseId, groupId, onSuccess){
         groupId = groupId || 0;
         let data = {courseId: courseId, groupId: groupId, service: "getCourseProgressionOverview"};
@@ -56,9 +62,13 @@ export class AppWebApi extends WebApi
         this.post(this.gateway, data, onSuccess);
     }
 
-    getReportDiagTag(courseId, groupId, userId, onSuccess){
+    getReportDiagTag(courseId, groupId, cmId, output, options, onSuccess){
         groupId = groupId || 0;
-        let data = {courseId: courseId, cmId: 0, userId:userId, groupId: groupId, service: "getReportDiagTag"};
+        cmId = cmId || 0;
+        output = output || 'html';
+        options = options || 'question';
+
+        let data = {courseId: courseId, cmId: cmId, groupId: groupId, service: "getReportDiagTag", output: output, options: options};
         this.post(this.gateway, data, onSuccess);
     }
 
