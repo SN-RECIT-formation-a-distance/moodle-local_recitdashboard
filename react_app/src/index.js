@@ -18,7 +18,7 @@ export * from "./common/i18n";
 class App extends Component {
     static defaultProps = {
         signedUser: null,
-        selectCourseId: 0
+        courseId: 0
     };
 
     constructor(props) {
@@ -45,7 +45,7 @@ class App extends Component {
         
         let main =
             <div>
-                <MainView />
+                <MainView courseId={this.props.courseId} />
                 {$glVars.feedback.msg.map((item, index) => {  
                     return (<VisualFeedback key={index} id={index} msg={item.msg} type={item.type} title={item.title} timeout={item.timeout}/>);                                    
                 })}
@@ -63,7 +63,7 @@ class App extends Component {
 document.addEventListener('DOMContentLoaded', function(){ 
     const domContainer = document.getElementById('recit_dashboard');
     let signedUser = {userId: domContainer.getAttribute('data-student-id'), roles: domContainer.getAttribute('data-roles').split(",")};
-    ReactDOM.render(<App signedUser={signedUser} selectCourseId={parseInt(domContainer.getAttribute('data-course-id'))}/>, domContainer);
+    ReactDOM.render(<App signedUser={signedUser} courseId={parseInt(domContainer.getAttribute('data-course-id'))}/>, domContainer);
 	//document.body.style.backgroundColor = 'inherit';
 }, false);
 

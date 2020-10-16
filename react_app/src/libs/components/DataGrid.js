@@ -108,7 +108,7 @@ class Body extends Component {
     
     render() {
         if(this.state.nbRows === 0){
-            return (<caption style={{captionSide: "bottom"}}>No item</caption>);
+            return (<caption style={{captionSide: "bottom"}}>Aucun élément</caption>);
         }
         else{
             //return (<tbody>{this.renderChildren()}</tbody>);
