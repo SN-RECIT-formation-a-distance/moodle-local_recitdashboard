@@ -58,14 +58,14 @@ export class ReportCourseProgressOverview extends Component{
                         <DataGrid.Body>
                             {this.state.dataProvider.map((item, index) => {
                                     let row = 
-                                        <DataGrid.Body.Row key={index} onDbClick={() => this.props.onSelectUser({id: item.userId, name: item.studentName})}>
+                                        <DataGrid.Body.Row key={index}>
                                             <DataGrid.Body.Cell>{index + 1}</DataGrid.Body.Cell>
                                             <DataGrid.Body.Cell sortValue={item.studentName}>{item.studentName}</DataGrid.Body.Cell>
                                             <DataGrid.Body.Cell sortValue={item.pctWork.toString()} style={{textAlign: "center"}}>
-                                                <OverlayTrigger placement="right" delay={{ show: 250, hide: 400 }}
-                                                    overlay={<Tooltip>{`Temps: ${item.pctTime}%  | Travail: ${item.pctWork}%`}</Tooltip>}>
-                                                    <ProgressBar striped min={0} max={100} variant={this.getProgressColor(item)} now={item.pctWork} label={`${item.pctWork.toFixed(0)}%`}/>
-                                                </OverlayTrigger>
+                                                <ProgressBar striped min={0} max={100} variant={this.getProgressColor(item)} now={item.pctTime} 
+                                                        label={<span style={{position: 'absolute', textShadow: '0px 0px 1px black', marginLeft: '.5rem'}}>{`Temps: ${item.pctTime.toFixed(0)}%`}</span>}/>
+                                                <ProgressBar striped min={0} max={100} variant={this.getProgressColor(item)} now={item.pctWork} 
+                                                    label={<span style={{position: 'absolute', textShadow: '0px 0px 1px black', marginLeft: '.5rem'}}>{`Travail: ${item.pctWork.toFixed(0)}%`}</span>}/>
                                             </DataGrid.Body.Cell>                                            
                                             <DataGrid.Body.Cell>{item.lastUpdate}</DataGrid.Body.Cell>
                                         </DataGrid.Body.Row>
