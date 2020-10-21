@@ -51,7 +51,8 @@ export class ReportCourseProgressOverview extends Component{
                             <DataGrid.Header.Row>
                                 <DataGrid.Header.Cell style={{width: 70}}>{"#"}</DataGrid.Header.Cell>
                                 <DataGrid.Header.Cell >{"Élève"}</DataGrid.Header.Cell>
-                                <DataGrid.Header.Cell style={{width: 270}}>{"Progression"}</DataGrid.Header.Cell>
+                                <DataGrid.Header.Cell style={{width: 270}}>{"Progression Temps"}</DataGrid.Header.Cell>
+                                <DataGrid.Header.Cell style={{width: 270}}>{"Progression Travail"}</DataGrid.Header.Cell>
                                 <DataGrid.Header.Cell style={{width: 180}}>{"Mise à jour"}</DataGrid.Header.Cell>
                             </DataGrid.Header.Row>
                         </DataGrid.Header>
@@ -64,6 +65,8 @@ export class ReportCourseProgressOverview extends Component{
                                             <DataGrid.Body.Cell sortValue={item.pctWork.toString()} style={{textAlign: "center"}}>
                                                 <ProgressBar striped min={0} max={100} variant={this.getProgressColor(item)} now={item.pctTime} 
                                                         label={<span style={{position: 'absolute', textShadow: '0px 0px 1px black', marginLeft: '.5rem'}}>{`Temps: ${item.pctTime.toFixed(0)}%`}</span>}/>
+                                            </DataGrid.Body.Cell>
+                                            <DataGrid.Body.Cell sortValue={item.pctWork.toString()} style={{textAlign: "center"}}>
                                                 <ProgressBar striped min={0} max={100} variant={this.getProgressColor(item)} now={item.pctWork} 
                                                     label={<span style={{position: 'absolute', textShadow: '0px 0px 1px black', marginLeft: '.5rem'}}>{`Travail: ${item.pctWork.toFixed(0)}%`}</span>}/>
                                             </DataGrid.Body.Cell>                                            

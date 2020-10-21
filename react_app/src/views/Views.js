@@ -166,9 +166,9 @@ class FilterOptions extends Component{
                         return (options.courseId > 0 && options.groupId > 0 && options.cmId > 0)
                     }
                 },
-                {text: 'Aperçu de la progression', value: '2', callbackValidation: function(options){
+                /*{text: 'Aperçu de la progression', value: '2', callbackValidation: function(options){
                     return (options.courseId > 0 && options.groupId > 0)
-                }}
+                }}*/
             ],
             groupList: [],
             studentList: [],

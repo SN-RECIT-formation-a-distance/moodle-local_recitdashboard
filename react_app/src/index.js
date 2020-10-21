@@ -28,12 +28,15 @@ class App extends Component {
 
         $glVars.signedUser = this.props.signedUser;
 
+        console.log($glVars.signedUser);
+
         let mode = (UtilsMoodle.checkRoles($glVars.signedUser.roles, UtilsMoodle.rolesL2) ? 't' : 's');
 
         this.state = {mode: mode};
     }
 
     componentDidMount(){
+
         $glVars.feedback.addObserver("App", this.onFeedback); 
     }
 
@@ -42,7 +45,6 @@ class App extends Component {
     }
 
     render() {  
-        
         let main =
             <div>
                 <MainView courseId={this.props.courseId} />
@@ -63,8 +65,13 @@ class App extends Component {
 document.addEventListener('DOMContentLoaded', function(){ 
     const domContainer = document.getElementById('recit_dashboard');
     let signedUser = {userId: domContainer.getAttribute('data-student-id'), roles: domContainer.getAttribute('data-roles').split(",")};
+
+    if(UtilsMoodle.checkRoles(signedUser.roles, UtilsMoodle.rolesL3)){
+        window.location.href = `${M.cfg.wwwroot}`;
+        return;
+    }
+
     ReactDOM.render(<App signedUser={signedUser} courseId={parseInt(domContainer.getAttribute('data-course-id'))}/>, domContainer);
-	//document.body.style.backgroundColor = 'inherit';
 }, false);
 
 

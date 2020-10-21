@@ -214,7 +214,7 @@ export class UtilsMoodle
 {
     static rolesL1 = ['ad', 'mg', 'cc', 'et'];
     static rolesL2 = ['ad', 'mg', 'cc', 'et', 'tc'];
-    static rolesL3 = ['sd', 'gu', 'fp'];
+    static rolesL3 = ['sd', 'gu', 'fp', ''];
 
     static checkRoles(roles, r1){
         let r2 = roles;
