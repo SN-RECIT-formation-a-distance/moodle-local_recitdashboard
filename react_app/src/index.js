@@ -28,8 +28,6 @@ class App extends Component {
 
         $glVars.signedUser = this.props.signedUser;
 
-        console.log($glVars.signedUser);
-
         let mode = (UtilsMoodle.checkRoles($glVars.signedUser.roles, UtilsMoodle.rolesL2) ? 't' : 's');
 
         this.state = {mode: mode};

@@ -34,7 +34,7 @@ export class GadgetGroupsOverview extends Component{
     getData(){
         if(this.props.options === null){ return; }
 
-        $glVars.webApi.getGroupsOverview(this.props.options.courseId, this.props.options.onlyMyGroups, this.getDataResult);        
+        $glVars.webApi.getGroupsOverview(this.props.options.course.id, 0, this.getDataResult);        
     }
 
     getDataResult(result){         

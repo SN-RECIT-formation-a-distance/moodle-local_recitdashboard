@@ -30,6 +30,7 @@ export class ReportDiagnosticTags extends Component{
     componentDidUpdate(prevProps){
         // Typical usage (don't forget to compare props):
         if(JSON.stringify(this.props.options) !== JSON.stringify(prevProps.options)){
+            console.log("b")
             this.getData();
         }
     }
@@ -38,7 +39,7 @@ export class ReportDiagnosticTags extends Component{
         if(this.props.options === null){ return; }
 
         output = output || 'html';
-        $glVars.webApi.getReportDiagTag(this.props.options.courseId, this.props.options.groupId, this.props.options.cmId, output, 'question', this.getDataResult);  
+        $glVars.webApi.getReportDiagTag(this.props.options.course.id, this.props.options.group.id, this.props.options.cm.id, output, 'question', this.getDataResult);  
     }
 
     getDataResult(result){    
@@ -153,7 +154,7 @@ export class ReportDiagnosticTags extends Component{
             <br/>
             <hr/>
             <div>
-                <a href={`${Options.getGateway()}?service=getReportDiagTag&cmId=${this.props.options.cmId}&output=csv&options=question`} target='_blank'>{"Télécharger en CSV"}</a>
+                <a href={`${Options.getGateway()}?service=getReportDiagTag&cmId=${this.props.options.cm.id}&output=csv&options=question`} target='_blank'>{"Télécharger en CSV"}</a>
             </div>
         </div>;
 

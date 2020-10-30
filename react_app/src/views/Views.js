@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {Card, Nav, Button, Collapse, Jumbotron} from 'react-bootstrap';
+import {NavDropdown, Nav, Button, Collapse, Jumbotron, NavItem} from 'react-bootstrap';
 import {faTachometerAlt, faPlus, faMinus, faFileAlt, faThumbsUp} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {ComboBox} from '../libs/components/Components';
@@ -7,7 +7,7 @@ import {JsNx} from '../libs/utils/Utils';
 import {$glVars} from '../common/common';
 import {GadgetGroupsOverview} from './gadgets/GadgetGroupsOverview';
 import {ReportDiagnosticTags} from './reports/ReportDiagnosticTags';
-import {ReportCourseProgressOverview} from './reports/ReportCourseProgress';
+import {ReportSectionCompletion} from './reports/ReportSectionCompletion';
 
 export class MainView extends Component{
     static defaultProps = { 
@@ -20,8 +20,30 @@ export class MainView extends Component{
 
         this.onSelect = this.onSelect.bind(this);
         this.onChangeFilterOptions = this.onChangeFilterOptions.bind(this);
+        this.onGo = this.onGo.bind(this);
 
-        this.state = {selectedView: 1, options: null};
+        this.state = {
+            selectedView: 0, 
+            show: false,
+            options: {
+                course: {id: 0, name: ""},
+                group: {id: 0, name: ""},
+                student: {id: 0, name: ""},
+                section: {id: 0, name: ""},
+                cm: {id: 0, name: ""},
+                report: {id: 0, name: "", validation: null, require: {course: true, group: false, student: false, section: false, cm: false}}                
+            },
+            reportList: [
+                {text: 'Test selon les tags de questions', value: 1, require:{course: true, group: true, student: false, section: true, cm: true}, validation: function(options){
+                        return (options.course.id > 0 && options.group.id > 0 && options.cm.id > 0)
+                    }
+                },
+                {text: 'Achèvement par section', value: 2, require:{course: true, group: true, student: false, section: false, cm: false}, validation: function(options){
+                        return (options.course.id > 0 && options.group.id > 0)
+                    }
+                }
+            ],
+        };
     }
 
     render(){
@@ -34,9 +56,11 @@ export class MainView extends Component{
                         <Nav.Item>
                             <Nav.Link href="#" eventKey={0}><FontAwesomeIcon icon={faTachometerAlt}/> Tableau de bord</Nav.Link>
                         </Nav.Item>
-                        <Nav.Item>
-                            <Nav.Link href="#" eventKey={1}><FontAwesomeIcon icon={faFileAlt}/> Rapports</Nav.Link>
-                        </Nav.Item>
+                        <NavDropdown variant="outline-primary"   title={<span><FontAwesomeIcon icon={faFileAlt}/>{this.state.options.report.name.length === 0 ? " Reports" : ` ${this.state.options.report.name} `}</span>} id="btnReports" >
+                            {this.state.reportList.map((item, index) => {
+                                return <NavDropdown.Item eventKey={item.value} key={index}>{item.text}</NavDropdown.Item>;
+                            })}
+                        </NavDropdown>
                     </Nav>  
                     <br/>    <br/>    
                     {this.getFilterOptions()}              
@@ -49,27 +73,58 @@ export class MainView extends Component{
     }
 
     onSelect(eventKey){
-        this.setState({selectedView: eventKey});
+        let options = this.state.options;
+        
+        if(["1", "2"].includes(eventKey)){
+            let item = JsNx.getItem(this.state.reportList, 'value', parseInt(eventKey, 10));
+            options.report.name = item.text;
+            options.report.id = item.value;
+            options.report.validation = item.validation;
+            options.report.require = item.require;
+        }
+        else{
+            options.report.name = "";
+            options.report.id = 0;
+            options.report.validation = null;
+            options.report.require = {course: true, group: false, student: false, section: false, cm: false};
+        }
+        
+        this.setState({selectedView: eventKey, options: options, show: false});
     }
 
     getView(){
+        if(!this.state.show){ return null;}
+
         switch(this.state.selectedView.toString()){
             case '0': return <DashboardView options={this.state.options}/>;
-            case '1': return <ReportsView options={this.state.options}/>;
+            case '1': 
+            case '2':
+                return <ReportsView options={this.state.options}/>;
             default: return null;
         }
     }
 
     getFilterOptions(){
         switch(this.state.selectedView.toString()){
-            case '0': return <FilterOptions onChange={this.onChangeFilterOptions} courseId={this.props.courseId} courseOn={true}/>;
-            case '1': return <FilterOptions onChange={this.onChangeFilterOptions} courseId={this.props.courseId} courseOn={true} sectionOn={true} activityOn={true} reportsOn={true} groupOn={true} studentOn={true}/>;
+            case '0': return <FilterOptions onChange={this.onChangeFilterOptions} options={this.state.options} onGo={this.onGo} />;
+            case '1': 
+            case '2': 
+                return <FilterOptions onChange={this.onChangeFilterOptions} options={this.state.options} onGo={this.onGo}/>;
             default: return null;
         }
     }
 
-    onChangeFilterOptions(options){
-        this.setState({options: options});
+    onChangeFilterOptions(event){
+        let options = this.state.options;
+        let attr = event.target.name.split(".");
+        options[attr[0]].id = event.target.value;
+        options[attr[0]].name = event.target.text;
+
+        this.setState({options: options, show: false});
+    }
+
+    onGo(){
+        this.setState({show: true});
     }
 }
 
@@ -81,7 +136,7 @@ class DashboardView extends Component{
     render() {  
         let desc = "";
         if(this.props.options !== null){
-            desc = `${this.props.options.courseName}`;
+            desc = `${this.props.options.course.name}`;
         }
 
         let main =
@@ -104,10 +159,10 @@ class ReportsView extends Component{
         if(this.props.options !== null){
             desc = 
             <div style={{textAlign: 'center'}}>
-                <h2>{this.props.options.courseName}</h2>
-                <h3>{this.props.options.sectionName}</h3>
-                <h4>{this.props.options.cmName}</h4>
-                <h5>{this.props.options.reportName}</h5>
+                <h2>{this.props.options.course.name}</h2>
+                <h3>{this.props.options.section.name}</h3>
+                <h4>{this.props.options.cm.name}</h4>
+                <h5>{this.props.options.report.name}</h5>
             </div>
         }
 
@@ -123,11 +178,11 @@ class ReportsView extends Component{
     getReport(){
         if(this.props.options === null){ return null;}
 
-        switch(this.props.options.reportId){
+        switch(this.props.options.report.id.toString()){
             case '1':
                 return <ReportDiagnosticTags options={this.props.options}/>;
             case '2':
-                return <ReportCourseProgressOverview options={this.props.options}/>;
+                return <ReportSectionCompletion options={this.props.options}/>;
             default:
                 return null;
         }
@@ -137,13 +192,8 @@ class ReportsView extends Component{
 class FilterOptions extends Component{
     static defaultProps = { 
         onChange: null,
-        courseId: 0,
-        courseOn: false,
-        sectionOn: false,
-        activityOn: false,
-        groupOn: false,
-        studentOn: false,
-        reportsOn: false
+        options: null,
+        onGo: null
     };
 
     constructor(props){
@@ -160,33 +210,9 @@ class FilterOptions extends Component{
             dataProvider: [],             
             courseList: [], 
             sectionList: [],
-            activityList: [],
-            reportList: [
-                {text: 'Test selon les tags de questions', value: '1', callbackValidation: function(options){
-                        return (options.courseId > 0 && options.groupId > 0 && options.cmId > 0)
-                    }
-                },
-                /*{text: 'Aperçu de la progression', value: '2', callbackValidation: function(options){
-                    return (options.courseId > 0 && options.groupId > 0)
-                }}*/
-            ],
+            activityList: [],           
             groupList: [],
-            studentList: [],
-            options: {
-                courseId: 0,
-                courseName: "",
-                sectionId: 0,
-                sectionName: "",
-                cmId: 0,
-                cmName: "",
-                reportId: '0',
-                reportName: "",
-                reportValidation: null,
-                groupId: 0,
-                groupName: "",
-                studentId: 0,
-                studentName: ""
-            }
+            studentList: []
         };
     }
 
@@ -214,62 +240,49 @@ class FilterOptions extends Component{
     }
 
     onAfterDataResult(){
-        if(parseInt(this.props.courseId,10) > 0){
+        /*if(parseInt(this.props.options.course.id, 10) > 0){
             this.onDataChange({target: {name: 'courseId', value: this.props.courseId.toString()}});
-        }
+        }*/
     }
     
     render(){
+        let options = this.props.options;
+
         let main = 
                 <div className='filter-options'>
                     <h6>Options de filtrage <Button variant="link" size="sm" onClick={() => {this.setState({collapse: !this.state.collapse})}}>{this.state.collapse ? <FontAwesomeIcon icon={faMinus}/> : <FontAwesomeIcon icon={faPlus}/>}</Button></h6>
                     <Collapse in={this.state.collapse}>
                         <div>
                             <div className='filter-container'>
-                                {this.props.courseOn && 
-                                    <div className='filter-item'>
-                                        <strong>Cours</strong>
-                                        <ComboBox placeholder={"Sélectionnez votre option"} options={this.state.courseList} onChange={this.onDataChange} name="courseId" value={this.state.options.courseId}/>
-                                    </div>
-                                }
-                                {this.props.groupOn && 
-                                    <div className='filter-item'>
-                                         <div>
-                                            <strong>Groupe</strong>
-                                            <ComboBox placeholder={"Tous les groupes"} options={this.state.groupList} onChange={this.onDataChange} name="groupId" value={this.state.options.groupId}/>
-                                        </div>  
-                                        <br/>
-                                        {this.props.studentOn && 
-                                            <div>
-                                                <strong>Élèves</strong>
-                                                <ComboBox placeholder={"Tous les élèves"} options={this.state.studentList} onChange={this.onDataChange} name="studentId" value={this.state.options.studentId} disabled={true}/>
-                                            </div>  
-                                        }
-                                    </div>
-                                }
-                                {this.props.sectionOn && 
-                                    <div className='filter-item'>
-                                        <div>
-                                            <strong>Sections</strong>
-                                            <ComboBox placeholder={"Toutes les sections"} options={this.state.sectionList} onChange={this.onDataChange} name="sectionId" value={this.state.options.sectionId}/>
-                                        </div>
-                                        <br/>
-                                        {this.props.activityOn && 
-                                            <div>
-                                                <strong>Activités</strong>
-                                                <ComboBox placeholder={"Toutes les activités"} options={this.state.activityList} onChange={this.onDataChange} name="cmId" value={this.state.options.cmId}/>
-                                            </div>  
-                                        }
-                                    </div>
-                                }                               
-                                {this.props.reportsOn && 
-                                    <div className='filter-item'>
-                                        <strong>Rapports</strong>
-                                        <ComboBox placeholder={"Sélectionnez votre option"} options={this.state.reportList} onChange={this.onDataChange} name="reportId" value={this.state.options.reportId}/>
-                                    </div>
-                                }
                                 <div className='filter-item'>
-                                    <Button variant='primary' onClick={() => this.props.onChange(JsNx.clone(this.state.options))} disabled={this.disableBtnGo()}>
+                                    <strong>Cours</strong>
+                                    <ComboBox disabled={!options.report.require.course} placeholder={"Sélectionnez votre option"} options={this.state.courseList} onChange={this.onDataChange} name="course.id" value={options.course.id}/>
+                                </div>
+                                <div className='filter-item'>
+                                    <div>
+                                        <strong>Groupe</strong>
+                                        <ComboBox disabled={!options.report.require.group} placeholder={"Tous les groupes"} options={this.state.groupList} onChange={this.onDataChange} name="group.id" value={options.group.id}/>
+                                    </div>  
+                                    <br/>
+                                    <div>
+                                        <strong>Élèves</strong>
+                                        <ComboBox disabled={!options.report.require.student} placeholder={"Tous les élèves"} options={this.state.studentList} onChange={this.onDataChange} name="student.id" value={options.student.id}/>
+                                    </div>  
+                                </div>
+                                <div className='filter-item'>
+                                    <div>
+                                        <strong>Sections</strong>
+                                        <ComboBox disabled={!options.report.require.section} placeholder={"Toutes les sections"} options={this.state.sectionList} onChange={this.onDataChange} name="section.id" value={options.section.id}/>
+                                    </div>
+                                    <br/>
+                                    <div>
+                                        <strong>Activités</strong>
+                                        <ComboBox disabled={!options.report.require.cm} placeholder={"Toutes les activités"} options={this.state.activityList} onChange={this.onDataChange} name="cm.id" value={options.cm.id}/>
+                                    </div>  
+                                </div>
+
+                                <div className='filter-item'>
+                                    <Button variant='primary' onClick={this.props.onGo} disabled={this.disableBtnGo()}>
                                         <FontAwesomeIcon icon={faThumbsUp}/>  Allez
                                     </Button>
                                 </div>
@@ -284,68 +297,45 @@ class FilterOptions extends Component{
 
     disableBtnGo(){
         // mode report on
-        if(this.props.reportsOn){
+        if(parseInt(this.props.options.report.id,10) > 0){
             
-            if(this.state.options.reportValidation === null){ 
+            if(this.props.options.report.validation === null){ 
                 return true;
             }
 
-            return !this.state.options.reportValidation(this.state.options);
+            return !this.props.options.report.validation(this.props.options);
         }
         else{
-            return !(parseInt(this.state.options.courseId,10) > 0);
+            return !(parseInt(this.props.options.course.id,10) > 0);
         }
     }
 
     onDataChange(event){
-        let options = this.state.options;
-        let sectionList = [];
-        let activityList = [];
-
-        options[event.target.name] = event.target.value;
-        options.courseName = "";
-        options.sectionName = "";
-        options.cmName = "";
-        options.reportName = "";
-        options.reportValidation = null;
-
-        for(let item of this.state.dataProvider){
-            if((item.courseId.toString() === options.courseId) && (JsNx.getItem(sectionList, 'value', item.sectionId, null) === null)){
-                sectionList.push({text: item.sectionName, value: item.sectionId});
+        let sectionList = this.state.sectionList;
+        let activityList = this.state.activityList;
+        
+        if(event.target.name === "course.id"){
+            for(let item of this.state.dataProvider){
+                if((item.courseId.toString() === event.target.value) && (JsNx.getItem(sectionList, 'value', item.sectionId, null) === null)){
+                    sectionList.push({text: item.sectionName, value: item.sectionId});
+                }
             }
+            activityList = [];
 
-            if((item.sectionId.toString() === options.sectionId) && (JsNx.getItem(activityList, 'value', item.cmId, null) === null)){
-                activityList.push({text: item.cmName, value: item.cmId});
+            if(parseInt(event.target.value,10) > 0){
+                $glVars.webApi.getEnrolledUserList(0, 0, event.target.value, this.getEnrolledUserListResult); 
             }
-
-            if((item.courseId.toString() === options.courseId)){
-                options.courseName = item.courseName;
-            }
-
-            if((item.sectionId.toString() === options.sectionId)){
-                options.sectionName = item.sectionName;
-            }
-
-            if((item.cmId.toString() === options.cmId)){
-                options.cmName = item.cmName;
+        }
+        
+        if(event.target.name === "section.id"){
+            for(let item of this.state.dataProvider){
+                if((item.sectionId.toString() === event.target.value) && (JsNx.getItem(activityList, 'value', item.cmId, null) === null)){
+                    activityList.push({text: item.cmName, value: item.cmId});
+                }
             }
         }
 
-        let reportItem = JsNx.getItem(this.state.reportList, 'value', options.reportId, null);
-        if(reportItem){
-            options.reportName = reportItem.text;
-            options.reportValidation = reportItem.callbackValidation;
-        }
-
-        if((event.target.name === "courseId") && (parseInt(options.courseId,10) > 0)){
-            options.sectionId = 0;
-            options.cmId = 0;
-            options.groupId = 0;
-            options.studentId = 0;
-            $glVars.webApi.getEnrolledUserList(0, 0, options.courseId, this.getEnrolledUserListResult); 
-        }
-
-        this.setState({options: options, sectionList: sectionList, activityList: activityList});
+        this.setState({sectionList: sectionList, activityList: activityList}, () => this.props.onChange(event));
     }
     
     getEnrolledUserListResult(result){

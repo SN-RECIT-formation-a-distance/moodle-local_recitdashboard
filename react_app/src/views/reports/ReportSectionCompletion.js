@@ -3,9 +3,10 @@ import {Card, ButtonGroup, Button, Badge, OverlayTrigger, Tooltip, DropdownButto
 import {faSync} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {DataGrid} from '../../libs/components/Components';
+import {JsNx} from '../../libs/utils/Utils';
 import {$glVars} from '../../common/common';
 
-export class ReportCourseProgressOverview extends Component{
+export class ReportSectionCompletion  extends Component{
     static defaultProps = {        
         options: null
     };
@@ -31,11 +32,12 @@ export class ReportCourseProgressOverview extends Component{
     }
 
     getData(){
-        $glVars.webApi.getCourseProgressionOverview(this.props.options.course.id, this.props.options.group.id, this.getDataResult);        
+        $glVars.webApi.reportSectionCompletion(this.props.options.course.id, this.props.options.group.id, this.getDataResult);        
     }
 
     getDataResult(result){         
         if(result.success){
+            console.log(result.data)
             this.setState({dataProvider: result.data});
         }
         else{
@@ -44,33 +46,30 @@ export class ReportCourseProgressOverview extends Component{
     }
 
     render() {    
+        let grades = JsNx.at(this.state.dataProvider, 0, {grades: []}).grades;
+
         let main = 
                 <div >
                     <DataGrid orderBy={true}>
                         <DataGrid.Header>
                             <DataGrid.Header.Row>
-                                <DataGrid.Header.Cell style={{width: 70}}>{"#"}</DataGrid.Header.Cell>
-                                <DataGrid.Header.Cell >{"Élève"}</DataGrid.Header.Cell>
-                                <DataGrid.Header.Cell style={{width: 270}}>{"Progression Temps"}</DataGrid.Header.Cell>
-                                <DataGrid.Header.Cell style={{width: 270}}>{"Progression Travail"}</DataGrid.Header.Cell>
-                                <DataGrid.Header.Cell style={{width: 180}}>{"Mise à jour"}</DataGrid.Header.Cell>
+                                <DataGrid.Header.Cell >{"Prénom / Nom"}</DataGrid.Header.Cell>
+                                {grades.map((item, index) => {
+                                    let result = <DataGrid.Header.Cell key={index}>{item.itemName}</DataGrid.Header.Cell>
+                                    return (result);                                    
+                                }
+                            )}
                             </DataGrid.Header.Row>
                         </DataGrid.Header>
                         <DataGrid.Body>
                             {this.state.dataProvider.map((item, index) => {
                                     let row = 
                                         <DataGrid.Body.Row key={index}>
-                                            <DataGrid.Body.Cell>{index + 1}</DataGrid.Body.Cell>
                                             <DataGrid.Body.Cell sortValue={item.studentName}>{item.studentName}</DataGrid.Body.Cell>
-                                            <DataGrid.Body.Cell sortValue={item.pctWork.toString()} style={{textAlign: "center"}}>
-                                                <ProgressBar striped min={0} max={100} variant={this.getProgressColor(item)} now={item.pctTime} 
-                                                        label={<span style={{position: 'absolute', textShadow: '0px 0px 1px black', marginLeft: '.5rem'}}>{`Temps: ${item.pctTime.toFixed(0)}%`}</span>}/>
-                                            </DataGrid.Body.Cell>
-                                            <DataGrid.Body.Cell sortValue={item.pctWork.toString()} style={{textAlign: "center"}}>
-                                                <ProgressBar striped min={0} max={100} variant={this.getProgressColor(item)} now={item.pctWork} 
-                                                    label={<span style={{position: 'absolute', textShadow: '0px 0px 1px black', marginLeft: '.5rem'}}>{`Travail: ${item.pctWork.toFixed(0)}%`}</span>}/>
-                                            </DataGrid.Body.Cell>                                            
-                                            <DataGrid.Body.Cell>{item.lastUpdate}</DataGrid.Body.Cell>
+                                            {grades.map((item, index) => {
+                                                let result = <DataGrid.Header.Cell key={index}>{item.finalGrade}</DataGrid.Header.Cell>
+                                                return (result);                                    
+                                            })}
                                         </DataGrid.Body.Row>
                                     return (row);                                    
                                 }
