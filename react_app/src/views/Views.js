@@ -38,7 +38,7 @@ export class MainView extends Component{
                         return (options.course.id > 0 && options.group.id > 0 && options.cm.id > 0)
                     }
                 },
-                {text: 'Achèvement par section', value: 2, require:{course: true, group: true, student: false, section: false, cm: false}, validation: function(options){
+                {text: 'Achèvement par section', value: 2, require:{course: true, group: true, student: true, section: true, cm: true}, validation: function(options){
                         return (options.course.id > 0 && options.group.id > 0)
                     }
                 }
@@ -78,7 +78,7 @@ export class MainView extends Component{
         if(["1", "2"].includes(eventKey)){
             let item = JsNx.getItem(this.state.reportList, 'value', parseInt(eventKey, 10));
             options.report.name = item.text;
-            options.report.id = item.value;
+            options.report.id = parseInt(item.value, 10);
             options.report.validation = item.validation;
             options.report.require = item.require;
         }
@@ -117,10 +117,10 @@ export class MainView extends Component{
     onChangeFilterOptions(event){
         let options = this.state.options;
         let attr = event.target.name.split(".");
-        options[attr[0]].id = event.target.value;
+        options[attr[0]].id = parseInt(event.target.value, 10);
         options[attr[0]].name = event.target.text;
 
-        this.setState({options: options, show: false});
+        this.setState({options: options});
     }
 
     onGo(){
@@ -155,11 +155,15 @@ class ReportsView extends Component{
     };
 
     render() {  
+        if(!this.props.options.report.validation(this.props.options)){ return null;}
+
         let desc = "";
         if(this.props.options !== null){
             desc = 
             <div style={{textAlign: 'center'}}>
                 <h2>{this.props.options.course.name}</h2>
+                <h5>{this.props.options.group.name}</h5>
+                <h5>{this.props.options.student.name}</h5>
                 <h3>{this.props.options.section.name}</h3>
                 <h4>{this.props.options.cm.name}</h4>
                 <h5>{this.props.options.report.name}</h5>
@@ -248,6 +252,11 @@ class FilterOptions extends Component{
     render(){
         let options = this.props.options;
 
+        let studentList = this.state.studentList;
+        if(options.group.id > 0){
+            studentList = studentList.filter( item => item.data.groupId === options.group.id);
+        }
+
         let main = 
                 <div className='filter-options'>
                     <h6>Options de filtrage <Button variant="link" size="sm" onClick={() => {this.setState({collapse: !this.state.collapse})}}>{this.state.collapse ? <FontAwesomeIcon icon={faMinus}/> : <FontAwesomeIcon icon={faPlus}/>}</Button></h6>
@@ -266,7 +275,7 @@ class FilterOptions extends Component{
                                     <br/>
                                     <div>
                                         <strong>Élèves</strong>
-                                        <ComboBox disabled={!options.report.require.student} placeholder={"Tous les élèves"} options={this.state.studentList} onChange={this.onDataChange} name="student.id" value={options.student.id}/>
+                                        <ComboBox disabled={!options.report.require.student} placeholder={"Tous les élèves"} options={studentList} onChange={this.onDataChange} name="student.id" value={options.student.id}/>
                                     </div>  
                                 </div>
                                 <div className='filter-item'>
@@ -297,7 +306,7 @@ class FilterOptions extends Component{
 
     disableBtnGo(){
         // mode report on
-        if(parseInt(this.props.options.report.id,10) > 0){
+        if(this.props.options.report.id > 0){
             
             if(this.props.options.report.validation === null){ 
                 return true;
@@ -306,14 +315,16 @@ class FilterOptions extends Component{
             return !this.props.options.report.validation(this.props.options);
         }
         else{
-            return !(parseInt(this.props.options.course.id,10) > 0);
+            return !(this.props.options.course.id > 0);
         }
     }
 
     onDataChange(event){
         let sectionList = this.state.sectionList;
         let activityList = this.state.activityList;
-        
+
+        event.target.value = (event.target.value === '' ? 0 : event.target.value);
+
         if(event.target.name === "course.id"){
             for(let item of this.state.dataProvider){
                 if((item.courseId.toString() === event.target.value) && (JsNx.getItem(sectionList, 'value', item.sectionId, null) === null)){
@@ -328,6 +339,8 @@ class FilterOptions extends Component{
         }
         
         if(event.target.name === "section.id"){
+            activityList = [];
+
             for(let item of this.state.dataProvider){
                 if((item.sectionId.toString() === event.target.value) && (JsNx.getItem(activityList, 'value', item.cmId, null) === null)){
                     activityList.push({text: item.cmName, value: item.cmId});
@@ -341,13 +354,21 @@ class FilterOptions extends Component{
     getEnrolledUserListResult(result){
         if(result.success){
             let groupList = [];
-            for(let groups of result.data){
-                let group = JsNx.at(groups, 0, null);
+            let studentList = [];
+
+            for(let group of result.data){
+                let item = JsNx.at(group, 0, null);
                 if(group){
-                    groupList.push({text: group.groupName, value: group.groupId, data: group});
+                    groupList.push({text: item.groupName, value: item.groupId, data: item});
+                }
+
+                for(let user of group){
+                    if(JsNx.getItem(studentList, 'value', user.userId, null) === null){
+                        studentList.push({text: user.userName, value: user.userId, data: user});
+                    }
                 }
             }
-            this.setState({groupList: groupList});
+            this.setState({groupList: groupList, studentList: studentList});
         }
         else{
             $glVars.feedback.showError($glVars.i18n.tags.appname, result.msg);

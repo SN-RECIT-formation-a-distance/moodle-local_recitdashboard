@@ -329,7 +329,7 @@ class HCell extends ACell{
 
         let main = 
             <th colSpan={this.getColSpan()} rowSpan={this.getRowSpan()} style={style}>
-                {(this.props.children || "").toString()}
+                {this.props.children || ""}
                 {this.getBtnOrderBy()}
             </th>
 
