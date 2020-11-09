@@ -30,7 +30,7 @@ export class GadgetStudentsFollowup extends Component{
     }
 
     getData(){
-        $glVars.webApi.getPendingActions(this.props.options.course.id,  this.props.options.group.id, this.getDataResult);        
+        $glVars.webApi.getStudentsFollowup(this.props.options.course.id,  this.props.options.group.id, this.getDataResult);        
     }
 
     getDataResult(result){         
