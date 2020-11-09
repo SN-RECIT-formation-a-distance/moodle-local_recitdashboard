@@ -103,8 +103,8 @@ export class AppWebApi extends WebApi
         this.post(this.gateway, data, onSuccess);
     }
     
-    getPendingHomeworks(courseId, groupId, onSuccess){
-        let data = {groupId: groupId, courseId: courseId, service: "getPendingHomeworks"};
+    getPendingActions(courseId, groupId, onSuccess){
+        let data = {groupId: groupId, courseId: courseId, service: "getPendingActions"};
         this.post(this.gateway, data, onSuccess);
     }
 

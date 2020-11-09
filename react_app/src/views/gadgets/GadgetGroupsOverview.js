@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import { Card, ButtonGroup, ButtonToolbar, Button} from 'react-bootstrap';
 import { ResponsivePie } from '@nivo/pie';
-import {faSync} from '@fortawesome/free-solid-svg-icons';
+import {faSync, faTimesCircle} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {$glVars} from '../../common/common';
 
@@ -14,10 +14,11 @@ export class GadgetGroupsOverview extends Component{
     constructor(props) {
         super(props);
 
+        this.onClose = this.onClose.bind(this);
         this.getData = this.getData.bind(this);
         this.getDataResult = this.getDataResult.bind(this);
 
-        this.state = {dataProvider:[]};
+        this.state = {dataProvider:[], show: true};
     }
 
     componentDidMount(){
@@ -26,7 +27,7 @@ export class GadgetGroupsOverview extends Component{
 
     componentDidUpdate(prevProps){
         // Typical usage (don't forget to compare props):
-        if(JSON.stringify(this.props.options) !== JSON.stringify(prevProps.options)){
+        if(this.props.options.course.id !== prevProps.options.course.id){
             this.getData();
         }
     }
@@ -39,7 +40,7 @@ export class GadgetGroupsOverview extends Component{
 
     getDataResult(result){         
         if(result.success){
-            this.setState({dataProvider: result.data});
+            this.setState({dataProvider: result.data, show: true});
         }
         else{
             $glVars.feedback.showError($glVars.i18n.tags.appname, result.msg);
@@ -47,6 +48,8 @@ export class GadgetGroupsOverview extends Component{
     }
 
     render(){
+        if(!this.state.show){ return null; }
+
         if(this.state.dataProvider.length === 0){ return null;}
 
         let main =
@@ -57,7 +60,8 @@ export class GadgetGroupsOverview extends Component{
                         
                         <ButtonToolbar aria-label="Toolbar with Buttons">
                             <ButtonGroup  >
-                                <Button  variant="outline-secondary" size="sm" onClick={this.getData}><FontAwesomeIcon icon={faSync}/></Button>
+                                <Button  variant="outline-secondary" size="sm" onClick={this.getData} title="Mettre à jour le gadget"><FontAwesomeIcon icon={faSync}/></Button>
+                                <Button  variant="outline-secondary" size="sm" onClick={this.onClose} title="Enlever le gadget"><FontAwesomeIcon icon={faTimesCircle}/></Button>
                             </ButtonGroup>
                         </ButtonToolbar>                              
                     </Card.Title>
@@ -70,6 +74,10 @@ export class GadgetGroupsOverview extends Component{
                 </Card.Body>
             </Card>;
         return main;
+    }
+
+    onClose(){
+        this.setState({show: false});
     }
 }
 

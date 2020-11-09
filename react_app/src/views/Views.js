@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
-import {NavDropdown, Nav, Button, Collapse, Jumbotron, NavItem} from 'react-bootstrap';
-import {faTachometerAlt, faPlus, faMinus, faFileAlt, faThumbsUp} from '@fortawesome/free-solid-svg-icons';
+import {NavDropdown, Nav, Button, Collapse, Jumbotron} from 'react-bootstrap';
+import {faTachometerAlt, faPlus, faMinus, faFileAlt, faSearchPlus} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {ComboBox} from '../libs/components/Components';
 import {JsNx} from '../libs/utils/Utils';
 import {$glVars} from '../common/common';
 import {GadgetGroupsOverview} from './gadgets/GadgetGroupsOverview';
+import {GadgetStudentsFollowup} from './gadgets/GadgetStudentsFollowup';
 import {ReportDiagnosticTags} from './reports/ReportDiagnosticTags';
 import {ReportSectionCompletion} from './reports/ReportSectionCompletion';
 
@@ -26,7 +27,7 @@ export class MainView extends Component{
             selectedView: 0, 
             show: false,
             options: {
-                course: {id: 0, name: ""},
+                course: {id: this.props.courseId, name: ""},
                 group: {id: 0, name: ""},
                 student: {id: 0, name: ""},
                 section: {id: 0, name: ""},
@@ -73,7 +74,7 @@ export class MainView extends Component{
     }
 
     onSelect(eventKey){
-        let options = this.state.options;
+        let options = JsNx.clone(this.state.options);
         
         if(["1", "2"].includes(eventKey)){
             let item = JsNx.getItem(this.state.reportList, 'value', parseInt(eventKey, 10));
@@ -115,7 +116,7 @@ export class MainView extends Component{
     }
 
     onChangeFilterOptions(event){
-        let options = this.state.options;
+        let options = JsNx.clone(this.state.options);
         let attr = event.target.name.split(".");
         options[attr[0]].id = parseInt(event.target.value, 10);
         options[attr[0]].name = event.target.text;
@@ -142,6 +143,7 @@ class DashboardView extends Component{
         let main =
             <div>
                 <h2 style={{textAlign: 'center'}}>{desc}</h2>
+                <GadgetStudentsFollowup options={this.props.options} /> 
                 <GadgetGroupsOverview options={this.props.options} /> 
             </div>
 
@@ -292,7 +294,7 @@ class FilterOptions extends Component{
 
                                 <div className='filter-item'>
                                     <Button variant='primary' onClick={this.props.onGo} disabled={this.disableBtnGo()}>
-                                        <FontAwesomeIcon icon={faThumbsUp}/>  Allez
+                                        <FontAwesomeIcon icon={faSearchPlus}/>  Allez
                                     </Button>
                                 </div>
                             </div>
