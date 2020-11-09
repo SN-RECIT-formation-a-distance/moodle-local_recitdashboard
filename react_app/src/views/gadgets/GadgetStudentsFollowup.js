@@ -46,12 +46,19 @@ export class GadgetStudentsFollowup extends Component{
         if(!this.state.show){ return null; }
 
         let bodyContent = {maxHeight: 400, overflowY: "auto"};
+
+        let nbItems = 0;
+
+        for(let item of this.state.dataProvider){
+            nbItems += item.nbItems;
+        }
         
         let main = 
             <Card className='gadget'>
                 <Card.Body>
                     <Card.Title>
-                        <span>{"Suivi des élèves"}</span>
+                        <span>{`Suivi des élèves`}</span>
+                        <span><Badge pill variant="primary">{nbItems}</Badge>{` item(s) à suivre`}</span>
                         <ButtonToolbar aria-label="Toolbar with Buttons">
                             <ButtonGroup className="mr-2">
                                 <Button  variant="outline-secondary" size="sm" onClick={this.getData} title="Mettre à jour le gadget"><FontAwesomeIcon icon={faSync}/></Button>
@@ -65,7 +72,7 @@ export class GadgetStudentsFollowup extends Component{
                         {this.state.dataProvider.map((item, index) => {
                             let variant = "warning";
 
-                            if(item.nb > 5){
+                            if(item.nbItems > 5){
                                 variant = "danger";
                             }
 
@@ -73,8 +80,8 @@ export class GadgetStudentsFollowup extends Component{
                                 <Alert variant={variant} key={index} style={{margin: '1rem'}}>
                                     <b>Activité: <a href={item.url} target={"_blank"}>{`${item.cmName} `}</a></b>
                                     <br/>
-                                    <h2 style={{display: 'inline'}}><Badge pill variant="primary">{item.nb}</Badge></h2>
-                                    <span>{` ${item.description}.`}</span>
+                                    <h2 style={{display: 'inline'}}><Badge pill variant="primary">{item.nbItems}</Badge></h2>
+                                    <span>{` ${item.extra.description}.`}</span>
                                 </Alert>
                             return result;
                         })}

@@ -105,7 +105,16 @@ export class AppWebApi extends WebApi
     
     getStudentsFollowup(courseId, groupId, onSuccess){
         let data = {groupId: groupId, courseId: courseId, service: "getStudentsFollowup"};
-        this.post(this.gateway, data, onSuccess);
+
+        let onSuccessTmp = function(result){
+            for(let i = 0; i < result.data.length; i++){
+                result.data[i].extra = JSON.parse(result.data[i].extra);
+            }
+
+            onSuccess(result);
+        }
+
+        this.post(this.gateway, data, onSuccessTmp);
     }
 
     reportSectionCompletion(courseId, groupId, onSuccess){
