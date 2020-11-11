@@ -57,7 +57,7 @@ export class MainView extends Component{
                         <Nav.Item>
                             <Nav.Link href="#" eventKey={0}><FontAwesomeIcon icon={faTachometerAlt}/> Tableau de bord</Nav.Link>
                         </Nav.Item>
-                        <NavDropdown variant="outline-primary"   title={<span><FontAwesomeIcon icon={faFileAlt}/>{this.state.options.report.name.length === 0 ? " Reports" : ` ${this.state.options.report.name} `}</span>} id="btnReports" >
+                        <NavDropdown variant="outline-primary"   title={<span><FontAwesomeIcon icon={faFileAlt}/>{this.state.options.report.name.length === 0 ? " Rapports" : ` ${this.state.options.report.name} `}</span>} id="btnReports" >
                             {this.state.reportList.map((item, index) => {
                                 return <NavDropdown.Item eventKey={item.value} key={index}>{item.text}</NavDropdown.Item>;
                             })}
