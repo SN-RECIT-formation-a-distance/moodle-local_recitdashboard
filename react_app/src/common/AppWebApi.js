@@ -28,10 +28,10 @@ export class AppWebApi extends WebApi
         }
     }
     
-    getEnrolledCourseList(userId, onSuccess){
+    /*getEnrolledCourseList(userId, onSuccess){
         let data = {userId: userId, service: "getEnrolledCourseList"};
         this.post(this.gateway, data, onSuccess);
-    }
+    }*/
 
     getEnrolledUserList(cmId, userId, courseId, onSuccess){
         let data = {cmId: cmId, userId: userId, courseId: courseId, service: "getEnrolledUserList"};
@@ -44,7 +44,7 @@ export class AppWebApi extends WebApi
         this.post(this.gateway, data, onSuccess);
     }
 
-    getCourseProgressionOverview(courseId, groupId, onSuccess){
+   /* getCourseProgressionOverview(courseId, groupId, onSuccess){
         groupId = groupId || 0;
         let data = {courseId: courseId, groupId: groupId, service: "getCourseProgressionOverview"};
         this.post(this.gateway, data, onSuccess);
@@ -65,7 +65,7 @@ export class AppWebApi extends WebApi
         userId = userId || 0;
         let data = {courseId: courseId, userId: userId, service: "getStudentAssiduity"};
         this.post(this.gateway, data, onSuccess);
-    }
+    }*/
 
     getReportDiagTag(courseId, groupId, cmId, output, options, onSuccess){
         groupId = groupId || 0;
@@ -77,17 +77,17 @@ export class AppWebApi extends WebApi
         this.post(this.gateway, data, onSuccess);
     }
 
-    getGroupsProgressOverview(courseId, onSuccess){
+    /*getGroupsProgressOverview(courseId, onSuccess){
         let data = {courseId: courseId, service: "getGroupsProgressOverview"};
         this.post(this.gateway, data, onSuccess);
-    }
+    }*/
 
-    getGroupsOverview(courseId, onlyMyGroups, onSuccess){
-        let data = {courseId: courseId, onlyMyGroups: (onlyMyGroups ? 1 : 0), service: "getGroupsOverview"};
+    getGroupsOverview(courseId, groupId, onSuccess){
+        let data = {courseId: courseId, groupId: groupId, service: "getGroupsOverview"};
         this.post(this.gateway, data, onSuccess);
     }
 
-    getStudentTracking(courseId, userId, onlyMyGroups, onSuccess){
+    /*getStudentTracking(courseId, userId, onlyMyGroups, onSuccess){
         userId = userId || 0;
         let data = {courseId: courseId, userId: userId, onlyMyGroups: (onlyMyGroups ? 1 : 0), service: "getStudentTracking"};
         this.post(this.gateway, data, onSuccess);
@@ -101,7 +101,7 @@ export class AppWebApi extends WebApi
     searchUser(queryStr, courseId, onSuccess){
         let data = {queryStr: queryStr, courseId: courseId || 0, service: "searchUser"};
         this.post(this.gateway, data, onSuccess);
-    }
+    }*/
     
     getStudentsFollowup(courseId, groupId, onSuccess){
         let data = {groupId: groupId, courseId: courseId, service: "getStudentsFollowup"};

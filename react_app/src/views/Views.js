@@ -32,7 +32,7 @@ export class MainView extends Component{
                 student: {id: 0, name: ""},
                 section: {id: 0, name: ""},
                 cm: {id: 0, name: ""},
-                report: {id: 0, name: "", validation: null, require: {course: true, group: false, student: false, section: false, cm: false}}                
+                report: {id: 0, name: "", validation: null, require: {course: true, group: true, student: false, section: false, cm: false}}                
             },
             reportList: [
                 {text: 'Test selon les tags de questions', value: 1, require:{course: true, group: true, student: false, section: true, cm: true}, validation: function(options){
@@ -87,7 +87,7 @@ export class MainView extends Component{
             options.report.name = "";
             options.report.id = 0;
             options.report.validation = null;
-            options.report.require = {course: true, group: false, student: false, section: false, cm: false};
+            options.report.require = {course: true, group: true, student: false, section: false, cm: false};
         }
         
         this.setState({selectedView: eventKey, options: options, show: false});
@@ -246,9 +246,13 @@ class FilterOptions extends Component{
     }
 
     onAfterDataResult(){
-        /*if(parseInt(this.props.options.course.id, 10) > 0){
-            this.onDataChange({target: {name: 'courseId', value: this.props.courseId.toString()}});
-        }*/
+        
+        if(parseInt(this.props.options.course.id, 10) > 0){
+            let item = JsNx.getItem(this.state.courseList, 'value', this.props.options.course.id, null);
+            if(item){
+                this.onDataChange({target: Object.assign({name: 'course.id'}, item)});
+            }
+        }
     }
     
     render(){

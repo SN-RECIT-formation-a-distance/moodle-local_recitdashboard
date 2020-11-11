@@ -24,7 +24,7 @@ export class GadgetStudentsFollowup extends Component{
     }
 
     componentDidUpdate(prevProps){
-        if(this.props.options.course.id !== prevProps.options.course.id){
+        if((this.props.options.course.id !== prevProps.options.course.id) || (this.props.options.group.id !== prevProps.options.group.id)){
             this.getData();
         }
     }

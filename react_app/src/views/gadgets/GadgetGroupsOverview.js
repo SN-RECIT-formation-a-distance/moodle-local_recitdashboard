@@ -26,8 +26,7 @@ export class GadgetGroupsOverview extends Component{
     }
 
     componentDidUpdate(prevProps){
-        // Typical usage (don't forget to compare props):
-        if(this.props.options.course.id !== prevProps.options.course.id){
+        if((this.props.options.course.id !== prevProps.options.course.id) || (this.props.options.group.id !== prevProps.options.group.id)){
             this.getData();
         }
     }
@@ -35,7 +34,7 @@ export class GadgetGroupsOverview extends Component{
     getData(){
         if(this.props.options === null){ return; }
 
-        $glVars.webApi.getGroupsOverview(this.props.options.course.id, 0, this.getDataResult);        
+        $glVars.webApi.getGroupsOverview(this.props.options.course.id, this.props.options.group.id, this.getDataResult);        
     }
 
     getDataResult(result){         
