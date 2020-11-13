@@ -117,8 +117,8 @@ export class AppWebApi extends WebApi
         this.post(this.gateway, data, onSuccessTmp);
     }
 
-    reportSectionCompletion(courseId, groupId, onSuccess){
-        let data = {groupId: groupId, courseId: courseId, service: "reportSectionCompletion"};
+    reportSectionResults(courseId, groupId, onSuccess){
+        let data = {groupId: groupId, courseId: courseId, service: "reportSectionResults"};
         this.post(this.gateway, data, onSuccess);
     }
 };

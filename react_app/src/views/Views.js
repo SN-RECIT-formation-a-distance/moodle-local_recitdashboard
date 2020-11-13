@@ -8,7 +8,7 @@ import {$glVars} from '../common/common';
 import {GadgetGroupsOverview} from './gadgets/GadgetGroupsOverview';
 import {GadgetStudentsFollowup} from './gadgets/GadgetStudentsFollowup';
 import {ReportDiagnosticTags} from './reports/ReportDiagnosticTags';
-import {ReportSectionCompletion} from './reports/ReportSectionCompletion';
+import {ReportSectionResults} from './reports/ReportSectionResults';
 
 export class MainView extends Component{
     static defaultProps = { 
@@ -39,7 +39,7 @@ export class MainView extends Component{
                         return (options.course.id > 0 && options.group.id > 0 && options.cm.id > 0)
                     }
                 },
-                {text: 'Achèvement par section', value: 2, require:{course: true, group: true, student: true, section: true, cm: true}, validation: function(options){
+                {text: 'Résultats par section', value: 2, require:{course: true, group: true, student: true, section: true, cm: false}, validation: function(options){
                         return (options.course.id > 0 && options.group.id > 0)
                     }
                 }
@@ -134,16 +134,13 @@ class DashboardView extends Component{
         options: null
     };
 
-    render() {  
-        let desc = "";
-        if(this.props.options !== null){
-            desc = `${this.props.options.course.name}`;
-        }
-
+    render() {         
         let main =
             <div>
-                <h2 style={{textAlign: 'center'}}>{desc}</h2>
+                <Header options={this.props.options} title={"Tableau de bord"}/>
+                <br/>
                 <GadgetStudentsFollowup options={this.props.options} /> 
+                <br/>
                 <GadgetGroupsOverview options={this.props.options} /> 
             </div>
 
@@ -159,23 +156,11 @@ class ReportsView extends Component{
     render() {  
         if(!this.props.options.report.validation(this.props.options)){ return null;}
 
-        let desc = "";
-        if(this.props.options !== null){
-            desc = 
-            <div style={{textAlign: 'center'}}>
-                <h2>{this.props.options.course.name}</h2>
-                <h5>{this.props.options.group.name}</h5>
-                <h5>{this.props.options.student.name}</h5>
-                <h3>{this.props.options.section.name}</h3>
-                <h4>{this.props.options.cm.name}</h4>
-                <h5>{this.props.options.report.name}</h5>
-            </div>
-        }
-
         let main =
             <div>
-                <h4>{desc}</h4>
-                {this.getReport()}
+                <Header options={this.props.options} title={this.props.options.report.name}/>
+                <br/>
+                {this.getReport()}                
             </div>
 
         return (main);
@@ -188,7 +173,7 @@ class ReportsView extends Component{
             case '1':
                 return <ReportDiagnosticTags options={this.props.options}/>;
             case '2':
-                return <ReportSectionCompletion options={this.props.options}/>;
+                return <ReportSectionResults options={this.props.options}/>;
             default:
                 return null;
         }
@@ -333,7 +318,7 @@ class FilterOptions extends Component{
 
         if(event.target.name === "course.id"){
             for(let item of this.state.dataProvider){
-                if((item.courseId.toString() === event.target.value) && (JsNx.getItem(sectionList, 'value', item.sectionId, null) === null)){
+                if((item.courseId.toString() === event.target.value.toString()) && (JsNx.getItem(sectionList, 'value', item.sectionId, null) === null)){
                     sectionList.push({text: item.sectionName, value: item.sectionId});
                 }
             }
@@ -348,7 +333,7 @@ class FilterOptions extends Component{
             activityList = [];
 
             for(let item of this.state.dataProvider){
-                if((item.sectionId.toString() === event.target.value) && (JsNx.getItem(activityList, 'value', item.cmId, null) === null)){
+                if((item.sectionId.toString() === event.target.value.toString()) && (JsNx.getItem(activityList, 'value', item.cmId, null) === null)){
                     activityList.push({text: item.cmName, value: item.cmId});
                 }
             }
@@ -379,5 +364,32 @@ class FilterOptions extends Component{
         else{
             $glVars.feedback.showError($glVars.i18n.tags.appname, result.msg);
         }
+    }
+}
+
+class Header extends Component{
+    static defaultProps = { 
+        title: "",
+        options: null
+    };
+
+    render(){
+        let main = null;
+
+        if(this.props.options !== null){
+            let subtitle1 = [this.props.options.course.name, this.props.options.section.name, this.props.options.cm.name].filter(item => item.length > 0);
+            let subtitle3 = [this.props.options.group.name, this.props.options.student.name].filter(item => item.length > 0);
+            
+            main = 
+            <div style={{textAlign: "left"}}>
+                <h2 style={{borderBottom: "1px solid #efefef"}}>{this.props.title}</h2>
+                <div style={{display: "flex", justifyContent: "space-between"}}>
+                    <h6>{subtitle1.join(" - ")}</h6>
+                    <h6>{subtitle3.join(" - ")}</h6>
+                </div>
+            </div>
+        }
+
+        return main;
     }
 }
