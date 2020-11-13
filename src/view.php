@@ -55,7 +55,7 @@ require_login();
 // Globals.
 $PAGE->set_url("/local/recitdashboard/view.php");
 $PAGE->requires->css(new moodle_url($CFG->wwwroot . '/local/recitdashboard/react_app_build/index.css'), true);
-$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/local/recitdashboard/react_app_build/index.js?v='.rand(0,100)), true);
+$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/local/recitdashboard/react_app_build/index.js'), true);
 
 // Set page context.
 $PAGE->set_context(context_system::instance());
