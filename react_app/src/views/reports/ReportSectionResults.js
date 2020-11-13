@@ -130,11 +130,14 @@ export class ReportSectionResults  extends Component{
 
         let context = "";
 
-        if(grade >= 80 && grade <= 100){
+        if(grade >= 70){
             context = 'hsl(134, 41%, 83%)';
         }
-        else if(grade >= 60 && grade < 80){
+        else if(grade >= 60 && grade < 70){
             context = 'hsl(45, 100%, 86%)';
+        }
+        else if(grade >= 50 && grade < 60){
+            context = 'hsl(27, 100%, 76%)';
         }
         else{
             context = 'hsl(354, 70%, 87%)';
