@@ -326,13 +326,15 @@ class FilterOptions extends Component{
         event.target.value = (event.target.value === '' ? 0 : event.target.value);
 
         if(event.target.name === "course.id"){
+            sectionList = [];
+            activityList = [];
+
             for(let item of this.state.dataProvider){
                 if((item.courseId.toString() === event.target.value.toString()) && (JsNx.getItem(sectionList, 'value', item.sectionId, null) === null)){
                     sectionList.push({text: item.sectionName, value: item.sectionId});
                 }
             }
-            activityList = [];
-
+            
             if(parseInt(event.target.value,10) > 0){
                 $glVars.webApi.getEnrolledUserList(0, 0, event.target.value, this.getEnrolledUserListResult); 
             }
