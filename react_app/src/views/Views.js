@@ -9,6 +9,7 @@ import {GadgetGroupsOverview} from './gadgets/GadgetGroupsOverview';
 import {GadgetStudentsFollowup} from './gadgets/GadgetStudentsFollowup';
 import {ReportDiagnosticTags} from './reports/ReportDiagnosticTags';
 import {ReportSectionResults} from './reports/ReportSectionResults';
+import {ReportActivityCompletion} from './reports/ReportActivityCompletion';
 
 export class MainView extends Component{
     static defaultProps = { 
@@ -40,6 +41,10 @@ export class MainView extends Component{
                     }
                 },
                 {text: 'Résultats par section', value: 2, require:{course: true, group: true, student: true, section: true, cm: false}, validation: function(options){
+                        return (options.course.id > 0 && options.group.id > 0)
+                    }
+                },
+                {text: "Achèvement d'activités", value: 3, require:{course: true, group: true, student: true, section: true, cm: false}, validation: function(options){
                         return (options.course.id > 0 && options.group.id > 0)
                     }
                 }
@@ -76,7 +81,7 @@ export class MainView extends Component{
     onSelect(eventKey){
         let options = JsNx.clone(this.state.options);
         
-        if(["1", "2"].includes(eventKey)){
+        if(["1", "2", "3"].includes(eventKey)){
             let item = JsNx.getItem(this.state.reportList, 'value', parseInt(eventKey, 10));
             options.report.name = item.text;
             options.report.id = parseInt(item.value, 10);
@@ -100,6 +105,7 @@ export class MainView extends Component{
             case '0': return <DashboardView options={this.state.options}/>;
             case '1': 
             case '2':
+            case '3':
                 return <ReportsView options={this.state.options}/>;
             default: return null;
         }
@@ -110,6 +116,7 @@ export class MainView extends Component{
             case '0': return <FilterOptions onChange={this.onChangeFilterOptions} options={this.state.options} onGo={this.onGo} />;
             case '1': 
             case '2': 
+            case '3':
                 return <FilterOptions onChange={this.onChangeFilterOptions} options={this.state.options} onGo={this.onGo}/>;
             default: return null;
         }
@@ -174,6 +181,8 @@ class ReportsView extends Component{
                 return <ReportDiagnosticTags options={this.props.options}/>;
             case '2':
                 return <ReportSectionResults options={this.props.options}/>;
+            case '3':
+                return <ReportActivityCompletion options={this.props.options}/>;
             default:
                 return null;
         }

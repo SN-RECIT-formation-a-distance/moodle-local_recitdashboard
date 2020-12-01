@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
 import {DataGrid} from '../../libs/components/Components';
+import { faCheck} from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {JsNx} from '../../libs/utils/Utils';
 import {$glVars} from '../../common/common';
 
-export class ReportSectionResults  extends Component{
+export class ReportActivityCompletion  extends Component{
     static defaultProps = {        
         options: null
     };
@@ -32,7 +34,7 @@ export class ReportSectionResults  extends Component{
     }
 
     getData(){
-        $glVars.webApi.reportSectionResults(this.props.options.course.id, this.props.options.group.id, this.getDataResult);        
+        $glVars.webApi.reportActivityCompletion(this.props.options.course.id, this.props.options.group.id, this.getDataResult);        
     }
 
     getDataResult(result){         
@@ -57,7 +59,7 @@ export class ReportSectionResults  extends Component{
             dataProvider = dataProvider.filter(item => item.userId === this.props.options.student.id);
         }
 
-        let grades = JsNx.at(dataProvider, 0, {grades: []}).grades;
+        let activityList = JsNx.at(dataProvider, 0, {activityList: []}).activityList;
 
         let main = 
                 <div style={{overflow: "auto"}}>
@@ -65,12 +67,13 @@ export class ReportSectionResults  extends Component{
                         <DataGrid.Header>
                             <DataGrid.Header.Row>
                                 <DataGrid.Header.Cell style={{minWidth: "160px"}}>{"Prénom / Nom"}</DataGrid.Header.Cell>
-                                {grades.map((item, index) => {
+                                {activityList.map((item, index) => {
                                     if(!this.filterSectionAndCm(item)){ return null;}
 
                                     let result = 
-                                        <DataGrid.Header.Cell key={index} style={{textAlign: "center"}}>
-                                            <a href={`${M.cfg.wwwroot}/mod/${item.itemModule}/view.php?id=${item.cmId}`} target={"_blank"}>{item.itemName}</a>
+                                        <DataGrid.Header.Cell key={index} style={{textAlign: "center", minWidth: "100px"}}>
+                                            <a href={`${M.cfg.wwwroot}/mod/${item.modName}/view.php?id=${item.cmId}`} target={"_blank"}>{item.cmName}</a>
+                                            <div style={{fontSize: "12px"}}>{(item.completionExpected !== null ? item.completionExpected.substr(0, 10) : "")}</div>
                                         </DataGrid.Header.Cell>
 
                                     return (result);                                    
@@ -85,18 +88,17 @@ export class ReportSectionResults  extends Component{
 
                                     let cell = 
                                         <DataGrid.Body.Cell sortValue={item.studentName}  key={0}>
-                                            <a href={`${M.cfg.wwwroot}/user/profile.php?id=${item.userId}`} target={"_blank"}>{item.studentName}</a>
+                                            <a href={`${M.cfg.wwwroot}/user/profile.php?id=${item.userId}&course=${item.courseId}`} target={"_blank"}>{item.studentName}</a>
                                         </DataGrid.Body.Cell>;
 
                                     items.push(cell);
 
-                                    item.grades.map((item2, index2) => {
+                                    item.activityList.map((item2, index2) => {
                                         if(!this.filterSectionAndCm(item2)){ return null;}
 
-                                        let color = that.getCellContext(item2.successPct);
                                         cell = 
-                                            <DataGrid.Body.Cell style={{textAlign: "center", verticalAlign: "midle", backgroundColor: color, border: `.5px solid ${color}`}} key={items.length}>
-                                                {`${parseFloat(item2.finalGrade).toFixed(1)}/${item2.gradeMax.toFixed(1)}`}
+                                            <DataGrid.Body.Cell style={{textAlign: "center", verticalAlign: "midle"}} key={items.length} sortValue={item2.completionState}>
+                                                {(item2.completionState === 1 ? <FontAwesomeIcon icon={faCheck}/> : null )}
                                             </DataGrid.Body.Cell>
 
                                         items.push(cell);
@@ -125,25 +127,4 @@ export class ReportSectionResults  extends Component{
 
         return true;
     }
-
-    getCellContext(grade){
-        grade = parseFloat(grade);
-
-        let context = "";
-
-        if(grade >= 70){
-            context = 'hsl(134, 41%, 83%)';
-        }
-        else if(grade >= 60 && grade < 70){
-            context = 'hsl(45, 100%, 86%)';
-        }
-        else if(grade >= 50 && grade < 60){
-            context = 'hsl(27, 100%, 76%)';
-        }
-        else{
-            context = 'hsl(354, 70%, 87%)';
-        }
-
-        return context;
-    }    
 }
