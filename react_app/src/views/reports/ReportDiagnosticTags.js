@@ -30,7 +30,6 @@ export class ReportDiagnosticTags extends Component{
     componentDidUpdate(prevProps){
         // Typical usage (don't forget to compare props):
         if(JSON.stringify(this.props.options) !== JSON.stringify(prevProps.options)){
-            console.log("b")
             this.getData();
         }
     }

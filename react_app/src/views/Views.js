@@ -37,7 +37,7 @@ export class MainView extends Component{
             },
             reportList: [
                 {text: 'Test selon les tags de questions', value: 1, require:{course: true, group: true, student: false, section: true, cm: true}, validation: function(options){
-                        return (options.course.id > 0 && options.group.id > 0 && options.cm.id > 0)
+                        return (options.course.id > 0 && options.group.id > 0)
                     }
                 },
                 {text: 'Résultats par section', value: 2, require:{course: true, group: true, student: true, section: true, cm: false}, validation: function(options){
