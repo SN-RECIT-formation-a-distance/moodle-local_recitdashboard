@@ -81,12 +81,17 @@ export class MainView extends Component{
     onSelect(eventKey){
         let options = JsNx.clone(this.state.options);
         
-        if(["1", "2", "3"].includes(eventKey)){
-            let item = JsNx.getItem(this.state.reportList, 'value', parseInt(eventKey, 10));
+        eventKey = parseInt(eventKey, 10);
+        if(eventKey >= 1){
+            let item = JsNx.getItem(this.state.reportList, 'value', eventKey);
             options.report.name = item.text;
             options.report.id = parseInt(item.value, 10);
             options.report.validation = item.validation;
             options.report.require = item.require;
+            options.section.id = 0;
+            options.section.name = '';
+            options.cm.id = 0;
+            options.cm.name = '';
         }
         else{
             options.report.name = "";

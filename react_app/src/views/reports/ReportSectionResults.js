@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import {DataGrid} from '../../libs/components/Components';
 import {JsNx} from '../../libs/utils/Utils';
-import {$glVars} from '../../common/common';
+import {$glVars, Options} from '../../common/common';
 
 export class ReportSectionResults  extends Component{
     static defaultProps = {        
@@ -108,7 +108,13 @@ export class ReportSectionResults  extends Component{
                                 }
                             )}
                         </DataGrid.Body>
-                    </DataGrid>                           
+                    </DataGrid>
+                    <br/>
+                    <hr/>
+                    <div>
+                        <a href={`${Options.getGateway()}?service=reportSectionResults&courseId=${this.props.options.course.id}&groupId=${this.props.options.group.id}&output=csv`} target='_blank'>{"Télécharger en CSV"}</a>
+                    </div>                           
+                    <br/>
                 </div>;
 
         return (main);

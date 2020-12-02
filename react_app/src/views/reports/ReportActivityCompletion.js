@@ -3,7 +3,7 @@ import {DataGrid} from '../../libs/components/Components';
 import { faCheck} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {JsNx} from '../../libs/utils/Utils';
-import {$glVars} from '../../common/common';
+import {$glVars, Options} from '../../common/common';
 
 export class ReportActivityCompletion  extends Component{
     static defaultProps = {        
@@ -110,7 +110,13 @@ export class ReportActivityCompletion  extends Component{
                                 }
                             )}
                         </DataGrid.Body>
-                    </DataGrid>                           
+                    </DataGrid>        
+                    <br/>
+                    <hr/>
+                    <div>
+                        <a href={`${Options.getGateway()}?service=reportActivityCompletion&courseId=${this.props.options.course.id}&groupId=${this.props.options.group.id}&output=csv`} target='_blank'>{"Télécharger en CSV"}</a>
+                    </div> 
+                    <br/>                     
                 </div>;
 
         return (main);
