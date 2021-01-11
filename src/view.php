@@ -41,12 +41,10 @@ class RecitDashboard{
         $this->selectedCourseId = $selectedCourseId;
     }
 
-    public function display(){       
-        $roles = Utils::getUserRolesOnContext(context_system::instance(), $this->user->id);
-        //$studentId = (in_array('ad', $roles) ? 0 : $this->user->id);
+    public function display(){    
         $studentId = $this->user->id;
         $selectedCourseId = ($this->selectedCourseId > 1 ? $this->selectedCourseId : 0);
-        echo sprintf("<div id='recit_dashboard' data-student-id='%ld' data-course-id='%ld' data-roles='%s'></div>", $studentId, $selectedCourseId, implode(",", $roles));
+        echo sprintf("<div id='recit_dashboard' data-student-id='%ld' data-course-id='%ld'></div>", $studentId, $selectedCourseId);
     }
 }
 

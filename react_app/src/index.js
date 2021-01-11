@@ -8,8 +8,7 @@ import ReactDOM from "react-dom";
 
 import {faSync} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {VisualFeedback, Loading, Components} from "./libs/components/Components";
-import {UtilsMoodle} from "./libs/utils/Utils";
+import {VisualFeedback, Loading} from "./libs/components/Components";
 import {MainView} from "./views/Views";
 import {$glVars} from "./common/common";
 import "./common/style.scss";
@@ -27,10 +26,6 @@ class App extends Component {
         this.onFeedback = this.onFeedback.bind(this);
 
         $glVars.signedUser = this.props.signedUser;
-
-        let mode = (UtilsMoodle.checkRoles($glVars.signedUser.roles, UtilsMoodle.rolesL2) ? 't' : 's');
-
-        this.state = {mode: mode};
     }
 
     componentDidMount(){
@@ -62,12 +57,7 @@ class App extends Component {
 
 document.addEventListener('DOMContentLoaded', function(){ 
     const domContainer = document.getElementById('recit_dashboard');
-    let signedUser = {userId: domContainer.getAttribute('data-student-id'), roles: domContainer.getAttribute('data-roles').split(",")};
-
-    if(UtilsMoodle.checkRoles(signedUser.roles, UtilsMoodle.rolesL3)){
-        window.location.href = `${M.cfg.wwwroot}`;
-        return;
-    }
+    let signedUser = {userId: domContainer.getAttribute('data-student-id')};
 
     ReactDOM.render(<App signedUser={signedUser} courseId={parseInt(domContainer.getAttribute('data-course-id'))}/>, domContainer);
 }, false);

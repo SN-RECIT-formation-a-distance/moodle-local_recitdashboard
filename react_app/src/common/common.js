@@ -6,7 +6,7 @@ import {AppWebApi} from "./AppWebApi";
 export * from "./Options";
 
 export const $glVars = {
-    signedUser: {userId: 0, roles: []},
+    signedUser: {userId: 0},
     feedback: new FeedbackCtrl(),
     i18n: new I18n(),
     webApi: new AppWebApi()

@@ -39,6 +39,7 @@ export class GadgetStudentsFollowup extends Component{
         }
         else{
             $glVars.feedback.showError($glVars.i18n.tags.appname, result.msg);
+            this.setState({dataProvider: [], show: false});
         }
     }
 
