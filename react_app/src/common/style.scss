@@ -40,7 +40,7 @@
     .filter-container{
         display: flex; justify-content: left; align-items: baseline;
         .filter-item{border-right: 1px solid #dfdfdf; padding: 2rem;   flex-basis: 100%}
-        .filter-item:last-child{border-right: none; flex-basis: auto; }
+        .filter-item:last-child{border-right: none; flex-basis: 35%; }
     }
 }
 
