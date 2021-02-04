@@ -73,7 +73,9 @@ export class GadgetStudentsFollowup extends Component{
                         {this.state.dataProvider.map((item, index) => {
                             let variant = "warning";
 
-                            if(item.nbItems > 5){
+                            let diffInDays = Math.floor(Math.abs(new Date() - new Date(item.timeModified)) / 86400000);
+
+                            if((item.nbItems > 5) || (diffInDays > 7)) {
                                 variant = "danger";
                             }
 
