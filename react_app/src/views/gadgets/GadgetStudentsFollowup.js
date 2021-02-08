@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import {Card, ButtonGroup, Button, Badge, Alert, ButtonToolbar} from 'react-bootstrap';
-import {faSync, faTimesCircle, faThumbsUp} from '@fortawesome/free-solid-svg-icons';
+import {Card, ButtonGroup, Button, Badge, Alert, ButtonToolbar, OverlayTrigger, Tooltip} from 'react-bootstrap';
+import {faSync, faTimesCircle, faThumbsUp, faInfo} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {$glVars} from '../../common/common';
 
@@ -64,6 +64,9 @@ export class GadgetStudentsFollowup extends Component{
                             <ButtonGroup className="mr-2">
                                 <Button  variant="outline-secondary" size="sm" onClick={this.getData} title="Mettre à jour le gadget"><FontAwesomeIcon icon={faSync}/></Button>
                                 <Button  variant="outline-secondary" size="sm" onClick={this.onClose} title="Enlever le gadget"><FontAwesomeIcon icon={faTimesCircle}/></Button>
+                                <OverlayTrigger placement="left" delay={{ show: 250 }} overlay={<Tooltip>{`Remis < 7 jours : jaune.`}<br/>{`Remis > 7 : rouge.`}</Tooltip>}>
+                                    <Button size="sm" variant="secondary"><FontAwesomeIcon icon={faInfo}/></Button>
+                                </OverlayTrigger>
                             </ButtonGroup>
                         </ButtonToolbar>                        
                     </Card.Title>
