@@ -93,10 +93,11 @@ export class ReportSectionResults  extends Component{
                                     item.grades.map((item2, index2) => {
                                         if(!this.filterSectionAndCm(item2)){ return null;}
 
-                                        let color = that.getCellContext(item2.successPct);
+                                        let color = that.getCellContext(item2);
+                                        let value = that.getCellValue(item2);
                                         cell = 
                                             <DataGrid.Body.Cell style={{textAlign: "center", verticalAlign: "midle", backgroundColor: color, border: `.5px solid ${color}`}} key={items.length}>
-                                                {`${parseFloat(item2.finalGrade).toFixed(1)}/${item2.gradeMax.toFixed(1)}`}
+                                                {value}
                                             </DataGrid.Body.Cell>
 
                                         items.push(cell);
@@ -132,8 +133,10 @@ export class ReportSectionResults  extends Component{
         return true;
     }
 
-    getCellContext(grade){
-        grade = parseFloat(grade);
+    getCellContext(item){
+        if(item.finalGrade < 0){ return "inherit";}
+
+        let grade = parseFloat(item.successPct);
 
         let context = "";
 
@@ -151,5 +154,19 @@ export class ReportSectionResults  extends Component{
         }
 
         return context;
-    }    
+    }   
+    
+    getCellValue(item){
+        if(item.finalGrade < 0){ return "";}
+
+        let finalGrade = parseFloat(item.finalGrade).toFixed(1);
+        let gradeMax = item.gradeMax.toFixed(1);
+        let ret = `${finalGrade}/${gradeMax}`;
+        if((item.itemModule === 'quiz') && (item.extra !== null)){
+            return <a href={`${M.cfg.wwwroot}/mod/quiz/review.php?attempt=${item.extra.attempt}`} target='_blank'>{ret}</a>
+        }
+        else{
+            return ret;
+        }
+    }
 }
