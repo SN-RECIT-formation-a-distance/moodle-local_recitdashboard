@@ -46,7 +46,7 @@ export class GadgetStudentsFollowup extends Component{
     render() {    
         if(!this.state.show){ return null; }
 
-        let bodyContent = {maxHeight: 400, overflowY: "auto"};
+        let bodyContent = {maxHeight: 400, overflowY: "auto", display: "flex", flexWrap: "wrap"};
 
         let nbItems = 0;
 
@@ -58,13 +58,13 @@ export class GadgetStudentsFollowup extends Component{
             <Card className='gadget'>
                 <Card.Body>
                     <Card.Title>
-                        <span>{`Suivi des élèves`}</span>
+                        <span>{`Suivi des travaux`}</span>
                         <span><Badge pill variant="primary">{nbItems}</Badge>{` item(s) à suivre`}</span>
                         <ButtonToolbar aria-label="Toolbar with Buttons">
                             <ButtonGroup className="mr-2">
                                 <Button  variant="outline-secondary" size="sm" onClick={this.getData} title="Mettre à jour le gadget"><FontAwesomeIcon icon={faSync}/></Button>
                                 <Button  variant="outline-secondary" size="sm" onClick={this.onClose} title="Enlever le gadget"><FontAwesomeIcon icon={faTimesCircle}/></Button>
-                                <OverlayTrigger placement="left" delay={{ show: 250 }} overlay={<Tooltip>{`Remis < 7 jours : jaune.`}<br/>{`Remis > 7 : rouge.`}</Tooltip>}>
+                                <OverlayTrigger placement="left" delay={{ show: 250 }} overlay={<Tooltip>{`La pastille de couleur passe du jaune au rouge lorsqu'un travail remis par l'élève date de plus de 7 jours.`}</Tooltip>}>
                                     <Button size="sm" variant="secondary"><FontAwesomeIcon icon={faInfo}/></Button>
                                 </OverlayTrigger>
                             </ButtonGroup>
@@ -83,7 +83,7 @@ export class GadgetStudentsFollowup extends Component{
                             }
 
                             let result = 
-                                <Alert variant={variant} key={index} style={{margin: '1rem'}}>
+                                <Alert variant={variant} key={index} style={{margin: '.5rem'}}>
                                     <b>Activité: <a href={item.url} target={"_blank"}>{`${item.cmName} `}</a></b>
                                     <br/>
                                     <h2 style={{display: 'inline'}}><Badge pill variant="primary">{item.nbItems}</Badge></h2>
