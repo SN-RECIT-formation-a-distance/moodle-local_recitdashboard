@@ -94,10 +94,10 @@ export class ReportSectionResults  extends Component{
                                         if(!this.filterSectionAndCm(item2)){ return null;}
 
                                         let color = that.getCellContext(item2);
-                                        let value = that.getCellValue(item2);
+                                        let text = that.getCellValue(item2);
                                         cell = 
-                                            <DataGrid.Body.Cell style={{textAlign: "center", verticalAlign: "midle", backgroundColor: color, border: `.5px solid ${color}`}} key={items.length}>
-                                                {value}
+                                            <DataGrid.Body.Cell  sortValue={(item2.finalGrade ? item2.finalGrade.toString() : "")} style={{textAlign: "center", verticalAlign: "midle", backgroundColor: color, border: `.5px solid ${color}`}} key={items.length}>
+                                                {text}
                                             </DataGrid.Body.Cell>
 
                                         items.push(cell);

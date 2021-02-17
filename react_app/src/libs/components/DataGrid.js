@@ -349,10 +349,10 @@ class HCell extends ACell{
             direction = 1;
         }
         else if(this.props.orderBy.direction > 0){
-            glyph = <FontAwesomeIcon icon={faSortAmountUpAlt}  />//<Glyphicon glyph="sort-by-attributes"/>;
+            glyph = <FontAwesomeIcon icon={faSortAmountDownAlt}  />//<Glyphicon glyph="sort-by-attributes"/>;
         }
         else{
-            glyph = <FontAwesomeIcon icon={faSortAmountDownAlt} />;//<Glyphicon glyph="sort-by-attributes-alt"/>;
+            glyph = <FontAwesomeIcon icon={faSortAmountUpAlt} />;//<Glyphicon glyph="sort-by-attributes-alt"/>;
         }
 
         return <Button className='BtnSort' size='sm' variant="link" onClick={() => this.onSort(direction)}>{glyph}</Button>;
