@@ -44,7 +44,7 @@ export class DataGrid extends Component {
                         {this.renderChildren()}
                     </Table>;
                     
-        return (<div style={{overflow: "auto", maxHeight: window.innerHeight}} ref={this.ref} onScroll={this.onScroll} >{table}</div>);
+        return (<div style={{overflow: "auto", maxHeight: (window.innerHeight*0.8)}} ref={this.ref} onScroll={this.onScroll} >{table}</div>);
     }
 
     onScroll(event){

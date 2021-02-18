@@ -30,7 +30,13 @@
     thead{
         tr{
             th{vertical-align: middle;}
-            th[data-freeze="1"]{background-color: #FFF;}
+            th[data-freeze="1"]{background-color: #FFF; }
+            th:first-child[data-freeze="1"]{ z-index: 100 }
+        }
+    }
+    tbody{
+        tr{
+            th[data-freeze="1"]{background-color: #FFF; z-index: 100}
         }
     }
 }
