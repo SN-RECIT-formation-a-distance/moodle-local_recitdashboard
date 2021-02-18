@@ -16,18 +16,24 @@ export class DataGrid extends Component {
 
         this.onOrderBy = this.onOrderBy.bind(this);
 
-        this.state = {orderBy: {iCol: -1, direction: -1, apply: this.onOrderBy}}; // direction [1=ASC|-1=DESC]
+        this.state = {orderBy: {iCol: -1, direction: -1, apply: this.onOrderBy}, scroll: {left:0, top:  0}}; // direction [1=ASC|-1=DESC]
+
+        this.onScroll = this.onScroll.bind(this);
     }
 
     renderChildren() {       
         return React.Children.map(this.props.children, (child, index) => {
             if(child.type.name === "Header"){
                 return React.cloneElement(child, {
-                    orderBy: this.getOrderBy()
+                    orderBy: this.getOrderBy(),
+                    scrollPos: this.state.scroll
                 });
             }
             else{
-                return React.cloneElement(child, {orderBy: this.state.orderBy});
+                return React.cloneElement(child, {
+                    orderBy: this.state.orderBy, 
+                    scrollPos: this.state.scroll
+                });
             }
         });
     }
@@ -38,7 +44,20 @@ export class DataGrid extends Component {
                         {this.renderChildren()}
                     </Table>;
                     
-        return (table);
+        return (<div style={{overflow: "auto", maxHeight: window.innerHeight}} ref={this.ref} onScroll={this.onScroll} >{table}</div>);
+    }
+
+    onScroll(event){
+        let scroll = this.state.scroll;
+
+        if((Math.abs(scroll.left - event.target.scrollLeft) % 10 > 0) && (Math.abs(scroll.top - event.target.scrollTop) % 10 > 0)){
+            return;
+        }
+
+        scroll.left = event.target.scrollLeft;
+        scroll.top = event.target.scrollTop;
+
+        this.setState({scroll: scroll})
     }
 
     getOrderBy(){
@@ -59,13 +78,16 @@ export class DataGrid extends Component {
 class Header extends Component {
     static defaultProps = {
         children: null,
-        orderBy: null
+        orderBy: null,
+        scrollPos: null
     };
     
     renderChildren() {        
         return React.Children.map(this.props.children, (child, index) => {
             return React.cloneElement(child, {
-                orderBy: this.props.orderBy
+                orderBy: this.props.orderBy,
+                index: index,
+                scrollPos: this.props.scrollPos
             });
         });
     }
@@ -79,7 +101,8 @@ class Body extends Component {
     static defaultProps = {
         children: null,
         selectedIndex: -1,
-        orderBy: null
+        orderBy: null,
+        scrollPos: null
     };
     
     static getDerivedStateFromProps(nextProps, prevState){
@@ -101,7 +124,8 @@ class Body extends Component {
             
             return React.cloneElement(child, {
               index: index,
-              selected: this.props.selectedIndex === index
+              selected: this.props.selectedIndex === index,
+              scrollPos: this.props.scrollPos
             });
         });
     }
@@ -152,7 +176,9 @@ class Body extends Component {
 class HRow extends Component {
     static defaultProps = {
         children: null,
-        orderBy: null
+        orderBy: null,
+        index: 0,
+        scrollPos: null
     };
        
     renderChildren() {        
@@ -161,7 +187,10 @@ class HRow extends Component {
 
             return React.cloneElement(child, {
                 iCol: index,
-                orderBy: this.props.orderBy
+                iRow: this.props.index,
+                orderBy: this.props.orderBy,
+                scrollPos: this.props.scrollPos,
+                ttype: 'thead'
             });
         });
     }
@@ -174,12 +203,13 @@ class HRow extends Component {
 class BRow extends Component {
     static defaultProps = {
         children: null,
-        index: -1,
+        index: 0,
         selected: false,
         onClick: null,
         onDbClick: null,        
         style: null,
-        alert: ""
+        alert: "",
+        scrollPos: null
     };
     
     constructor(props, context){
@@ -195,7 +225,9 @@ class BRow extends Component {
 
             return React.cloneElement(child, {
                 iRow: this.props.index,
-                iCol: index
+                iCol: index,
+                scrollPos: this.props.scrollPos,
+                ttype: 'tbody'
             });
         });
     }
@@ -313,7 +345,9 @@ class HCell extends ACell{
         rowSpan: 0,
         iRow: -1,
         iCol: -1,
-        orderBy: null
+        orderBy: null,
+        scrollPos: null,
+        ttype: ''
     };
 
     constructor(props){
@@ -325,10 +359,21 @@ class HCell extends ACell{
 
     render() {    
         let style = Object.assign({}, this.props.style);
+        let freeze = 0;
+
         style.position = "relative";
+        if((this.props.scrollPos) && (this.props.scrollPos.left > 0) && (this.props.iRow >= 0)  && (this.props.iCol === 0) ){
+            style.left = `${this.props.scrollPos.left}px`;
+            freeze = 1;
+        }
+
+        if((this.props.scrollPos) && (this.props.scrollPos.top > 0) && (this.props.iRow === 0) && (this.props.ttype === 'thead')){
+            style.top = `${this.props.scrollPos.top}px`;
+            freeze = 1;
+        }
 
         let main = 
-            <th colSpan={this.getColSpan()} rowSpan={this.getRowSpan()} style={style}>
+            <th colSpan={this.getColSpan()} rowSpan={this.getRowSpan()} style={style} data-freeze={freeze}>
                 {this.props.children || ""}
                 {this.getBtnOrderBy()}
             </th>

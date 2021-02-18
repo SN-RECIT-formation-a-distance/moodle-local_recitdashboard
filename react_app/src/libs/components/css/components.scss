@@ -24,15 +24,21 @@
     .Img{width: 128px; height: 128px; position: relative; top: 50%; left: 50%; margin-right: -50%; transform: translate(-50%, -50%); }
 }
 //////////////////////////////////////////////////////////////
-// Loading
+// DataGrid
 //////////////////////////////////////////////////////////////
 .DataGrid{
     thead{
         tr{
             th{vertical-align: middle;}
+            th[data-freeze="1"]{background-color: #FFF;}
         }
     }
 }
+.DataGrid.table-hover{
+    tbody {
+        tr:hover > th{background-color: initial;} // patch for icontent module
+    }
+} 
 /**********************************************************
  * MultipleSelect
  **********************************************************/

@@ -62,7 +62,7 @@ export class ReportActivityCompletion  extends Component{
         let activityList = JsNx.at(dataProvider, 0, {activityList: []}).activityList;
 
         let main = 
-                <div style={{overflow: "auto"}}>
+                <div>
                     <DataGrid orderBy={true}>
                         <DataGrid.Header>
                             <DataGrid.Header.Row>
@@ -71,7 +71,7 @@ export class ReportActivityCompletion  extends Component{
                                     if(!this.filterSectionAndCm(item)){ return null;}
 
                                     let result = 
-                                        <DataGrid.Header.Cell key={index} style={{textAlign: "center", minWidth: "100px"}}>
+                                        <DataGrid.Header.Cell key={index} style={{textAlign: "center", minWidth: "100px", position: 'sticky', top: '0' }} >
                                             <a href={`${M.cfg.wwwroot}/mod/${item.modName}/view.php?id=${item.cmId}`} target={"_blank"}>{item.cmName}</a>
                                             <div style={{fontSize: "12px"}}>{(item.completionExpected !== null ? item.completionExpected.substr(0, 10) : "")}</div>
                                         </DataGrid.Header.Cell>
@@ -87,9 +87,9 @@ export class ReportActivityCompletion  extends Component{
                                     let items =  [];
 
                                     let cell = 
-                                        <DataGrid.Body.Cell sortValue={item.studentName}  key={0}>
+                                        <DataGrid.Header.Cell sortValue={item.studentName}  key={0}>
                                             <a href={`${M.cfg.wwwroot}/user/profile.php?id=${item.userId}&course=${item.courseId}`} target={"_blank"}>{item.studentName}</a>
-                                        </DataGrid.Body.Cell>;
+                                        </DataGrid.Header.Cell>;
 
                                     items.push(cell);
 
@@ -98,7 +98,7 @@ export class ReportActivityCompletion  extends Component{
 
                                         cell = 
                                             <DataGrid.Body.Cell style={{textAlign: "center", verticalAlign: "midle"}} key={items.length} sortValue={item2.completionState}>
-                                                {(item2.completionState === 1 ? <FontAwesomeIcon icon={faCheck}/> : null )}
+                                                {(item2.completionState >= 1 ? <FontAwesomeIcon icon={faCheck}/> : null )}
                                             </DataGrid.Body.Cell>
 
                                         items.push(cell);

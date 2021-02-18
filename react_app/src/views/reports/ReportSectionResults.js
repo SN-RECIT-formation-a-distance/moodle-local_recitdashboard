@@ -60,7 +60,7 @@ export class ReportSectionResults  extends Component{
         let grades = JsNx.at(dataProvider, 0, {grades: []}).grades;
 
         let main = 
-                <div style={{overflow: "auto"}}>
+                <div >
                     <DataGrid orderBy={true}>
                         <DataGrid.Header>
                             <DataGrid.Header.Row>
@@ -84,9 +84,9 @@ export class ReportSectionResults  extends Component{
                                     let items =  [];
 
                                     let cell = 
-                                        <DataGrid.Body.Cell sortValue={item.studentName}  key={0}>
+                                        <DataGrid.Header.Cell sortValue={item.studentName}  key={0}>
                                             <a href={`${M.cfg.wwwroot}/user/profile.php?id=${item.userId}`} target={"_blank"}>{item.studentName}</a>
-                                        </DataGrid.Body.Cell>;
+                                        </DataGrid.Header.Cell>;
 
                                     items.push(cell);
 
