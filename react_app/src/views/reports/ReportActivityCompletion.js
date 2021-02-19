@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {DataGrid} from '../../libs/components/Components';
-import { faCheck} from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faTimes} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {JsNx} from '../../libs/utils/Utils';
 import {$glVars, Options} from '../../common/common';
@@ -96,9 +96,11 @@ export class ReportActivityCompletion  extends Component{
                                     item.activityList.map((item2, index2) => {
                                         if(!this.filterSectionAndCm(item2)){ return null;}
 
+                                        let text = that.getCellText(item2);
+
                                         cell = 
                                             <DataGrid.Body.Cell style={{textAlign: "center", verticalAlign: "midle"}} key={items.length} sortValue={item2.completionState}>
-                                                {(item2.completionState >= 1 ? <FontAwesomeIcon icon={faCheck}/> : null )}
+                                                {text}
                                             </DataGrid.Body.Cell>
 
                                         items.push(cell);
@@ -132,5 +134,18 @@ export class ReportActivityCompletion  extends Component{
         }
 
         return true;
+    }
+
+    getCellText(item){
+        switch(item.completionState){
+            case 1:
+                return <FontAwesomeIcon icon={faCheck}/>;
+            case 2:
+                return <FontAwesomeIcon color="#28a745" icon={faCheck}/>;
+            case 3:                
+                return  <FontAwesomeIcon color="#dc3545" icon={faTimes}/>;
+            default:
+                return null;
+        }
     }
 }
