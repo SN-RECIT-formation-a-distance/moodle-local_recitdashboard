@@ -6,7 +6,8 @@ import {ComboBox} from '../libs/components/Components';
 import {JsNx} from '../libs/utils/Utils';
 import {$glVars} from '../common/common';
 import {GadgetGroupsOverview} from './gadgets/GadgetGroupsOverview';
-import {GadgetStudentsFollowup} from './gadgets/GadgetStudentsFollowup';
+import {GadgetWorkFollowup} from './gadgets/GadgetWorkFollowup';
+import {GadgetStudentFollowup} from './gadgets/GadgetStudentFollowup';
 import {ReportDiagnosticTags} from './reports/ReportDiagnosticTags';
 import {ReportSectionResults} from './reports/ReportSectionResults';
 import {ReportActivityCompletion} from './reports/ReportActivityCompletion';
@@ -151,7 +152,9 @@ class DashboardView extends Component{
             <div>
                 <Header options={this.props.options} title={"Tableau de bord"}/>
                 <br/>
-                <GadgetStudentsFollowup options={this.props.options} /> 
+                <GadgetWorkFollowup options={this.props.options} /> 
+                <br/>
+                <GadgetStudentFollowup options={this.props.options} /> 
                 <br/>
                 <GadgetGroupsOverview options={this.props.options} /> 
             </div>

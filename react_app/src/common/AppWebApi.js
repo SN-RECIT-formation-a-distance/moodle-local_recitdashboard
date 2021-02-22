@@ -103,8 +103,8 @@ export class AppWebApi extends WebApi
         this.post(this.gateway, data, onSuccess);
     }*/
     
-    getStudentsFollowup(courseId, groupId, onSuccess){
-        let data = {groupId: groupId, courseId: courseId, service: "getStudentsFollowup"};
+    getWorkFollowup(courseId, groupId, onSuccess){
+        let data = {groupId: groupId, courseId: courseId, service: "getWorkFollowup"};
 
         let onSuccessTmp = function(result){
             for(let i = 0; i < result.data.length; i++){
@@ -115,6 +115,12 @@ export class AppWebApi extends WebApi
         }
 
         this.post(this.gateway, data, onSuccessTmp);
+    }
+
+    getStudentFollowup(courseId, groupId, onSuccess){
+        let data = {groupId: groupId, courseId: courseId, service: "getStudentFollowup"};
+
+        this.post(this.gateway, data, onSuccess);
     }
 
     reportSectionResults(courseId, groupId, onSuccess){
