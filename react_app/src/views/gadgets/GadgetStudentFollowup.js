@@ -4,7 +4,7 @@ import {faSync, faTimesCircle, faThumbsUp, faInfo} from '@fortawesome/free-solid
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {$glVars} from '../../common/common';
 
-export class GadgetStudentsFollowup extends Component{
+export class GadgetStudentFollowup extends Component{
     static defaultProps = {        
         options: null
     };
@@ -15,6 +15,7 @@ export class GadgetStudentsFollowup extends Component{
         this.onClose = this.onClose.bind(this);
         this.getData = this.getData.bind(this);
         this.getDataResult = this.getDataResult.bind(this);
+        this.getUsers = this.getUsers.bind(this);
 
         this.state = {dataProvider: [], show: true};
     }
@@ -30,7 +31,7 @@ export class GadgetStudentsFollowup extends Component{
     }
 
     getData(){
-        $glVars.webApi.getStudentsFollowup(this.props.options.course.id,  this.props.options.group.id, this.getDataResult);        
+        $glVars.webApi.getStudentFollowup(this.props.options.course.id,  this.props.options.group.id, this.getDataResult);        
     }
 
     getDataResult(result){         
@@ -48,25 +49,18 @@ export class GadgetStudentsFollowup extends Component{
 
         let bodyContent = {maxHeight: 400, overflowY: "auto", display: "flex", flexWrap: "wrap"};
 
-        let nbItems = 0;
+        let nbItems = this.state.dataProvider.length;
 
-        for(let item of this.state.dataProvider){
-            nbItems += item.nbItems;
-        }
-        
         let main = 
             <Card className='gadget'>
                 <Card.Body>
                     <Card.Title>
-                        <span>{`Suivi des travaux`}</span>
-                        <span><Badge pill variant="primary">{nbItems}</Badge>{` item(s) à suivre`}</span>
+                        <span>{`Suivi des élèves`}</span>
+                        <span><Badge pill variant="primary">{nbItems}</Badge>{` élève(s) à suivre`}</span>
                         <ButtonToolbar aria-label="Toolbar with Buttons">
                             <ButtonGroup className="mr-2">
                                 <Button  variant="outline-secondary" size="sm" onClick={this.getData} title="Mettre à jour le gadget"><FontAwesomeIcon icon={faSync}/></Button>
                                 <Button  variant="outline-secondary" size="sm" onClick={this.onClose} title="Enlever le gadget"><FontAwesomeIcon icon={faTimesCircle}/></Button>
-                                <OverlayTrigger placement="left" delay={{ show: 250 }} overlay={<Tooltip>{`La pastille de couleur passe du jaune au rouge lorsqu'un travail remis par l'élève date de plus de 7 jours.`}</Tooltip>}>
-                                    <Button size="sm" variant="secondary"><FontAwesomeIcon icon={faInfo}/></Button>
-                                </OverlayTrigger>
                             </ButtonGroup>
                         </ButtonToolbar>                        
                     </Card.Title>
@@ -74,20 +68,9 @@ export class GadgetStudentsFollowup extends Component{
                     <div style={bodyContent}>
 
                         {this.state.dataProvider.map((item, index) => {
-                            let variant = "warning";
-
-                            let diffInDays = Math.floor(Math.abs(new Date() - new Date(item.timeModified)) / 86400000);
-
-                            if((item.nbItems > 5) || (diffInDays > 7)) {
-                                variant = "danger";
-                            }
-
                             let result = 
-                                <Alert variant={variant} key={index} style={{margin: '.5rem'}}>
-                                    <b>Activité: <a href={item.url} target={"_blank"}>{`${item.cmName} `}</a></b>
-                                    <br/>
-                                    <h2 style={{display: 'inline'}}><Badge pill variant="primary">{item.nbItems}</Badge></h2>
-                                    <span>{` ${item.extra.description}.`}</span>
+                                <Alert variant="warning" key={index} style={{margin: '.5rem'}}>
+                                    {this.getUsers(item)}
                                 </Alert>
                             return result;
                         })}
@@ -102,5 +85,20 @@ export class GadgetStudentsFollowup extends Component{
 
     onClose(){
         this.setState({show: false});
+    }
+
+    getUsers(item){        
+        let result = <span>
+                        {"L'élève "}<a href={`${M.cfg.wwwroot}/user/view.php?id=${item.user.userId}&course=${this.props.options.course.id}`} target='_blank'>{item.user.username}</a>
+                        {` a besoin du suivi dans les activités suivantes :`}
+                        <ul>
+                        {item.activityList.map((cm, index) => {
+                            let result = <li key={index} ><a target='_blank' href={`${M.cfg.wwwroot}/mod/${cm.itemModule}/view.php?id=${cm.cmId}`}>{cm.itemName}</a></li>;
+                            return result;
+                        })}
+                        </ul>
+                    </span>;
+
+        return result;
     }
 }
