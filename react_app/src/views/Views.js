@@ -9,6 +9,7 @@ import {GadgetGroupsOverview} from './gadgets/GadgetGroupsOverview';
 import {GadgetStudentsFollowup} from './gadgets/GadgetStudentsFollowup';
 import {ReportDiagnosticTags} from './reports/ReportDiagnosticTags';
 import {ReportSectionResults} from './reports/ReportSectionResults';
+import {ReportQuiz} from './reports/ReportQuiz';
 import {ReportActivityCompletion} from './reports/ReportActivityCompletion';
 
 export class MainView extends Component{
@@ -46,6 +47,10 @@ export class MainView extends Component{
                 },
                 {text: "Achèvement d'activités", value: 3, require:{course: true, group: true, student: true, section: true, cm: false}, validation: function(options){
                         return (options.course.id > 0 && options.group.id > 0)
+                    }
+                },
+                {text: "Résultats de tests", value: 4, require:{course: true, group: true, student: true, section: true, cm: true}, validation: function(options){
+                        return (options.course.id > 0 && options.group.id > 0 && options.cm.id > 0)
                     }
                 }
             ],
@@ -111,6 +116,7 @@ export class MainView extends Component{
             case '1': 
             case '2':
             case '3':
+            case '4':
                 return <ReportsView options={this.state.options}/>;
             default: return null;
         }
@@ -122,6 +128,7 @@ export class MainView extends Component{
             case '1': 
             case '2': 
             case '3':
+            case '4':
                 return <FilterOptions onChange={this.onChangeFilterOptions} options={this.state.options} onGo={this.onGo}/>;
             default: return null;
         }
@@ -165,7 +172,7 @@ class ReportsView extends Component{
         options: null
     };
 
-    render() {  
+    render() {
         if(!this.props.options.report.validation(this.props.options)){ return null;}
 
         let main =
@@ -188,6 +195,8 @@ class ReportsView extends Component{
                 return <ReportSectionResults options={this.props.options}/>;
             case '3':
                 return <ReportActivityCompletion options={this.props.options}/>;
+            case '4':
+                return <ReportQuiz options={this.props.options}/>;
             default:
                 return null;
         }

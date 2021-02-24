@@ -11,3 +11,10 @@ export const $glVars = {
     i18n: new I18n(),
     webApi: new AppWebApi()
 }
+
+export class AppCommon {
+    static Colors = {
+        red: '#dc3545',
+        green: '#28a745'
+    }
+}

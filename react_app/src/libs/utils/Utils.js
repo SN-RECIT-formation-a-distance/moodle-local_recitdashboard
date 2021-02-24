@@ -454,6 +454,7 @@ export class UtilsTreeStruct
         }
         return false;
     }
+    
     /*static removeNode(tree, propNodes, callback){
         let i, node;
         
@@ -477,4 +478,58 @@ export class UtilsTreeStruct
         }
         return false;
     }*/
+}
+
+export class CSV {
+    static download_csv(csv, filename) {
+        var csvFile;
+        var downloadLink;
+    
+        // CSV FILE
+        csvFile = new Blob([csv], {type: "text/csv"});
+    
+        // Download link
+        downloadLink = document.createElement("a");
+    
+        // File name
+        downloadLink.download = filename;
+    
+        // We have to create a link to the file
+        downloadLink.href = window.URL.createObjectURL(csvFile);
+    
+        // Make sure that the link is not displayed
+        downloadLink.style.display = "none";
+    
+        // Add the link to your DOM
+        document.body.appendChild(downloadLink);
+    
+        // Lanzamos
+        downloadLink.click();
+    }
+    
+    static export_table_to_csv(table, filename) {
+        var csv = [];
+        var rows = document.querySelectorAll("#"+table+" tr");
+        var header = document.querySelectorAll("#"+table+" th");
+        var headers = [];
+        for (var i = 0; i < header.length; i++) {
+            headers.push(header[i].innerText.replace('\n','').replace(',',';'));
+        }
+        csv.push(headers.join(","));
+        
+        for (var i = 0; i < rows.length; i++) {
+            var row = [], cols = rows[i].querySelectorAll("td");
+            
+            for (var j = 0; j < cols.length; j++){
+                let text = cols[j].innerText;
+                if (text.length == 0) text = cols[j].firstElementChild.getAttribute("title")
+                row.push(text);
+            }
+            
+            csv.push(row.join(","));		
+        }
+    
+        // Download CSV
+        CSV.download_csv(csv.join("\n"), filename);
+    }
 }
