@@ -80,17 +80,26 @@ export class ReportQuiz  extends Component{
                                         </Popover>
                                       );
                                     let result = 
-                                        <DataGrid.Header.Cell key={index} style={{textAlign: "center"}}>
-                                            <span>{item.name} <br></br> {item.tag} </span>
-                                        <OverlayTrigger trigger="click" placement="bottom" overlay={popover}>
-                                            <FontAwesomeIcon icon={faInfoCircle}></FontAwesomeIcon>
-                                        </OverlayTrigger>
+                                        <DataGrid.Header.Cell key={index} style={{textAlign: "center"}} >
+                                            <span>{`${item.name} `}</span>
+                                            <OverlayTrigger trigger="click" placement="bottom" overlay={popover} rootClose={true}>
+                                                <FontAwesomeIcon icon={faInfoCircle}></FontAwesomeIcon>
+                                            </OverlayTrigger>
                                         </DataGrid.Header.Cell>
 
                                     return (result);                                    
                                 }
                             )}
                             </DataGrid.Header.Row>
+                            <DataGrid.Body.Row>
+                                <DataGrid.Header.Cell>Tags</DataGrid.Header.Cell>
+                                {dataProvider.questions.map((item, index) => {
+                                    let tags = (item.tag ? item.tag.toString().replaceAll(",", "") : "");
+                                    let result = <DataGrid.Body.Cell key={index} style={{textAlign: "center"}}>{tags}</DataGrid.Body.Cell>
+                                    return (result);                                    
+                                }
+                            )}
+                            </DataGrid.Body.Row>
                         </DataGrid.Header>
                         <DataGrid.Body>
                             {dataProvider.students.map((item, index) => {   
@@ -99,9 +108,9 @@ export class ReportQuiz  extends Component{
                                     let pos = 0;
 
                                     let cell = 
-                                        <DataGrid.Body.Cell sortValue={item.name}  key={0}>
+                                        <DataGrid.Header.Cell sortValue={item.name}  key={0}>
                                             <a href={`${M.cfg.wwwroot}/user/profile.php?id=${item.userId}`} target={"_blank"}>{item.name}</a>
-                                        </DataGrid.Body.Cell>;
+                                        </DataGrid.Header.Cell>;
 
                                     items.push(cell);
 

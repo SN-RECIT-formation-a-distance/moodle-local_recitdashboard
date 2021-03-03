@@ -3,6 +3,7 @@ import {Card, ButtonGroup, Button, Badge, Alert, ButtonToolbar, OverlayTrigger, 
 import {faSync, faTimesCircle, faThumbsUp, faInfo} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {$glVars} from '../../common/common';
+import { JsNx } from '../../libs/utils/Utils';
 
 export class GadgetStudentFollowup extends Component{
     static defaultProps = {        
@@ -49,14 +50,12 @@ export class GadgetStudentFollowup extends Component{
 
         let bodyContent = {maxHeight: 400, overflowY: "auto", display: "flex", flexWrap: "wrap"};
 
-        let nbItems = this.state.dataProvider.length;
-
         let main = 
             <Card className='gadget'>
                 <Card.Body>
                     <Card.Title>
                         <span>{`Suivi des élèves`}</span>
-                        <span><Badge pill variant="primary">{nbItems}</Badge>{` élève(s) à suivre`}</span>
+                        <span><Badge pill variant="primary">{this.state.dataProvider.length}</Badge>{` élève(s) à suivre`}</span>
                         <ButtonToolbar aria-label="Toolbar with Buttons">
                             <ButtonGroup className="mr-2">
                                 <Button  variant="outline-secondary" size="sm" onClick={this.getData} title="Mettre à jour le gadget"><FontAwesomeIcon icon={faSync}/></Button>
@@ -88,16 +87,25 @@ export class GadgetStudentFollowup extends Component{
     }
 
     getUsers(item){        
-        let result = <span>
-                        {"L'élève "}<a href={`${M.cfg.wwwroot}/user/view.php?id=${item.user.userId}&course=${this.props.options.course.id}`} target='_blank'>{item.user.username}</a>
-                        {` a besoin du suivi dans les activités suivantes :`}
-                        <ul>
-                        {item.activityList.map((cm, index) => {
-                            let result = <li key={index} ><a target='_blank' href={`${M.cfg.wwwroot}/mod/${cm.itemModule}/view.php?id=${cm.cmId}`}>{cm.itemName}</a></li>;
-                            return result;
-                        })}
-                        </ul>
-                    </span>;
+        let result = 
+            <span>
+                {"L'élève "}<a href={`${M.cfg.wwwroot}/user/view.php?id=${item.userId}&course=${this.props.options.course.id}`} target='_blank'>{item.username}</a>
+                {` a besoin du suivi :`}
+                <ul>
+                {item.issues.map((issue, index) => {
+                    let result = null;
+
+                    if(issue.hasOwnProperty('nbDaysLastAccess')){
+                        result = <li key={index} >{`${issue.nbDaysLastAccess} jours sans se connecter au cours.`}</li>;
+                    }
+                    else if(issue.hasOwnProperty('nbDaysLate')){
+                        result = <li key={index} >{`L'activité `}<a target='_blank' href={issue.url}>{issue.cmName}</a>{` est ${issue.nbDaysLate} jour en retard.`}</li>;
+                    }
+                    
+                    return result;
+                })}
+                </ul>
+            </span>;
 
         return result;
     }
