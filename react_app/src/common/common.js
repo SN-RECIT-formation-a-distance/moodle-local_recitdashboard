@@ -15,6 +15,7 @@ export const $glVars = {
 export class AppCommon {
     static Colors = {
         red: '#dc3545',
-        green: '#28a745'
+        green: '#28a745',
+        blue: '#007bff'
     }
 }

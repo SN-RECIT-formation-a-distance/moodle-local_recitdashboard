@@ -77,7 +77,7 @@ export class AppWebApi extends WebApi
         this.post(this.gateway, data, onSuccess);
     }
 
-    getReportQuiz(courseId, groupId, cmId, onSuccess){
+    reportQuiz(courseId, groupId, cmId, onSuccess){
         groupId = groupId || 0;
         cmId = cmId || 0;
         let output = 'json';

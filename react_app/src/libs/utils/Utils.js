@@ -479,7 +479,7 @@ export class UtilsTreeStruct
         return false;
     }*/
 }
-
+/*
 export class CSV {
     static download_csv(csv, filename) {
         var csvFile;
@@ -532,4 +532,4 @@ export class CSV {
         // Download CSV
         CSV.download_csv(csv.join("\n"), filename);
     }
-}
+}*/
