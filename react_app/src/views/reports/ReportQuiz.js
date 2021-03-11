@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {DataGrid} from '../../libs/components/Components';
-import {OverlayTrigger, Popover} from 'react-bootstrap';
+import {OverlayTrigger, Popover, Button} from 'react-bootstrap';
 import {$glVars, Options, AppCommon} from '../../common/common';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {faCheck,faInfoCircle,faTimes, faCheckSquare} from '@fortawesome/free-solid-svg-icons';
@@ -47,6 +47,7 @@ export class ReportQuiz  extends Component{
     render() {    
         let dataProvider = this.state.dataProvider;
         if (dataProvider === null){ return null};
+        if (dataProvider.students.length === 0){ return null};
         
         if(this.props.options.student.id > 0){
             dataProvider.students = dataProvider.students.filter(item => item.userId === this.props.options.student.id);
@@ -59,12 +60,12 @@ export class ReportQuiz  extends Component{
                             <DataGrid.Header.Row>
                                 <DataGrid.Header.Cell style={{minWidth: "160px"}}>{"Prénom / Nom"}</DataGrid.Header.Cell>
                                 <DataGrid.Header.Cell>{"Courriel"}</DataGrid.Header.Cell>
-                                <DataGrid.Header.Cell style={{minWidth: "120px"}}>{"Tentatives"}</DataGrid.Header.Cell>
+                                <DataGrid.Header.Cell style={{minWidth: "150px"}}>{"Tentatives"}</DataGrid.Header.Cell>
                                 <DataGrid.Header.Cell style={{minWidth: "100px"}}>{"État"}</DataGrid.Header.Cell>
                                 <DataGrid.Header.Cell style={{minWidth: "160px"}}>{"Commencé le"}</DataGrid.Header.Cell>
                                 <DataGrid.Header.Cell style={{minWidth: "160px"}}>{"Terminé"}</DataGrid.Header.Cell>
                                 <DataGrid.Header.Cell style={{minWidth: "160px"}}>{"Temps utilisé"}</DataGrid.Header.Cell>
-                                <DataGrid.Header.Cell style={{minWidth: "60px"}}>{`Note/${dataProvider.quizMaxGrade.toFixed(2)}`}</DataGrid.Header.Cell>
+                                <DataGrid.Header.Cell style={{minWidth: "135px"}}>{`Note/${dataProvider.quizMaxGrade.toFixed(2)}`}</DataGrid.Header.Cell>
                                 {dataProvider.questions.map((item, index) => {
                                     const popover = (
                                         <Popover>
@@ -126,11 +127,11 @@ export class ReportQuiz  extends Component{
                                     items.push(<DataGrid.Body.Cell key={items.length}>{quizAttempt.attempState}</DataGrid.Body.Cell>);
                                     items.push(<DataGrid.Body.Cell key={items.length}>{quizAttempt.attemptTimeStart}</DataGrid.Body.Cell>);
                                     items.push(<DataGrid.Body.Cell key={items.length}>{quizAttempt.attemptTimeFinish}</DataGrid.Body.Cell>);
-                                    items.push(<DataGrid.Body.Cell key={items.length}>{quizAttempt.elapsedTime}</DataGrid.Body.Cell>);
-                                    items.push(<DataGrid.Body.Cell key={items.length}>{quizAttempt.finalGrade.toFixed(2)}</DataGrid.Body.Cell>);
+                                    items.push(<DataGrid.Body.Cell key={items.length} style={{textAlign: "center"}} >{this.formatElapsedTime(quizAttempt.elapsedTime)}</DataGrid.Body.Cell>);
+                                    items.push(<DataGrid.Body.Cell key={items.length} style={{backgroundColor: this.getCellContext(quizAttempt, dataProvider.quizMaxGrade), textAlign: "center"}}>{quizAttempt.finalGrade.toFixed(2)}</DataGrid.Body.Cell>);
 
                                     quizAttempt.questions.map((question, index3) => {
-                                        items.push(this.getCell(question, items.length));
+                                        items.push(this.getCell(quizAttempt, question, items.length));
                                     })
 
                                     return (<DataGrid.Body.Row key={row++}>{items}</DataGrid.Body.Row>);
@@ -149,16 +150,16 @@ export class ReportQuiz  extends Component{
         return (main);
     }
 
-    getCell(item, index){
+    getCell(quizAttempt, question, index){
         let text;
         let title;
         let color = AppCommon.Colors.red
-        if (item.grade == item.defaultMark){
+        if (question.grade == question.defaultMark){
             text = <FontAwesomeIcon icon={faCheck}/>;
             color = AppCommon.Colors.green;
             title = "Réussi";
         }
-        else if((item.grade < item.defaultMark) && (item.grade > 0)){
+        else if((question.grade < question.defaultMark) && (question.grade > 0)){
             text = <FontAwesomeIcon icon={faCheckSquare}/>;
             color = AppCommon.Colors.blue;
             title = "Partiellement correct";
@@ -169,14 +170,53 @@ export class ReportQuiz  extends Component{
         }
         
         let cell = 
-            <DataGrid.Body.Cell  sortValue={item.weightedGrade.toFixed(2)} style={{textAlign: "center", verticalAlign: "middle", color: color}} key={index}>
-                <span title={title}>{text}{" "}{item.weightedGrade.toFixed(2)}</span>
+            <DataGrid.Body.Cell  sortValue={question.weightedGrade.toFixed(2)} style={{textAlign: "center", verticalAlign: "middle"}} key={index}>
+                <Button variant="link" title={title} onClick={() => this.openQuestion(quizAttempt, question)} style={{color: color}}>
+                    {text}{" "}{question.weightedGrade.toFixed(2)}
+                </Button>
             </DataGrid.Body.Cell>
 
         return cell;
     }
-    /*downloadCSV(){
-        CSV.export_table_to_csv("quizreporttbl", "quizreport_"+this.props.options.group.name+".csv")
-    }*/
 
+    openQuestion(quizAttempt, question){
+        let url=`${M.cfg.wwwroot}/mod/quiz/reviewquestion.php?attempt=${quizAttempt.quizAttemptId}&slot=${question.slot}`;
+        window.open(url, "PopUp Question", "width=640,height=460");
+    }
+
+    getCellContext(item, quizMaxGrade){
+        if(item.finalGrade < 0){ return "inherit";}
+
+        let grade = item.finalGrade;
+
+        let context = "";
+
+        if(grade >= (quizMaxGrade*0.7)){
+            context = 'hsl(134, 41%, 83%)';
+        }
+        else if(grade >= (quizMaxGrade*0.6) && grade < (quizMaxGrade*0.7)){
+            context = 'hsl(45, 100%, 86%)';
+        }
+        else if(grade >= (quizMaxGrade*0.5) && grade < (quizMaxGrade*0.6)){
+            context = 'hsl(27, 100%, 76%)';
+        }
+        else{
+            context = 'hsl(354, 70%, 87%)';
+        }
+
+        return context;
+    }   
+
+    formatElapsedTime(nbSecs){
+        let dateObj = new Date(nbSecs * 1000);
+        let hours = dateObj.getUTCHours();
+        let minutes = dateObj.getUTCMinutes();
+        let seconds = dateObj.getSeconds();
+
+        let result = hours.toString().padStart(2, '0') + ':' + 
+        minutes.toString().padStart(2, '0') + ':' + 
+        seconds.toString().padStart(2, '0');
+
+        return result;
+    }
 }
