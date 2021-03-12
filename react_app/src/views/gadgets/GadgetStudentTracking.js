@@ -1,4 +1,4 @@
-
+/*
 import React, { Component } from 'react';
 import { Card, ButtonGroup, ButtonToolbar, Button, OverlayTrigger, Tooltip} from 'react-bootstrap';
 import {faSync, faInfo, faSearchPlus, faFileSignature, faUserPlus, faUserClock, faBell, faTasks} from '@fortawesome/free-solid-svg-icons';
@@ -187,3 +187,4 @@ class GroupView extends AView{
         return main;
     }
 }
+*/

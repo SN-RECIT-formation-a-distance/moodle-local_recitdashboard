@@ -4,7 +4,7 @@ import { Card, ButtonGroup, ButtonToolbar, Button} from 'react-bootstrap';
 import { ResponsivePie } from '@nivo/pie';
 import {faSync, faTimesCircle} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {$glVars} from '../../common/common';
+import {$glVars, AppCommon} from '../../common/common';
 
 export class GadgetGroupsOverview extends Component{
     static defaultProps = {        
@@ -144,7 +144,7 @@ class PieChart extends Component{
         innerRadius={0.5}
         padAngle={2}
         cornerRadius={0}
-        colors={['hsl(134, 41%, 83%)', 'hsl(45, 100%, 86%)', 'hsl(354, 70%, 87%)']}
+        colors={[AppCommon.Colors.lightGreen, AppCommon.Colors.lightYellow, AppCommon.Colors.lightRed]}
         borderWidth={1}
         borderColor={{ from: 'color', modifiers: [ [ 'darker', 0.2 ] ] }}
         enableRadialLabels={false}
@@ -167,7 +167,7 @@ class PieChart extends Component{
             {
                 id: 'gdef',
                 type: 'patternLines',
-                background: 'hsl(134, 41%, 83%)',
+                background: AppCommon.Colors.lightGreen,
                 color: 'rgba(255, 255, 255, 0.3)',
                 size: 4,
                 padding: 1,
@@ -176,7 +176,7 @@ class PieChart extends Component{
             {
                 id: 'ydef',
                 type: 'patternLines',
-                background: 'hsl(45, 100%, 86%)',
+                background: AppCommon.Colors.lightYellow,
                 color: 'rgba(255, 255, 255, 0.3)',
                 rotation: -45,
                 lineWidth: 6,
@@ -185,7 +185,7 @@ class PieChart extends Component{
             {
                 id: 'rdef',
                 type: 'patternLines',
-                background: 'hsl(354, 70%, 87%)',
+                background: AppCommon.Colors.lightRed,
                 color: 'rgba(255, 255, 255, 0.3)',
                 rotation: -45,
                 lineWidth: 6,

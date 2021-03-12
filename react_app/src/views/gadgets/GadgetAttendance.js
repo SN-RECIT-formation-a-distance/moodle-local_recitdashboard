@@ -1,5 +1,5 @@
 
-import React, { Component } from 'react';
+/*import React, { Component } from 'react';
 import { Card, ButtonGroup, ButtonToolbar, Button, DropdownButton, Dropdown, OverlayTrigger, Tooltip} from 'react-bootstrap';
 import { ResponsiveLine } from '@nivo/line'
 import {faSync, faInfo} from '@fortawesome/free-solid-svg-icons';
@@ -168,3 +168,4 @@ export class GadgetAttendance extends Component{
         return main;
     }
 }
+*/

@@ -1,4 +1,4 @@
-
+/*
 import React, { Component } from 'react';
 import { Card, ButtonGroup, ButtonToolbar, Button, DropdownButton, Dropdown} from 'react-bootstrap';
 import { ResponsiveHeatMap } from '@nivo/heatmap'
@@ -208,3 +208,4 @@ export class GadgetDiagnosticTags extends Component{
         this.setState({selectedGroupIndex: index});
     }
 }
+*/

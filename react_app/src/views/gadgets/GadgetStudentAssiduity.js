@@ -1,5 +1,5 @@
 
-import React, { Component } from 'react';
+/*import React, { Component } from 'react';
 import { Card, ButtonGroup, ButtonToolbar, Button} from 'react-bootstrap';
 import { ResponsiveBar } from '@nivo/bar'
 import {faSync} from '@fortawesome/free-solid-svg-icons';
@@ -59,67 +59,9 @@ export class GadgetStudentAssiduity extends Component{
             result.push({dateRef: new Date(item.timeCreated), nbRequest: item.nbRequest});
         }
 
-        /*let result = [];
-
-        if(tmp.length === 1){
-            result.push(tmp[0]);
-        }
-        else{
-            for(let i = 0; i < tmp.length - 1; i = i + 2){
-                let diff = tmp[i+1].dateRef.getDate() - tmp[i].dateRef.getDate() - 1;
-    
-                result.push(tmp[i]);
-                console.log(diff)
-    
-                for(let k = 0; k < diff; k++){
-                    let item = {dateRef: new Date(tmp[i].dateRef.getTime()+(1*24*60*60*1000)), nbRequest: 0};  // add 1 day
-                    result.push(item);
-                }
-    
-                result.push(tmp[i+1]);
-            } 
-        }*/
-        
         for(let item of result){
             item.dateRef = UtilsDateTime.format(item.dateRef);
         }
-        /*let result = [
-            {
-              "country": "AD",
-              "hot dog": 97,
-              "hot dogColor": "hsl(317, 70%, 50%)",
-            },
-            {
-              "country": "AE",
-              "hot dog": 161,
-              "hot dogColor": "hsl(31, 70%, 50%)",
-            },
-            {
-              "country": "AF",
-              "hot dog": 63,
-              "hot dogColor": "hsl(226, 70%, 50%)",
-            },
-            {
-              "country": "AG",
-              "hot dog": 77,
-              "hot dogColor": "hsl(271, 70%, 50%)",
-            },
-            {
-              "country": "AI",
-              "hot dog": 89,
-              "hot dogColor": "hsl(212, 70%, 50%)",
-            },
-            {
-              "country": "AL",
-              "hot dog": 185,
-              "hot dogColor": "hsl(180, 70%, 50%)",
-            },
-            {
-              "country": "AM",
-              "hot dog": 11,
-              "hot dogColor": "hsl(352, 70%, 50%)",
-            }
-          ]*/
 
         return result;
     }
@@ -206,3 +148,4 @@ export class GadgetStudentAssiduity extends Component{
         return main;
     }
 }
+*/

@@ -5,7 +5,7 @@ import {faPlus, faMinus} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {DataGrid, MultipleSelect} from '../../libs/components/Components';
 import {JsNx} from '../../libs/utils/Utils';
-import {$glVars, Options} from '../../common/common';
+import {$glVars, Options, AppCommon} from '../../common/common';
 
 export class ReportDiagnosticTags extends Component{
     static defaultProps = {
@@ -61,13 +61,13 @@ export class ReportDiagnosticTags extends Component{
         let cellContext = this.state.data.htmlCellContext;
 
         if(grade >= cellContext.minSuccess && grade <= cellContext.maxSuccess){
-            context = 'hsl(134, 41%, 83%)';
+            context = AppCommon.Colors.lightGreen;
         }
         else if(grade >= cellContext.minWarning && grade < cellContext.maxWarning){
-            context = 'hsl(45, 100%, 86%)';
+            context =  AppCommon.Colors.lightYellow;
         }
         else{
-            context = 'hsl(354, 70%, 87%)';
+            context =  AppCommon.Colors.lightRed;
         }
 
         return context;

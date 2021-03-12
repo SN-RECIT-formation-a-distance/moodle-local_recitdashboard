@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import {DataGrid} from '../../libs/components/Components';
 import {JsNx} from '../../libs/utils/Utils';
-import {$glVars, Options} from '../../common/common';
+import {$glVars, Options, AppCommon} from '../../common/common';
 
 export class ReportSectionResults  extends Component{
     static defaultProps = {        
@@ -141,16 +141,16 @@ export class ReportSectionResults  extends Component{
         let context = "";
 
         if(grade >= 70){
-            context = 'hsl(134, 41%, 83%)';
+            context = AppCommon.Colors.lightGreen;
         }
         else if(grade >= 60 && grade < 70){
-            context = 'hsl(45, 100%, 86%)';
+            context = AppCommon.Colors.lightYellow;
         }
         else if(grade >= 50 && grade < 60){
-            context = 'hsl(27, 100%, 76%)';
+            context = AppCommon.Colors.lightOrange;
         }
         else{
-            context = 'hsl(354, 70%, 87%)';
+            context = AppCommon.Colors.lightRed;
         }
 
         return context;

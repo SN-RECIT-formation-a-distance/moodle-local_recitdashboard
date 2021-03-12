@@ -3,7 +3,7 @@ import {DataGrid} from '../../libs/components/Components';
 import {OverlayTrigger, Popover, Button} from 'react-bootstrap';
 import {$glVars, Options, AppCommon} from '../../common/common';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {faCheck,faInfoCircle,faTimes, faCheckSquare} from '@fortawesome/free-solid-svg-icons';
+import {faCheck, faTimes, faCheckSquare} from '@fortawesome/free-solid-svg-icons';
 
 export class ReportQuiz  extends Component{
     static defaultProps = {        
@@ -192,16 +192,16 @@ export class ReportQuiz  extends Component{
         let context = "";
 
         if(grade >= (quizMaxGrade*0.7)){
-            context = 'hsl(134, 41%, 83%)';
+            context = AppCommon.Colors.lightGreen;
         }
         else if(grade >= (quizMaxGrade*0.6) && grade < (quizMaxGrade*0.7)){
-            context = 'hsl(45, 100%, 86%)';
+            context = AppCommon.Colors.lightYellow;
         }
         else if(grade >= (quizMaxGrade*0.5) && grade < (quizMaxGrade*0.6)){
-            context = 'hsl(27, 100%, 76%)';
+            context = AppCommon.Colors.lightOrange;
         }
         else{
-            context = 'hsl(354, 70%, 87%)';
+            context = AppCommon.Colors.lightRed;
         }
 
         return context;

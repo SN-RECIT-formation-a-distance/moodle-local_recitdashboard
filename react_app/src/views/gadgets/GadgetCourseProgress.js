@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+/*import React, { Component } from 'react';
 import {Card, ButtonGroup, Button, Badge, OverlayTrigger, Tooltip, DropdownButton, Dropdown, ButtonToolbar, ProgressBar} from 'react-bootstrap';
 import {faSync, faCheck} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -160,24 +160,6 @@ export class GadgetCourseProgressDetailled extends Component{
         return `${item.activity.studentGrade.toFixed(2)} / ${item.activity.maxGrade.toFixed(2)}`;
     }    
 
-   /* getDeadline(item){
-        if(item.completionState === 1){
-            return "success";
-        }
-        else if(item.completionExpected === null){
-            return "";
-        }
-        else if(item.daysDeadline < 0){
-            return "error";
-        }
-        else if(item.daysDeadline <= 3){
-            return "warning";
-        }
-        else{
-            return "";
-        }
-    }*/
-
     onSelectSection(index){
         this.setState({selectedSectionIndex: index});
     }
@@ -195,4 +177,4 @@ export class GadgetCourseProgressDetailled extends Component{
         let nbDays = Math.round(diff / 1000 / 60 / 60 / 24, 0);
         return (nbDays > 0 ? `${sepBef}${nbDays} jours${sepAft}` : '');
     }
-}
+}*/
