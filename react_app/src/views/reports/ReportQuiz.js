@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {DataGrid} from '../../libs/components/Components';
-import {OverlayTrigger, Popover, Button} from 'react-bootstrap';
+import {OverlayTrigger, Popover, Button, Badge} from 'react-bootstrap';
 import {$glVars, Options, AppCommon} from '../../common/common';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {faCheck, faTimes, faCheckSquare} from '@fortawesome/free-solid-svg-icons';
@@ -15,7 +15,6 @@ export class ReportQuiz  extends Component{
 
         this.getData = this.getData.bind(this);
         this.getDataResult = this.getDataResult.bind(this);
-       // this.downloadCSV = this.downloadCSV.bind(this);
 
         this.state = {dataProvider: null};
     }
@@ -65,7 +64,7 @@ export class ReportQuiz  extends Component{
                                 <DataGrid.Header.Cell style={{minWidth: "160px"}}>{"Commencé le"}</DataGrid.Header.Cell>
                                 <DataGrid.Header.Cell style={{minWidth: "160px"}}>{"Terminé"}</DataGrid.Header.Cell>
                                 <DataGrid.Header.Cell style={{minWidth: "160px"}}>{"Temps utilisé"}</DataGrid.Header.Cell>
-                                <DataGrid.Header.Cell style={{minWidth: "135px"}}>{`Note/${dataProvider.quizMaxGrade.toFixed(2)}`}</DataGrid.Header.Cell>
+                                <DataGrid.Header.Cell style={{minWidth: "140px"}}>{`Note/${dataProvider.quizMaxGrade.toFixed(2)}`}</DataGrid.Header.Cell>
                                 {dataProvider.questions.map((item, index) => {
                                     const popover = (
                                         <Popover>
@@ -96,8 +95,13 @@ export class ReportQuiz  extends Component{
                                 <DataGrid.Body.Cell></DataGrid.Body.Cell>
                                 <DataGrid.Body.Cell></DataGrid.Body.Cell>
                                 {dataProvider.questions.map((item, index) => {
-                                    let tags = (item.tags ? item.tags.toString().replaceAll(",", "") : "");
-                                    let result = <DataGrid.Body.Cell key={index} style={{textAlign: "center"}}>{tags}</DataGrid.Body.Cell>
+                                    let result = 
+                                        <DataGrid.Body.Cell key={index} style={{textAlign: "center"}}>
+                                            {item.tags.map((item, index) => {
+                                                return <Badge key={index}>{item}</Badge>
+                                                }
+                                            )}
+                                        </DataGrid.Body.Cell>
                                     return (result);                                    
                                 }
                             )}
@@ -109,9 +113,10 @@ export class ReportQuiz  extends Component{
                                 return student.quizAttempts.map((quizAttempt, index2) => {   
                                     // all items (children) need to be inside a single array otherwise the orderby won't work                                 
                                     let items =  [];
+                                    let cell = null;
 
                                     if(index2 === 0){
-                                        let cell = 
+                                        cell = 
                                         <DataGrid.Header.Cell sortValue={student.name}  key={items.length}>
                                             <a href={`${M.cfg.wwwroot}/user/profile.php?id=${student.userId}`} target={"_blank"}>{student.username}</a>
                                         </DataGrid.Header.Cell>;
@@ -128,7 +133,20 @@ export class ReportQuiz  extends Component{
                                     items.push(<DataGrid.Body.Cell key={items.length}>{quizAttempt.attemptTimeStart}</DataGrid.Body.Cell>);
                                     items.push(<DataGrid.Body.Cell key={items.length}>{quizAttempt.attemptTimeFinish}</DataGrid.Body.Cell>);
                                     items.push(<DataGrid.Body.Cell key={items.length} style={{textAlign: "center"}} >{this.formatElapsedTime(quizAttempt.elapsedTime)}</DataGrid.Body.Cell>);
-                                    items.push(<DataGrid.Body.Cell key={items.length} style={{backgroundColor: this.getCellContext(quizAttempt, dataProvider.quizMaxGrade), textAlign: "center"}}>{quizAttempt.finalGrade.toFixed(2)}</DataGrid.Body.Cell>);
+
+                                    let finalGrade = 0;
+                                    if(quizAttempt.finalGrade >= 0){
+                                        finalGrade = quizAttempt.finalGrade.toFixed(2);
+                                    }
+                                    else{
+                                        finalGrade = "Pas encore évalué";
+                                    }
+
+                                    cell = 
+                                    <DataGrid.Body.Cell key={items.length} style={{backgroundColor: this.getCellContext(quizAttempt, dataProvider.quizMaxGrade), textAlign: "center"}}>
+                                        <a href={`${M.cfg.wwwroot}/mod/quiz/review.php?attempt=${quizAttempt.quizAttemptId}`} target="_blank">{finalGrade}</a>
+                                    </DataGrid.Body.Cell>
+                                    items.push(cell);
 
                                     quizAttempt.questions.map((question, index3) => {
                                         items.push(this.getCell(quizAttempt, question, items.length));
@@ -151,28 +169,34 @@ export class ReportQuiz  extends Component{
     }
 
     getCell(quizAttempt, question, index){
-        let text;
-        let title;
-        let color = AppCommon.Colors.red
+        let text, title, color, weightedGrade;
+
+        weightedGrade = question.weightedGrade.toFixed(2)
         if (question.grade == question.defaultMark){
-            text = <FontAwesomeIcon icon={faCheck}/>;
+            text = [<FontAwesomeIcon icon={faCheck} key={0}/>, " ", weightedGrade];
             color = AppCommon.Colors.green;
             title = "Réussi";
         }
         else if((question.grade < question.defaultMark) && (question.grade > 0)){
-            text = <FontAwesomeIcon icon={faCheckSquare}/>;
+            text = [<FontAwesomeIcon icon={faCheckSquare} key={0}/>, " ", weightedGrade];
             color = AppCommon.Colors.blue;
             title = "Partiellement correct";
         }
+        else if(question.grade < 0){
+            text = "Nécessite évaluation";
+            color = AppCommon.Colors.blue;
+            title = "Nécessite évaluation";
+        }
         else{
-            text = <FontAwesomeIcon icon={faTimes}/>;
+            text = [<FontAwesomeIcon icon={faTimes} key={0}/>, " ", weightedGrade];
+            color = AppCommon.Colors.red;
             title = "Échoué";
         }
         
         let cell = 
             <DataGrid.Body.Cell  sortValue={question.weightedGrade.toFixed(2)} style={{textAlign: "center", verticalAlign: "middle"}} key={index}>
                 <Button variant="link" title={title} onClick={() => this.openQuestion(quizAttempt, question)} style={{color: color}}>
-                    {text}{" "}{question.weightedGrade.toFixed(2)}
+                    {text}
                 </Button>
             </DataGrid.Body.Cell>
 

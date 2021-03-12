@@ -74,7 +74,7 @@ export class GadgetStudentFollowup extends Component{
                             return result;
                         })}
 
-                        {this.state.dataProvider.length === 0 &&  <Alert variant="success">{"Pas de suivi à faire. "}<FontAwesomeIcon icon={faThumbsUp}/></Alert>}
+                        {this.state.dataProvider.length === 0 &&  <Alert variant="success">{"Pas de suivi hebdomadaire à faire. "}<FontAwesomeIcon icon={faThumbsUp}/></Alert>}
                     </div>
                 </Card.Body>
             </Card>;
