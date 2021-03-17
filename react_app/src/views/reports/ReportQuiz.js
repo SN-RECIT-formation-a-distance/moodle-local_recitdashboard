@@ -58,12 +58,11 @@ export class ReportQuiz  extends Component{
                         <DataGrid.Header>
                             <DataGrid.Header.Row>
                                 <DataGrid.Header.Cell style={{minWidth: "160px"}}>{"Prénom / Nom"}</DataGrid.Header.Cell>
-                                <DataGrid.Header.Cell>{"Courriel"}</DataGrid.Header.Cell>
-                                <DataGrid.Header.Cell style={{minWidth: "150px"}}>{"Tentatives"}</DataGrid.Header.Cell>
+                                <DataGrid.Header.Cell style={{minWidth: "70px"}} title="Tentatives">{"#"}</DataGrid.Header.Cell>
                                 <DataGrid.Header.Cell style={{minWidth: "100px"}}>{"État"}</DataGrid.Header.Cell>
-                                <DataGrid.Header.Cell style={{minWidth: "160px"}}>{"Commencé le"}</DataGrid.Header.Cell>
-                                <DataGrid.Header.Cell style={{minWidth: "160px"}}>{"Terminé"}</DataGrid.Header.Cell>
-                                <DataGrid.Header.Cell style={{minWidth: "160px"}}>{"Temps utilisé"}</DataGrid.Header.Cell>
+                                <DataGrid.Header.Cell style={{minWidth: "110px"}}>{"Début"}</DataGrid.Header.Cell>
+                                <DataGrid.Header.Cell style={{minWidth: "110px"}}>{"Terminé"}</DataGrid.Header.Cell>
+                                <DataGrid.Header.Cell style={{minWidth: "100px"}}>{"Temps"}</DataGrid.Header.Cell>
                                 <DataGrid.Header.Cell style={{minWidth: "140px"}}>{`Note/${dataProvider.quizMaxGrade.toFixed(2)}`}</DataGrid.Header.Cell>
                                 {dataProvider.questions.map((item, index) => {
                                     const popover = (
@@ -77,7 +76,7 @@ export class ReportQuiz  extends Component{
                                     let result = 
                                         <DataGrid.Header.Cell key={index} style={{textAlign: "center", width: "100px"}} >
                                             <OverlayTrigger trigger="click" placement="bottom" overlay={popover} rootClose={true}>
-                                                <span className="btn btn-link">{`Q.${item.slot}/${item.gradeWeight} `}</span>
+                                                <span className="btn btn-link">{`Q.${item.slot}/${item.gradeWeight.toFixed(2)} `}</span>
                                             </OverlayTrigger>
                                         </DataGrid.Header.Cell>
 
@@ -87,7 +86,6 @@ export class ReportQuiz  extends Component{
                             </DataGrid.Header.Row>
                             <DataGrid.Body.Row>
                                 <DataGrid.Header.Cell>Tags</DataGrid.Header.Cell>
-                                <DataGrid.Body.Cell></DataGrid.Body.Cell>
                                 <DataGrid.Body.Cell></DataGrid.Body.Cell>
                                 <DataGrid.Body.Cell></DataGrid.Body.Cell>
                                 <DataGrid.Body.Cell></DataGrid.Body.Cell>
@@ -121,11 +119,9 @@ export class ReportQuiz  extends Component{
                                             <a href={`${M.cfg.wwwroot}/user/profile.php?id=${student.userId}`} target={"_blank"}>{student.username}</a>
                                         </DataGrid.Header.Cell>;
                                         items.push(cell);
-                                        items.push(<DataGrid.Body.Cell key={items.length}>{student.email}</DataGrid.Body.Cell>);
                                     }
                                     else{
                                         items.push(<DataGrid.Header.Cell key={items.length}></DataGrid.Header.Cell>);
-                                        items.push(<DataGrid.Body.Cell key={items.length}></DataGrid.Body.Cell>);
                                     }
 
                                     items.push(<DataGrid.Body.Cell key={items.length}>{quizAttempt.attempt}</DataGrid.Body.Cell>);
@@ -169,20 +165,28 @@ export class ReportQuiz  extends Component{
     }
 
     getCell(quizAttempt, question, index){
-        let text, title, color, weightedGrade;
+        let text, title, color, weightedGrade, grade;
 
-        weightedGrade = question.weightedGrade.toFixed(2)
-        if (question.grade == question.defaultMark){
+        weightedGrade = question.weightedGrade.toFixed(2);
+        grade = (this.state.dataProvider.hasRandomQuestions == 1 ? question.weightedGrade : question.grade);
+        
+        if(quizAttempt.attemptTimeFinish.length === 0){
+            text = null;
+            color = "";
+            title = "";
+        }
+        // for float comparison
+        else if (grade.toString() === question.defaultMark.toString()){
             text = [<FontAwesomeIcon icon={faCheck} key={0}/>, " ", weightedGrade];
             color = AppCommon.Colors.green;
             title = "Réussi";
         }
-        else if((question.grade < question.defaultMark) && (question.grade > 0)){
+        else if((grade < question.defaultMark) && (grade > 0)){
             text = [<FontAwesomeIcon icon={faCheckSquare} key={0}/>, " ", weightedGrade];
             color = AppCommon.Colors.blue;
             title = "Partiellement correct";
         }
-        else if(question.grade < 0){
+        else if(grade < 0){
             text = "Nécessite évaluation";
             color = AppCommon.Colors.blue;
             title = "Nécessite évaluation";
@@ -208,14 +212,17 @@ export class ReportQuiz  extends Component{
         window.open(url, "PopUp Question", "width=640,height=460");
     }
 
-    getCellContext(item, quizMaxGrade){
-        if(item.finalGrade < 0){ return "inherit";}
+    getCellContext(quizAttempt, quizMaxGrade){
+        if(quizAttempt.finalGrade < 0){ return "inherit";}
 
-        let grade = item.finalGrade;
+        let grade = quizAttempt.finalGrade;
 
         let context = "";
 
-        if(grade >= (quizMaxGrade*0.7)){
+        if(quizAttempt.attemptTimeFinish.length === 0){
+            context = "";
+        }
+        else if(grade >= (quizMaxGrade*0.7)){
             context = AppCommon.Colors.lightGreen;
         }
         else if(grade >= (quizMaxGrade*0.6) && grade < (quizMaxGrade*0.7)){
@@ -231,8 +238,8 @@ export class ReportQuiz  extends Component{
         return context;
     }   
 
-    formatElapsedTime(nbSecs){
-        let dateObj = new Date(nbSecs * 1000);
+    formatElapsedTime(value){
+        /*let dateObj = new Date(nbSecs * 1000);
         let hours = dateObj.getUTCHours();
         let minutes = dateObj.getUTCMinutes();
         let seconds = dateObj.getSeconds();
@@ -241,6 +248,7 @@ export class ReportQuiz  extends Component{
         minutes.toString().padStart(2, '0') + ':' + 
         seconds.toString().padStart(2, '0');
 
-        return result;
+        return result;*/
+        return value;
     }
 }
