@@ -66,7 +66,8 @@ export class ReportActivityCompletion  extends Component{
                     <DataGrid orderBy={true}>
                         <DataGrid.Header>
                             <DataGrid.Header.Row>
-                                <DataGrid.Header.Cell style={{minWidth: "160px"}}>{"Prénom / Nom"}</DataGrid.Header.Cell>
+                                <DataGrid.Header.Cell style={{minWidth: "120px"}}>{"Prénom"}</DataGrid.Header.Cell>
+                                <DataGrid.Header.Cell style={{minWidth: "100px"}}>{"Nom"}</DataGrid.Header.Cell>
                                 {activityList.map((item, index) => {
                                     if(!this.filterSectionAndCm(item)){ return null;}
 
@@ -87,8 +88,15 @@ export class ReportActivityCompletion  extends Component{
                                     let items =  [];
 
                                     let cell = 
-                                        <DataGrid.Header.Cell sortValue={item.studentName}  key={0}>
-                                            <a href={`${M.cfg.wwwroot}/user/profile.php?id=${item.userId}&course=${item.courseId}`} target={"_blank"}>{item.studentName}</a>
+                                        <DataGrid.Header.Cell sortValue={item.firstName}  key={items.length} freezing={true}>
+                                            <a href={`${M.cfg.wwwroot}/user/profile.php?id=${item.userId}&course=${item.courseId}`} target={"_blank"}>{item.firstName}</a>
+                                        </DataGrid.Header.Cell>;
+
+                                    items.push(cell);
+
+                                    cell = 
+                                        <DataGrid.Header.Cell sortValue={item.lastName}  key={items.length} freezing={true}>
+                                            <a href={`${M.cfg.wwwroot}/user/profile.php?id=${item.userId}&course=${item.courseId}`} target={"_blank"}>{item.lastName}</a>
                                         </DataGrid.Header.Cell>;
 
                                     items.push(cell);

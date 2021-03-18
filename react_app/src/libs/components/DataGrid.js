@@ -347,7 +347,8 @@ class HCell extends ACell{
         iCol: -1,
         orderBy: null,
         scrollPos: null,
-        ttype: ''
+        ttype: '',
+        freezing: false
     };
 
     constructor(props){
@@ -362,7 +363,7 @@ class HCell extends ACell{
         let freeze = 0;
 
         style.position = "relative";
-        if((this.props.scrollPos) && (this.props.scrollPos.left > 0) && (this.props.iRow >= 0)  && (this.props.iCol === 0) ){
+        if((this.props.scrollPos) && (this.props.scrollPos.left > 0) && (this.props.iRow >= 0) && (this.props.freezing) ){
             style.left = `${this.props.scrollPos.left}px`;
             freeze = 1;
         }
