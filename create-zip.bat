@@ -1,6 +1,6 @@
 echo off
 set zipName=local_recitdashboard
-set pluginName=local_recitdashboard
+set pluginName=recitdashboard
 
 rem remove the current 
 del %zipName%
