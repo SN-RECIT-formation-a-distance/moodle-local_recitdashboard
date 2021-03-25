@@ -111,18 +111,20 @@ export class ReportDiagnosticTags extends Component{
                 </DataGrid.Header>
                 <DataGrid.Body>
                 {data.students.map((student, index) => {
-                            let row = 
-                                <DataGrid.Body.Row key={index}>
-                                    <DataGrid.Header.Cell freezing={true}>{student.firstName}</DataGrid.Header.Cell>
-                                    <DataGrid.Header.Cell freezing={true}>{student.lastName}</DataGrid.Header.Cell>
-                                    {tagList.map((tagName, index2) => {
-                                        let tag = JsNx.getItem(student.tags, 'tagName', tagName, null);
-                                        let value = (tag === null ? '0' : tag.value);
-                                        value = parseFloat(value).toFixed(1);
-                                        let col = <DataGrid.Body.Cell key={index2} style={{backgroundColor: that.getCellContext(value)}}>{`${value}%`}</DataGrid.Body.Cell>
-                                        return (col);
-                                    })}
-                                </DataGrid.Body.Row>
+                            let cols = [];
+                            cols.push(<DataGrid.Header.Cell key={cols.length} freezing={true}>{student.firstName}</DataGrid.Header.Cell>);
+                            cols.push(<DataGrid.Header.Cell key={cols.length} freezing={true}>{student.lastName}</DataGrid.Header.Cell>);
+
+                            {tagList.map((tagName, index2) => {
+                                let tag = JsNx.getItem(student.tags, 'tagName', tagName, null);
+                                let value = (tag === null ? '0' : tag.value);
+                                value = parseFloat(value).toFixed(1);
+                                let col = <DataGrid.Body.Cell key={cols.length} style={{backgroundColor: that.getCellContext(value)}}>{`${value}%`}</DataGrid.Body.Cell>
+                                cols.push(col);
+                                return (null);
+                            })}
+
+                            let row = <DataGrid.Body.Row key={index}>{cols}</DataGrid.Body.Row>;
                             return (row);                                    
                         }
                     )}
