@@ -141,6 +141,28 @@ export class MainView extends Component{
         options[attr[0]].id = parseInt(event.target.value, 10);
         options[attr[0]].name = event.target.text;
 
+        // reset dependences
+        switch(attr[0]){
+            case "course":
+                options.group.id = 0;
+                options.group.name = "";
+                options.student.id = 0;
+                options.student.name = "";
+                options.section.id = 0;
+                options.section.name = "";
+                options.cm.id = 0;
+                options.cm.name = "";
+                break;
+            case "group":
+                options.student.id = 0;
+                options.student.name = "";
+                break;
+            case "section":
+                options.cm.id = 0;
+                options.cm.name = "";
+                break;
+        }
+
         this.setState({options: options});
     }
 

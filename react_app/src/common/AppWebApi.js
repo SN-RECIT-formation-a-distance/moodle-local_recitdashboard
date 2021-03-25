@@ -67,13 +67,14 @@ export class AppWebApi extends WebApi
         this.post(this.gateway, data, onSuccess);
     }*/
 
-    getReportDiagTag(courseId, groupId, cmId, output, options, onSuccess){
+    getReportDiagTag(courseId, groupId, sectionId, cmId, output, options, onSuccess){
         groupId = groupId || 0;
+        sectionId = sectionId || 0;
         cmId = cmId || 0;
         output = output || 'html';
         options = options || 'question';
 
-        let data = {courseId: courseId, cmId: cmId, groupId: groupId, service: "getReportDiagTag", output: output, options: options};
+        let data = {courseId: courseId, sectionId: sectionId, cmId: cmId, groupId: groupId, service: "getReportDiagTag", output: output, options: options};
         this.post(this.gateway, data, onSuccess);
     }
 
