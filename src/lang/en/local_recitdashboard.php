@@ -1,2 +1,2 @@
 <?php
-$string['pluginname'] = 'RÉCIT Dashboard';
+$string['pluginname'] = 'RÉCIT Apprentimètre';
