@@ -64,7 +64,7 @@ if (!class_exists('DashboardPersistCtrl')) {
                 inner join {$this->prefix}user_enrolments as t2 on t1.id = t2.enrolid
                 inner join {$this->prefix}user as t3 on t2.userid = t3.id
                 left join {$this->prefix}groups_members as t3_1 on t3.id = t3_1.userid
-                left join {$this->prefix}groups as t3_2 on t3_1.groupid = t3_2.id 
+                left join {$this->prefix}groups as t3_2 on t3_1.groupid = t3_2.id and t3_2.courseid = t1.courseid
                 inner join {$this->prefix}course as t6 on t1.courseid = t6.id
                 inner join {$this->prefix}course_modules as t4 on t1.courseid = t4.course
                 left join {$this->prefix}course_modules_completion as t5 on t4.id = t5.coursemoduleid and t5.userid = t2.userid
@@ -275,7 +275,7 @@ if (!class_exists('DashboardPersistCtrl')) {
                             inner join {$this->prefix}grade_grades as t2 on t1.id = t2.itemid
                             inner join {$this->prefix}user as t3 on t2.userid = t3.id
                             left join {$this->prefix}groups_members as t3_1 on t3.id = t3_1.userid
-                            left join {$this->prefix}groups as t3_2 on t3_1.groupid = t3_2.id 
+                            left join {$this->prefix}groups as t3_2 on t3_1.groupid = t3_2.id and t3_2.courseid = t1.courseid 
                             WHERE t1.courseid = $courseId and itemtype = 'course'  $whereStmt
                             group by t3_2.id, t3.id, t2.finalgrade, t1.grademax) as tab1
             group by groupName) as tab2";
@@ -311,7 +311,16 @@ if (!class_exists('DashboardPersistCtrl')) {
                 $result[$item->group->id]->grades = $item;
             }
 
-            return array_values($result);
+            $result = array_values($result);
+
+            function cmp($a, $b) {
+                return strcmp($a->progress->group->name, $b->progress->group->name);
+            }
+
+            // sort by student name and question slot
+            usort($result, "cmp");
+
+            return $result;
         }
 
     /* public function getStudentTracking($courseId, $userId = 0, $onlyMyGroups = true){
@@ -821,6 +830,12 @@ if (!class_exists('DashboardPersistCtrl')) {
             // sort by student name and question slot
             usort($result->students, "cmp1");
             usort($result->questions, "cmp2");
+
+            foreach($result->students as $student){
+                foreach($student->quizAttempts as $attempt){
+                    usort($attempt->questions, "cmp2");
+                }
+            }
 
             return $result;
         }
