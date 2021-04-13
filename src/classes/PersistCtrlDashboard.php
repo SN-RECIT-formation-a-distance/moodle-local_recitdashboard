@@ -553,7 +553,7 @@ if (!class_exists('DashboardPersistCtrl')) {
             inner join {$this->prefix}user as t3 on t3.id = t2.userid
             inner join {$this->prefix}course_modules as t4 on t4.course = t1.courseid and t4.module = (select id from {$this->prefix}modules where name = t1.itemmodule order by name asc limit 1) and t4.instance = t1.iteminstance
             left join {$this->prefix}groups_members as t5 on t3.id = t5.userid
-            inner join {$this->prefix}mdl_groups as t5_1 on t5.groupid = t5_1.id and t5_1.courseid = t1.courseid
+            inner join {$this->prefix}groups as t5_1 on t5.groupid = t5_1.id and t5_1.courseid = t1.courseid
             inner join {$this->prefix}course_sections as t6 on t4.section = t6.id
             where t1.courseid = $courseId  and $stmtStudentRole $whereStmt
             group by t1.courseid, t3.id, t4.id, t1.itemname, t1.itemmodule
