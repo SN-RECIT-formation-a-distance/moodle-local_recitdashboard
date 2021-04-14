@@ -562,21 +562,45 @@ if (!class_exists('DashboardPersistCtrl')) {
             $tmp = $this->mysqlConn->execSQLAndGetObjects($query);
 
             $result = array();
+            $cmList = array(); // gather all activities to create the columns 
             foreach($tmp as $item){
-                $item->groupIds = explode(",", $item->groupIds);
-
+                // gather the user information
                 if(!isset($result[$item->userId])){
                     $result[$item->userId] = new stdClass();
                     $result[$item->userId]->userId = $item->userId;
                     $result[$item->userId]->firstName = $item->firstName;
                     $result[$item->userId]->lastName = $item->lastName;
-                    $result[$item->userId]->groupIds = $item->groupIds;
+                    $result[$item->userId]->groupIds = explode(",", $item->groupIds);
                     $result[$item->userId]->grades = array();
                 }
 
-                $item->extra = json_decode($item->extra);
+                // gather the activity information
+                $grade = new stdClass();
+                $grade->cmId = $item->cmId;
+                $grade->itemModule = $item->itemModule;
+                $grade->itemName = $item->itemName;
+                $grade->sectionId = $item->sectionId;
+                $grade->extra = null;                
+                $grade->finalGrade = -1;
+                $grade->gradeMax = 0;
+                $grade->successPct = 0;
 
-                $result[$item->userId]->grades[] = $item;
+                // array index must be a string for later merge
+                $cmList[".$item->cmId."] = $grade;
+
+                // gather the user information about the activity
+                $grade = clone($grade);
+                $grade->extra = json_decode($item->extra);
+                $grade->finalGrade = $item->finalGrade;
+                $grade->gradeMax = $item->gradeMax;
+                $grade->successPct = $item->successPct;
+                // array index must be a string for later merge
+                $result[$item->userId]->grades[".$item->cmId."] = $grade;
+            }
+
+            foreach($result as $user){
+                // merge both arrays (cmList and user-cmList) to prevent column shift
+                $user->grades = array_values(array_merge($cmList, $user->grades));
             }
 
             return array_values($result);
