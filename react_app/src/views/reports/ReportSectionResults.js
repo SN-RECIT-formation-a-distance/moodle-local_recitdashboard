@@ -26,7 +26,7 @@ export class ReportSectionResults  extends Component{
         /*if(JSON.stringify(this.props.options) !== JSON.stringify(prevProps.options)){
             this.getData();
         }*/
-        if(this.props.options.course.id !== prevProps.options.course.id){
+        if((this.props.options.course.id !== prevProps.options.course.id) || (this.props.options.group.id !== prevProps.options.group.id)){
             this.getData();
         }
     }
