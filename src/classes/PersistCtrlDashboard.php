@@ -549,7 +549,7 @@ if (!class_exists('DashboardPersistCtrl')) {
                                     from {$this->prefix}quiz_attempts as st1 where st1.quiz = t4.instance and st1.userid = t3.id and st1.state = 'finished' order by st1.attempt desc limit 1 )           
                 else null end) as extra
             FROM `{$this->prefix}grade_items` as t1
-            inner join {$this->prefix}grade_grades as t2 on t1.id = t2.itemid 
+            inner join {$this->prefix}grade_grades as t2 on t1.id = t2.itemid and t2.timecreated is not null
             inner join {$this->prefix}user as t3 on t3.id = t2.userid
             inner join {$this->prefix}course_modules as t4 on t4.course = t1.courseid and t4.module = (select id from {$this->prefix}modules where name = t1.itemmodule order by name asc limit 1) and t4.instance = t1.iteminstance
             left join {$this->prefix}groups_members as t5 on t3.id = t5.userid
