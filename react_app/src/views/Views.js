@@ -401,7 +401,9 @@ class FilterOptions extends Component{
             for(let group of result.data){
                 let item = JsNx.at(group, 0, null);
                 if(group){
-                    groupList.push({text: item.groupName, value: item.groupId, data: item});
+                    if(item.groupId > 0){
+                        groupList.push({text: item.groupName, value: item.groupId, data: item});
+                    }
                 }
 
                 for(let user of group){
