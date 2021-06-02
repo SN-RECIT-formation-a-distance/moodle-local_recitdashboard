@@ -99,7 +99,7 @@ export class GadgetStudentFollowup extends Component{
                     let result = null;
 
                     if(issue.hasOwnProperty('nbDaysLastAccess')){
-                        result = <li key={index} >{`${issue.nbDaysLastAccess} jours sans se connecter au cours.`}</li>;
+                        result = <li key={index} ><a target="_blank" href={`${M.cfg.wwwroot}/report/log/user.php?id=${item.userId}&course=${this.props.options.course.id}&mode=all`}>{`${issue.nbDaysLastAccess} jours`}</a>{` sans se connecter au cours.`}</li>;
                     }
                     else if(issue.hasOwnProperty('nbDaysLate')){
                         result = <li key={index} >{`L'activité `}<a target='_blank' href={issue.url}>{issue.cmName}</a>{` est ${issue.nbDaysLate} jour en retard.`}</li>;
