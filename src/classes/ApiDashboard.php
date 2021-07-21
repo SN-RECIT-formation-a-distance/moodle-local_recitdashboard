@@ -20,7 +20,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 require_once "$CFG->dirroot/local/recitcommon/php/WebApi.php";
-require_once 'PersistCtrlDashboard.php';
+require_once dirname(__FILE__).'/PersistCtrlDashboard.php';
 
 if (!class_exists('DashboardApi')) {
     class DashboardApi extends MoodleApi
