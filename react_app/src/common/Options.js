@@ -14,7 +14,7 @@ export class Options
     ]
 
     static getGateway(){
-        return `${M.cfg.wwwroot}/local/recitcommon/php/RecitApi.php`;
+        return `${M.cfg.wwwroot}/local/recitdashboard/classes/WebApi.php`;
     }
     
 }

@@ -20,13 +20,15 @@
  * @copyright RÉCIT 2019
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+namespace recitdashboard;
+
 require(__DIR__ . '/../../config.php');
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot . "/local/recitcommon/php/Utils.php");
+use moodle_url;
 
-class RecitDashboard{
+class MainView{
     public $cfg = null;
     public $user = null;
     public $page = null;
@@ -56,7 +58,7 @@ $PAGE->requires->css(new moodle_url($CFG->wwwroot . '/local/recitdashboard/react
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/local/recitdashboard/react_app_build/index.js'), true);
 
 // Set page context.
-$PAGE->set_context(context_system::instance());
+$PAGE->set_context(\context_system::instance());
 
 // Set page layout.
 $PAGE->set_pagelayout('base');
@@ -66,7 +68,7 @@ $PAGE->set_heading(get_string('pluginname', 'local_recitdashboard'));
 
 echo $OUTPUT->header();
 $courseId = (isset($_GET['courseId']) ? $_GET['courseId'] : 0);
-$recitDashboard = new RecitDashboard($CFG, $PAGE, $USER, $OUTPUT, $courseId);
+$recitDashboard = new MainView($CFG, $PAGE, $USER, $OUTPUT, $courseId);
 $recitDashboard->display();
 
 echo $OUTPUT->footer();
