@@ -40,11 +40,11 @@ class App extends Component {
     render() {  
         let main =
             <div>
-                <MainView courseId={this.props.courseId} />
                 {$glVars.feedback.msg.map((item, index) => {  
                     return (<VisualFeedback key={index} id={index} msg={item.msg} type={item.type} title={item.title} timeout={item.timeout}/>);                                    
                 })}
                 <Loading webApi={$glVars.webApi}><FontAwesomeIcon icon={faSync} spin/></Loading>
+                <MainView courseId={this.props.courseId} />
             </div>
 
         return (main);

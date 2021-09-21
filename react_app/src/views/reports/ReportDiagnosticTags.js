@@ -5,6 +5,7 @@ import {faPlus, faMinus} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {DataGrid, MultipleSelect} from '../../libs/components/Components';
 import {JsNx} from '../../libs/utils/Utils';
+import {Cookies} from '../../libs/utils/Cookies';
 import {$glVars, Options, AppCommon} from '../../common/common';
 
 export class ReportDiagnosticTags extends Component{
@@ -47,6 +48,12 @@ export class ReportDiagnosticTags extends Component{
             for(let item of result.data.tagList){
                 tagList.push({text: item, value: item});
             }
+            
+            let cellContext = Cookies.get("reportDiagTagContexts", null);
+            if(cellContext !== null){
+                result.data.htmlCellContext = JSON.parse(cellContext);
+            }
+            
             this.setState({data: result.data, tagList: tagList});
         }
         else{
@@ -167,6 +174,7 @@ export class ReportDiagnosticTags extends Component{
         
         if(this.state.data.htmlCellContext.hasOwnProperty(event.target.name)){
             this.state.data.htmlCellContext[event.target.name] = event.target.value;
+            Cookies.set('reportDiagTagContexts', JSON.stringify(this.state.data.htmlCellContext), 60*24*7); // 1 week
         }
         else{
             options[event.target.name] = event.target.value;

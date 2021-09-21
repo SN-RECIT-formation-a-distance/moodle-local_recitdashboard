@@ -29,6 +29,7 @@ require_once "$CFG->dirroot/local/recitcommon/php/ReportDiagTag.php";
 use recitcommon;
 use recitcommon\WebApiResult;
 use recitcommon\ReportDiagTagContent;
+use recitcommon\ReportDiagTagCSVWriter;
 use Exception;
 use stdClass;
 
