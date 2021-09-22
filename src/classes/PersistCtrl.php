@@ -421,7 +421,7 @@ class PersistCtrl extends recitcommon\MoodlePersistCtrl
         inner join {$this->prefix}course_modules as t3 on t1.id = t3.instance and t3.module = (select id from {$this->prefix}modules where name = 'assign') and t1.course = t3.course
         left join {$this->prefix}assign_grades as t4 on t4.assignment = tuser.assignment and t4.userid = tuser.userid
         -- il ramasse tous les devoirs où il y a besoin d'évaluation et la note n'est pas encore assignée ou si c'est une réévaluation
-        where t1.course = $courseId and tuser.status = 'submitted' and (coalesce(t4.grade,0) <= 0 or tuser.timemodified > coalesce(t4.timemodified,0)) $whereStmt
+        where t1.course = $courseId and tuser.status = 'submitted' and (coalesce(t4.grade,0) <= 0 or tuser.timemodified > coalesce(t4.timemodified,0)) $whereStmt and $stmtStudentRole
         group by t3.id, t1.id)
         union
         (SELECT t3.id as cmId, t1.name as cmName, '' as dueDate, FROM_UNIXTIME(t1.timemodified) as timeModified, count(*) as nbItems, group_concat(tuser.userid) as userIds,
@@ -446,7 +446,7 @@ class PersistCtrl extends recitcommon\MoodlePersistCtrl
                 inner join {$this->prefix}question_attempts as t4 on t3.id = t4.questionid
                 inner join {$this->prefix}question_attempt_steps as tuser on t4.id = tuser.questionattemptid
                 inner join {$this->prefix}course_modules as t6 on t1.id = t6.instance and t6.module = (select id from {$this->prefix}modules where name = 'quiz') and t1.course = t6.course
-                where t1.course = $courseId $whereStmt
+                where t1.course = $courseId $whereStmt and $stmtStudentRole
                 group by t6.id, t1.id, t3.name) as tab
         where find_in_set('needsgrading', states) = 1        
         group by cmId, cmName,  dueDate, timeModified, userIds)";
@@ -693,6 +693,8 @@ class PersistCtrl extends recitcommon\MoodlePersistCtrl
             $groupStmt = " t6_2.id = $groupId";
         }
 
+        $stmtStudentRole = $this->getStmtStudentRole('t6.id', 't1.id');
+
         $query = "SELECT if(count(*) > 0, 1, 0) as hasRandomQuestions,  count(*) as nbQuestions
         FROM {$this->prefix}course_modules as t1 
         inner join {$this->prefix}quiz_sections as t2 on t1.instance = t2.quizid
@@ -722,7 +724,7 @@ class PersistCtrl extends recitcommon\MoodlePersistCtrl
         left join mdl_groups_members as t6_1 on t6.id = t6_1.userid 
         left join mdl_groups as t6_2 on t6_1.groupid = t6_2.id ";
 
-        $queryPart3 = " where t2_1.name = 'quiz' and t2.id = $activityId and t1.id = $courseId and $groupStmt ";
+        $queryPart3 = " where t2_1.name = 'quiz' and t2.id = $activityId and t1.id = $courseId and  $groupStmt and $stmtStudentRole";
         $queryPart4 = "order by t6.id, t5.slot, t4.sumgrades desc";
 
         if($quiz->hasRandomQuestions == 1){
