@@ -178,12 +178,12 @@ export class ReportQuiz  extends Component{
             title = "";
         }
         // for float comparison
-        else if (grade.toString() === question.defaultMark.toString()){
+        else if (grade.toString() === question.gradeWeight.toString()){
             text = [<FontAwesomeIcon icon={faCheck} key={0}/>, " ", weightedGrade];
             color = AppCommon.Colors.green;
             title = "Réussi";
         }
-        else if((grade < question.defaultMark) && (grade > 0)){
+        else if((grade < question.gradeWeight) && (grade > 0)){
             text = [<FontAwesomeIcon icon={faCheckSquare} key={0}/>, " ", weightedGrade];
             color = AppCommon.Colors.blue;
             title = "Partiellement correct";

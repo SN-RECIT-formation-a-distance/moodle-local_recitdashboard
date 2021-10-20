@@ -729,7 +729,7 @@ class PersistCtrl extends recitcommon\MoodlePersistCtrl
 
         if($quiz->hasRandomQuestions == 1){
             $query = " $queryPart1 
-            0 as defaultMark, 0 as questionId, '' as questionName,  '' as questionText, '' as tags 
+            t5.maxmark as defaultMark, 0 as questionId, '' as questionName,  '' as questionText, '' as tags 
             $queryPart2
             $queryPart3
             group by t1.id, t2.id, t3.id, t5.id, t6.id
@@ -754,10 +754,6 @@ class PersistCtrl extends recitcommon\MoodlePersistCtrl
         $result->questions = array();
 
         foreach($tmp as $item){
-            if(($quiz->hasRandomQuestions == 1) && ($quiz->nbQuestions > 0)){
-                $item->defaultMark = Utils::divide($item->quizSumGrades, $quiz->nbQuestions) * ($item->quizMaxGrade / $item->quizSumGrades);
-            }
-
             // course info
             if(!isset($result->courseId)){
                 $result->courseId = $item->courseId;
@@ -777,14 +773,7 @@ class PersistCtrl extends recitcommon\MoodlePersistCtrl
                 $obj->defaultMark = $item->defaultMark;
                 $obj->questionName = $item->questionName;
                 $obj->questionText = $item->questionText;
-                $obj->gradeWeight = 0;
-                if($quiz->hasRandomQuestions == 1){
-                    $obj->gradeWeight = $item->defaultMark;
-                }
-                else{
-                    $obj->gradeWeight = $item->defaultMark * Utils::divide($item->quizMaxGrade, $item->quizSumGrades);
-                }
-                
+                $obj->gradeWeight = $item->defaultMark * Utils::divide($item->quizMaxGrade, $item->quizSumGrades);
                 
                 $obj->tags = explode(",", $item->tags);
                 $result->questions[$item->slot] = $obj;
@@ -824,6 +813,7 @@ class PersistCtrl extends recitcommon\MoodlePersistCtrl
                 $obj->grade = $item->grade;
                 $obj->defaultMark = $item->defaultMark;
                 $obj->slot = $item->slot;
+                $obj->gradeWeight = $result->questions[$obj->slot]->gradeWeight;
 
                 if($obj->grade >= 0){
                     $obj->weightedGrade = $result->questions[$obj->slot]->gradeWeight * $obj->grade;
