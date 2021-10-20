@@ -737,7 +737,7 @@ class PersistCtrl extends recitcommon\MoodlePersistCtrl
         }
         else{
             $query = " $queryPart1
-            t7.defaultmark as defaultMark, t7.id as questionId, t7.name as questionName, 
+            t5.maxmark as defaultMark, t7.id as questionId, t7.name as questionName, 
             t7.questiontext as questionText, 
             (SELECT group_concat(name SEPARATOR ',') FROM mdl_tag WHERE id IN (SELECT tagid from mdl_tag_instance where itemid = t7.id and itemtype in ('question') )) as tags 
             $queryPart2
