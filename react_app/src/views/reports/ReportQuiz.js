@@ -170,7 +170,7 @@ export class ReportQuiz  extends Component{
         let text, title, color, weightedGrade, grade;
 
         weightedGrade = question.weightedGrade.toFixed(2);
-        grade = (this.state.dataProvider.hasRandomQuestions == 1 ? question.weightedGrade : question.grade);
+        grade = question.weightedGrade; // question.grade
         
         if(quizAttempt.attemptTimeFinish.length === 0){
             text = null;
