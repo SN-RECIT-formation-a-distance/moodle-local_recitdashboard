@@ -435,21 +435,26 @@ class PersistCtrl extends recitcommon\MoodlePersistCtrl
         and t1.course = $courseId and t2.notifyteacher = 1 $whereStmt and $stmtStudentRole
         group by t3.id, t1.id)
         union
-        (select cmId, cmName, dueDate, timeModified, sum(if(find_in_set('needsgrading', states) = 1, 1, 0)) as nbItems, userIds, url, extra from 
-            (SELECT t6.id as cmId, concat(t1.name, ' - ', t3.name) as cmName, '' as dueDate, '' as timeModified, group_concat(distinct tuser.userid) as userIds, 
-            group_concat(distinct tuser.state order by tuser.id desc) as states,
-                concat('{$CFG->wwwroot}/mod/quiz/report.php?id=',t6.id,'&mode=grading') as url,
-                JSON_OBJECT('description', 'à corriger') as extra
-                FROM {$this->prefix}quiz as t1
-                inner join {$this->prefix}quiz_slots as t2 on t1.id = t2.quizid
-                inner join {$this->prefix}question as t3 on t3.id = t2.questionid
-                inner join {$this->prefix}question_attempts as t4 on t3.id = t4.questionid
-                inner join {$this->prefix}question_attempt_steps as tuser on t4.id = tuser.questionattemptid
-                inner join {$this->prefix}course_modules as t6 on t1.id = t6.instance and t6.module = (select id from {$this->prefix}modules where name = 'quiz') and t1.course = t6.course
-                where t1.course = $courseId $whereStmt and $stmtStudentRole
-                group by t6.id, t1.id, t3.name) as tab
-        where find_in_set('needsgrading', states) = 1        
-        group by cmId, cmName,  dueDate, timeModified, userIds)";
+        (select cmId, cmName, dueDate, timeModified, count(*) as nbItems, any_value(userIds), url, extra from 
+        (SELECT  t1.id as cmId, t2.name as cmName, '' as dueDate, max(t3.timemodified) as timeModified,  group_concat(distinct t3.userid) as userIds, t3.attempt as quizAttempt, t4.questionusageid, 
+        concat('{$CFG->wwwroot}/mod/quiz/report.php?id=',t1.id,'&mode=grading') as url, group_concat(tuser.state order by tuser.sequencenumber) as states,
+        JSON_OBJECT('description', 'à corriger') as extra
+        FROM 
+        {$this->prefix}course_modules as t1 
+        inner join {$this->prefix}quiz as t2 on t2.id = t1.instance and t1.module = (select id from {$this->prefix}modules where name = 'quiz') and t2.course = t1.course
+        inner join {$this->prefix}quiz_attempts as t3 on t3.quiz = t2.id 
+        inner join {$this->prefix}question_attempts as t4 on  t4.questionusageid = t3.uniqueid
+        inner join {$this->prefix}question_attempt_steps as tuser on t4.id = tuser.questionattemptid
+        where t1.course =  $courseId $whereStmt  
+        and t3.userid in (select st2.userid 
+            from {$this->prefix}role as st1 
+            inner join {$this->prefix}role_assignments as st2 on st1.id = st2.roleid 
+            inner join {$this->prefix}user_enrolments as st3 on st2.userid = st3.userid
+            inner join {$this->prefix}enrol as st4 on st3.enrolid = st4.id
+            where st4.courseid = t1.course and st2.userid = t3.userid and  st1.shortname in ('student') and st2.contextid in (select id from {$this->prefix}context where instanceid = t1.course and contextlevel = 50))
+        group by t1.id, t2.id, t3.id, t4.id) as tab
+        where right(states, 12) = 'needsgrading'
+        group by cmId)";
 
         $result = $this->mysqlConn->execSQLAndGetObjects($query);
 
