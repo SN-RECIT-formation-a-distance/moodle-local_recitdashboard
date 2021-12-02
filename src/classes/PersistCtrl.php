@@ -70,10 +70,10 @@ class PersistCtrl extends recitcommon\MoodlePersistCtrl
             from_unixtime(t6.enddate) as endDateCourse
             from {$this->prefix}enrol as t1
             inner join {$this->prefix}user_enrolments as t2 on t1.id = t2.enrolid
-            inner join {$this->prefix}user as t3 on t2.userid = t3.id
+            inner join {$this->prefix}user as t3 on t2.userid = t3.id and t3.deleted = 0 and t3.suspended = 0
             left join {$this->prefix}groups_members as t3_1 on t3.id = t3_1.userid
             left join {$this->prefix}groups as t3_2 on t3_1.groupid = t3_2.id and t3_2.courseid = t1.courseid
-            inner join {$this->prefix}course as t6 on t1.courseid = t6.id
+            inner join {$this->prefix}course as t6 on t1.courseid = t6.id and t6.visible = 1
             inner join {$this->prefix}course_modules as t4 on t1.courseid = t4.course
             left join {$this->prefix}course_modules_completion as t5 on t4.id = t5.coursemoduleid and t5.userid = t2.userid
             where t1.courseid = $courseId and t4.completion = 1 $whereStmt
@@ -281,7 +281,7 @@ class PersistCtrl extends recitcommon\MoodlePersistCtrl
         (SELECT coalesce(t3_2.id, 0) as groupId, coalesce(t3_2.name,'') as groupName, t3.id as userId, concat(t3.firstname, ' ', t3.lastname) as studentName, COALESCE((t2.finalgrade / t1.grademax) * 100, 0) as finalGradePct
                     FROM {$this->prefix}grade_items as t1                
                         inner join {$this->prefix}grade_grades as t2 on t1.id = t2.itemid
-                        inner join {$this->prefix}user as t3 on t2.userid = t3.id
+                        inner join {$this->prefix}user as t3 on t2.userid = t3.id and t3.deleted = 0 and t3.suspended = 0
                         left join {$this->prefix}groups_members as t3_1 on t3.id = t3_1.userid
                         left join {$this->prefix}groups as t3_2 on t3_1.groupid = t3_2.id and t3_2.courseid = t1.courseid 
                         WHERE t1.courseid = $courseId and itemtype = 'course'  $whereStmt
@@ -485,7 +485,7 @@ class PersistCtrl extends recitcommon\MoodlePersistCtrl
         JSON_OBJECT('nbDaysLastAccess', DATEDIFF(now(), from_unixtime(t4.lastaccess))) as issue
         from {$this->prefix}user_enrolments as t1
         inner join {$this->prefix}enrol as t2 on t1.enrolid = t2.id
-        inner join {$this->prefix}user as t4 on t1.userid = t4.id
+        inner join {$this->prefix}user as t4 on t1.userid = t4.id and t4.deleted = 0 and t4.suspended = 0
         where t2.courseid = $courseId and (DATEDIFF(now(), from_unixtime(t4.lastaccess)) >= 5) and $stmtStudentRole $groupStmt)
         union
         (SELECT t4.id as userId, concat(t4.firstname, ' ', t4.lastname) as username,  
@@ -493,7 +493,7 @@ class PersistCtrl extends recitcommon\MoodlePersistCtrl
         FROM {$this->prefix}user_enrolments as t1
         inner join {$this->prefix}enrol as t2 on t1.enrolid = t2.id
         inner join {$this->prefix}assign as t3 on t2.courseid = t3.course
-        inner join {$this->prefix}user as t4 on t1.userid = t4.id
+        inner join {$this->prefix}user as t4 on t1.userid = t4.id and t4.deleted = 0 and t4.suspended = 0
         inner join {$this->prefix}course_modules as t5 on t3.id = t5.instance and t5.module = (select id from {$this->prefix}modules where name = 'assign') and t5.course = t2.courseid
         where 
             t2.courseid = $courseId and 
@@ -507,7 +507,7 @@ class PersistCtrl extends recitcommon\MoodlePersistCtrl
         FROM {$this->prefix}user_enrolments as t1
         inner join {$this->prefix}enrol as t2 on t1.enrolid = t2.id
         inner join {$this->prefix}quiz as t3 on t2.courseid = t3.course
-        inner join {$this->prefix}user as t4 on t1.userid = t4.id
+        inner join {$this->prefix}user as t4 on t1.userid = t4.id and t4.deleted = 0 and t4.suspended = 0
         inner join {$this->prefix}course_modules as t5 on t3.id = t5.instance and t5.module = (select id from {$this->prefix}modules where name = 'quiz') and t5.course = t2.courseid
         where 
             t2.courseid = $courseId and 
@@ -563,7 +563,7 @@ class PersistCtrl extends recitcommon\MoodlePersistCtrl
             else null end) as extra
         FROM `{$this->prefix}grade_items` as t1
         inner join {$this->prefix}grade_grades as t2 on t1.id = t2.itemid and t2.timecreated is not null
-        inner join {$this->prefix}user as t3 on t3.id = t2.userid
+        inner join {$this->prefix}user as t3 on t3.id = t2.userid and t3.deleted = 0 and t3.suspended = 0
         inner join {$this->prefix}course_modules as t4 on t4.course = t1.courseid and t4.module = (select id from {$this->prefix}modules where name = t1.itemmodule order by name asc limit 1) and t4.instance = t1.iteminstance
         left join {$this->prefix}groups_members as t5 on t3.id = t5.userid
         inner join {$this->prefix}groups as t5_1 on t5.groupid = t5_1.id and t5_1.courseid = t1.courseid
@@ -658,7 +658,7 @@ class PersistCtrl extends recitcommon\MoodlePersistCtrl
         inner join {$this->prefix}course_sections as t4 on t4.id = t1.section 
         inner join {$this->prefix}role_assignments as st2 on st2.contextid in (select id from {$this->prefix}context where instanceid = t1.course and contextlevel = 50)
         inner join {$this->prefix}role as st1 on st1.id = st2.roleid
-        inner join {$this->prefix}user as t3 on t3.id = st2.userid 
+        inner join {$this->prefix}user as t3 on t3.id = st2.userid and t3.deleted = 0 and t3.suspended = 0
         left join {$this->prefix}groups_members as t5 on t3.id = t5.userid 
         left join {$this->prefix}course_modules_completion as t2 on t1.id = t2.coursemoduleid and t3.id = t2.userid
         where t1.course = $courseId and st1.shortname in ('student') $whereStmt
@@ -725,7 +725,7 @@ class PersistCtrl extends recitcommon\MoodlePersistCtrl
         inner join mdl_quiz as t3 on t2.instance = t3.id 
         inner join mdl_quiz_attempts as t4 on t4.quiz = t3.id 
         inner join mdl_question_attempts as t5 on t4.uniqueid = t5.questionusageid 
-        inner join mdl_user as t6 on t4.userid = t6.id 
+        inner join mdl_user as t6 on t4.userid = t6.id  and t6.deleted = 0 and t6.suspended = 0
         left join mdl_groups_members as t6_1 on t6.id = t6_1.userid 
         left join mdl_groups as t6_2 on t6_1.groupid = t6_2.id ";
 
