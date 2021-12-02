@@ -435,7 +435,7 @@ class PersistCtrl extends recitcommon\MoodlePersistCtrl
         and t1.course = $courseId and t2.notifyteacher = 1 $whereStmt and $stmtStudentRole
         group by t3.id, t1.id)
         union
-        (select cmId, cmName, dueDate, timeModified, count(*) as nbItems, any_value(userIds), url, extra from 
+        (select cmId, cmName, dueDate, timeModified, count(*) as nbItems, min(userIds), url, extra from 
         (SELECT  t1.id as cmId, t2.name as cmName, '' as dueDate, max(t3.timemodified) as timeModified,  group_concat(distinct t3.userid) as userIds, t3.attempt as quizAttempt, t4.questionusageid, 
         concat('{$CFG->wwwroot}/mod/quiz/report.php?id=',t1.id,'&mode=grading') as url, group_concat(tuser.state order by tuser.sequencenumber) as states,
         JSON_OBJECT('description', 'à corriger') as extra
