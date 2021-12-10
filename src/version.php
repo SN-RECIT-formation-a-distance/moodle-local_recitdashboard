@@ -22,7 +22,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->version   = 2021092400;       // The current module version (Date: YYYYMMDDXX)
-$plugin->release = 'R14-V1.3';
+$plugin->release = 'R14-V1.4';
 $plugin->requires  = 2018050800;    // Requires this Moodle version
 $plugin->component = 'local_recitdashboard';        // Full name of the plugin (used for diagnostics)
 $plugin->cron      = 0;
