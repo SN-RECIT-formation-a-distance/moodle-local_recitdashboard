@@ -61,7 +61,7 @@ $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/local/recitdashboard/react_
 $PAGE->set_context(\context_system::instance());
 
 // Set page layout.
-$PAGE->set_pagelayout('base');
+$PAGE->set_pagelayout('mydashboard');
 
 $PAGE->set_title(get_string('pluginname', 'local_recitdashboard'));
 $PAGE->set_heading(get_string('pluginname', 'local_recitdashboard'));
