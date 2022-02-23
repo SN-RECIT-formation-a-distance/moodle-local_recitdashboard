@@ -260,7 +260,7 @@ class FilterOptions extends Component{
     }
 
     getData(){
-        $glVars.webApi.getCourseSectionActivityList(1, this.getDataResult);        
+        $glVars.webApi.getCourseList(1, this.getDataResult);        
     }
 
     getDataResult(result){         
@@ -275,7 +275,7 @@ class FilterOptions extends Component{
         }
         else{
             $glVars.feedback.showError($glVars.i18n.tags.appname, result.msg);
-            this.setState({dataProvider: [], courseList: [], sectionList: [], activityList: []}, this.onAfterDataResult);
+            this.setState({dataProvider: [], sectionProvider: [], courseList: [], sectionList: [], activityList: []}, this.onAfterDataResult);
         }
     }
 
@@ -369,11 +369,7 @@ class FilterOptions extends Component{
             sectionList = [];
             activityList = [];
 
-            for(let item of this.state.dataProvider){
-                if((item.courseId.toString() === event.target.value.toString()) && (JsNx.getItem(sectionList, 'value', item.sectionId, null) === null)){
-                    sectionList.push({text: item.sectionName, value: item.sectionId});
-                }
-            }
+            $glVars.webApi.getSectionActivityList(event.target.value, (data) => this.getSectionActivityListResult(data));
             
             if(parseInt(event.target.value,10) > 0){
                 $glVars.webApi.getEnrolledUserList(0, 0, event.target.value, this.getEnrolledUserListResult); 
@@ -383,7 +379,7 @@ class FilterOptions extends Component{
         if(event.target.name === "section.id"){
             activityList = [];
 
-            for(let item of this.state.dataProvider){
+            for(let item of this.state.sectionProvider){
                 if((item.sectionId.toString() === event.target.value.toString()) && (JsNx.getItem(activityList, 'value', item.cmId, null) === null)){
                     activityList.push({text: item.cmName, value: item.cmId});
                 }
@@ -391,6 +387,20 @@ class FilterOptions extends Component{
         }
 
         this.setState({sectionList: sectionList, activityList: activityList}, () => this.props.onChange(event));
+    }
+
+    getSectionActivityListResult(result){
+        if (result.success){
+            let sectionList = [];
+
+            for(let item of result.data){
+                if(JsNx.getItem(sectionList, 'value', item.sectionId, null) === null){
+                    sectionList.push({text: item.sectionName, value: item.sectionId});
+                }
+            }
+
+            this.setState({sectionList: sectionList, sectionProvider: result.data});
+        }
     }
     
     getEnrolledUserListResult(result){

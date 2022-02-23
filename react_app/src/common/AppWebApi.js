@@ -43,6 +43,17 @@ export class AppWebApi extends WebApi
         let data = {service: "getCourseSectionActivityList", enrolled: enrolled};
         this.post(this.gateway, data, onSuccess);
     }
+    
+    getCourseList(enrolled, onSuccess){
+        enrolled = (typeof enrolled === 'boolean' ? enrolled : true);
+        let data = {service: "getCourseList", enrolled: enrolled};
+        this.post(this.gateway, data, onSuccess);
+    }
+    
+    getSectionActivityList(courseId, onSuccess){
+        let data = {service: "getSectionActivityList", courseId: courseId};
+        this.post(this.gateway, data, onSuccess);
+    }
 
    /* getCourseProgressionOverview(courseId, groupId, onSuccess){
         groupId = groupId || 0;
