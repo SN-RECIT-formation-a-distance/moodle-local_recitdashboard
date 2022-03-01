@@ -70,11 +70,11 @@ export class GadgetStudentFollowup extends Component{
                         <span><Badge pill variant="primary">{this.state.dataProvider.length}</Badge>{` élève(s) à suivre`}</span>
                         <ButtonToolbar aria-label="Toolbar with Buttons">
                             <ButtonGroup className="mr-2">
-                                <Button  variant="outline-secondary" size="sm" onClick={() => this.openPopup(true)} title="Options"><FontAwesomeIcon icon={faSlidersH}/></Button>
-                                <Button  variant="outline-secondary" size="sm" onClick={this.getData} title="Mettre à jour le gadget"><FontAwesomeIcon icon={faSync}/></Button>
-                                <Button  variant="outline-secondary" size="sm" onClick={this.onClose} title="Enlever le gadget"><FontAwesomeIcon icon={faTimesCircle}/></Button>
+                                <Button  variant="outline-secondary" onClick={() => this.openPopup(true)} title="Options"><FontAwesomeIcon icon={faSlidersH}/></Button>
+                                <Button  variant="outline-secondary" onClick={this.getData} title="Mettre à jour le gadget"><FontAwesomeIcon icon={faSync}/></Button>
+                                <Button  variant="outline-secondary" onClick={this.onClose} title="Enlever le gadget"><FontAwesomeIcon icon={faTimesCircle}/></Button>
                                 <OverlayTrigger placement="left" delay={{ show: 250 }} overlay={<Tooltip>{`Cette zone alerte l'enseignant lors des situations suivantes : L'élève n'a pas remis un devoir ou un test n'a pas été répondu alors que la date d'échéance est dépassée.  Ces messages d'alerte s'effacent après une période déterminée. Une alerte apparaît lorsque l'élève ne s'est pas connecté à la plateforme depuis plus que 5 jours.`}</Tooltip>}>
-                                    <Button size="sm" variant="outline-secondary"><FontAwesomeIcon icon={faInfo}/></Button>
+                                    <Button variant="outline-secondary"><FontAwesomeIcon icon={faInfo}/></Button>
                                 </OverlayTrigger>
                             </ButtonGroup>
                         </ButtonToolbar>                        

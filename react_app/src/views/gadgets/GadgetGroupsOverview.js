@@ -65,8 +65,8 @@ export class GadgetGroupsOverview extends Component{
                         
                         <ButtonToolbar aria-label="Toolbar with Buttons">
                             <ButtonGroup  >
-                                <Button  variant="outline-secondary" size="sm" onClick={this.getData} title="Mettre à jour le gadget"><FontAwesomeIcon icon={faSync}/></Button>
-                                <Button  variant="outline-secondary" size="sm" onClick={this.onClose} title="Enlever le gadget"><FontAwesomeIcon icon={faTimesCircle}/></Button>
+                                <Button  variant="outline-secondary" onClick={this.getData} title="Mettre à jour le gadget"><FontAwesomeIcon icon={faSync}/></Button>
+                                <Button  variant="outline-secondary" onClick={this.onClose} title="Enlever le gadget"><FontAwesomeIcon icon={faTimesCircle}/></Button>
                             </ButtonGroup>
                         </ButtonToolbar>                              
                     </Card.Title>

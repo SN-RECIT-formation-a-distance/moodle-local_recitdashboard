@@ -35,7 +35,7 @@ function xmldb_local_recitdashboard_upgrade($oldversion) {
     global $DB;
     $dbman = $DB->get_manager();
 
-    $newversion = 2022020900;
+    $newversion = 2022020901;
     if($oldversion < $newversion){
         $table = new xmldb_table('recitdashboard_options');
 

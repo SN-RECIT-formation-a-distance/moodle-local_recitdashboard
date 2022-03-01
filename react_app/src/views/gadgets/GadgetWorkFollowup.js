@@ -67,10 +67,10 @@ export class GadgetWorkFollowup extends Component{
                         <span><Badge pill variant="primary">{nbItems}</Badge>{` item(s) à suivre`}</span>
                         <ButtonToolbar aria-label="Toolbar with Buttons">
                             <ButtonGroup className="mr-2">
-                                <Button  variant="outline-secondary" size="sm" onClick={this.getData} title="Mettre à jour le gadget"><FontAwesomeIcon icon={faSync}/></Button>
-                                <Button  variant="outline-secondary" size="sm" onClick={this.onClose} title="Enlever le gadget"><FontAwesomeIcon icon={faTimesCircle}/></Button>
+                                <Button  variant="outline-secondary" onClick={this.getData} title="Mettre à jour le gadget"><FontAwesomeIcon icon={faSync}/></Button>
+                                <Button  variant="outline-secondary"  onClick={this.onClose} title="Enlever le gadget"><FontAwesomeIcon icon={faTimesCircle}/></Button>
                                 <OverlayTrigger placement="left" delay={{ show: 250 }} overlay={<Tooltip>{`La pastille de couleur passe du jaune au rouge lorsqu'un travail remis par l'élève date de plus de 7 jours.`}</Tooltip>}>
-                                    <Button size="sm" variant="outline-secondary"><FontAwesomeIcon icon={faInfo}/></Button>
+                                    <Button variant="outline-secondary"><FontAwesomeIcon icon={faInfo}/></Button>
                                 </OverlayTrigger>
                             </ButtonGroup>
                         </ButtonToolbar>                        
