@@ -40,6 +40,32 @@ class WebApi extends recitcommon\MoodleApi
         PersistCtrl::getInstance($DB, $USER);
     }
     
+    public function getUserOptions($request){
+        try{
+            $result = new stdClass();
+            $result->options = PersistCtrl::getInstance()->getUserOptions($this->signedUser->id);	
+            $this->prepareJson($result);
+            
+            return new WebApiResult(true, $result->options);
+        }
+        catch(Exception $ex){
+            return new WebApiResult(false, false, $ex->GetMessage());
+        }
+    }
+    
+    public function setUserOption($request){
+        try{
+            $result = new stdClass();
+            $result->options = PersistCtrl::getInstance()->setUserOption($this->signedUser->id, $request['key'], $request['value']);	
+            $this->prepareJson($result);
+            
+            return new WebApiResult(true, $result->options);
+        }
+        catch(Exception $ex){
+            return new WebApiResult(false, false, $ex->GetMessage());
+        }
+    }
+
     /*public function getCourseProgressionOverview($request){
         try{
             $courseId = intval($request['courseId']);
@@ -192,7 +218,7 @@ class WebApi extends recitcommon\MoodleApi
             $this->canUserAccess('a', 0, 0, $courseId);
             
             $result = new stdClass();
-            $result->details = PersistCtrl::getInstance()->getStudentFollowUp($courseId, $groupId);
+            $result->details = PersistCtrl::getInstance()->getStudentFollowUp($courseId, $groupId, 1);
             $this->prepareJson($result);
             
             return new WebApiResult(true, $result->details);

@@ -54,6 +54,16 @@ export class AppWebApi extends WebApi
         let data = {service: "getSectionActivityList", courseId: courseId};
         this.post(this.gateway, data, onSuccess);
     }
+    
+    getUserOptions(onSuccess){
+        let data = {service: "getUserOptions"};
+        this.post(this.gateway, data, onSuccess);
+    }
+    
+    setUserOption(key, value, onSuccess){
+        let data = {service: "setUserOption", key:key, value:value};
+        this.post(this.gateway, data, onSuccess);
+    }
 
    /* getCourseProgressionOverview(courseId, groupId, onSuccess){
         groupId = groupId || 0;

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {NavDropdown, Nav, Button, Collapse, Jumbotron} from 'react-bootstrap';
+import {NavDropdown, Nav, Button, Collapse, Jumbotron, Form} from 'react-bootstrap';
 import {faTachometerAlt, faPlus, faMinus, faFileAlt, faSearchPlus} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {ComboBox} from '../libs/components/Components';
@@ -12,6 +12,8 @@ import {ReportDiagnosticTags} from './reports/ReportDiagnosticTags';
 import {ReportSectionResults} from './reports/ReportSectionResults';
 import {ReportQuiz} from './reports/ReportQuiz';
 import {ReportActivityCompletion} from './reports/ReportActivityCompletion';
+import { OptionManager } from '../common/OptionManager';
+import { ComboBoxPlus } from '../libs/components/ComboBoxPlus';
 
 export class MainView extends Component{
     static defaultProps = { 
@@ -176,19 +178,43 @@ class DashboardView extends Component{
         options: null
     };
 
-    render() {         
+    constructor(props){
+        super(props);
+        this.state = {options: null};
+    }
+
+    render() {
+        if (!this.state.options) return null;
         let main =
             <div>
                 <Header options={this.props.options} title={"Tableau de bord"}/>
+                <NavDropdown variant="outline-primary" style={{textAlign:'right'}} title="Afficher un gadget">
+                    <NavDropdown.Item onClick={(e) => this.onHide('showworkfollowupwidget', 1)}>Suivi des travaux</NavDropdown.Item>
+                    <NavDropdown.Item onClick={(e) => this.onHide('showstudentfollowupwidget', 1)}>Suivi des élèves</NavDropdown.Item>
+                    <NavDropdown.Item onClick={(e) => this.onHide('showgroupsoverviewwidget', 1)}>Aperçu rapide de mes groupes</NavDropdown.Item>
+                </NavDropdown>
                 <br/>
-                <GadgetWorkFollowup options={this.props.options} /> 
+                <GadgetWorkFollowup options={this.props.options} onClose={() => this.onHide("showworkfollowupwidget", 0)} show={this.state.options.showworkfollowupwidget == 1}/> 
                 <br/>
-                <GadgetStudentFollowup options={this.props.options} /> 
+                <GadgetStudentFollowup options={this.props.options} onClose={() => this.onHide("showstudentfollowupwidget", 0)} show={this.state.options.showstudentfollowupwidget == 1}/> 
                 <br/>
-                <GadgetGroupsOverview options={this.props.options} /> 
+                <GadgetGroupsOverview options={this.props.options} onClose={() => this.onHide("showgroupsoverviewwidget", 0)} show={this.state.options.showgroupsoverviewwidget == 1}/> 
             </div>
 
         return (main);
+    }
+
+    componentDidMount(){
+        OptionManager.loadOptions((options) => {
+            this.setState({options: options});
+        });
+    }
+
+    onHide(key, toggle){
+        OptionManager.setValue(key, toggle);
+        let options = this.state.options;
+        options[key] = toggle;
+        this.setState({options: options});
     }
 }
 
@@ -305,28 +331,28 @@ class FilterOptions extends Component{
                             <div className='filter-container'>
                                 <div className='filter-item'>
                                     <strong>Cours</strong>
-                                    <ComboBox disabled={!options.report.require.course} placeholder={"Sélectionnez votre option"} options={this.state.courseList} onChange={this.onDataChange} name="course.id" value={options.course.id}/>
+                                    <ComboBoxPlus disabled={!options.report.require.course} placeholder={"Sélectionnez votre option"} options={this.state.courseList} onChange={this.onDataChange} name="course.id" value={options.course.id}/>
                                 </div>
                                 <div className='filter-item'>
                                     <div>
                                         <strong>Groupe</strong>
-                                        <ComboBox disabled={!options.report.require.group} placeholder={"Tous les groupes"} options={this.state.groupList} onChange={this.onDataChange} name="group.id" value={options.group.id}/>
+                                        <ComboBoxPlus disabled={!options.report.require.group} placeholder={"Tous les groupes"} options={this.state.groupList} onChange={this.onDataChange} name="group.id" value={options.group.id}/>
                                     </div>  
                                     <br/>
                                     <div>
                                         <strong>Élèves</strong>
-                                        <ComboBox disabled={!options.report.require.student} placeholder={"Tous les élèves"} options={studentList} onChange={this.onDataChange} name="student.id" value={options.student.id}/>
+                                        <ComboBoxPlus disabled={!options.report.require.student} placeholder={"Tous les élèves"} options={studentList} onChange={this.onDataChange} name="student.id" value={options.student.id}/>
                                     </div>  
                                 </div>
                                 <div className='filter-item'>
                                     <div>
                                         <strong>Sections</strong>
-                                        <ComboBox disabled={!options.report.require.section} placeholder={"Toutes les sections"} options={this.state.sectionList} onChange={this.onDataChange} name="section.id" value={options.section.id}/>
+                                        <ComboBoxPlus disabled={!options.report.require.section} placeholder={"Toutes les sections"} options={this.state.sectionList} onChange={this.onDataChange} name="section.id" value={options.section.id}/>
                                     </div>
                                     <br/>
                                     <div>
                                         <strong>Activités</strong>
-                                        <ComboBox disabled={!options.report.require.cm} placeholder={"Toutes les activités"} options={this.state.activityList} onChange={this.onDataChange} name="cm.id" value={options.cm.id}/>
+                                        <ComboBoxPlus disabled={!options.report.require.cm} placeholder={"Toutes les activités"} options={this.state.activityList} onChange={this.onDataChange} name="cm.id" value={options.cm.id}/>
                                     </div>  
                                 </div>
 

@@ -8,7 +8,9 @@ import {$glVars, AppCommon} from '../../common/common';
 
 export class GadgetGroupsOverview extends Component{
     static defaultProps = {        
-        options: null
+        options: null,
+        onClose: null,
+        show: true,
     };
 
     constructor(props) {
@@ -28,6 +30,9 @@ export class GadgetGroupsOverview extends Component{
     componentDidUpdate(prevProps){
         if((this.props.options.course.id !== prevProps.options.course.id) || (this.props.options.group.id !== prevProps.options.group.id)){
             this.getData();
+        }
+        if(this.props.show !== this.state.show){
+            this.setState({show: this.props.show});
         }
     }
 
@@ -78,6 +83,9 @@ export class GadgetGroupsOverview extends Component{
 
     onClose(){
         this.setState({show: false});
+        if (this.props.onClose){
+            this.props.onClose();
+        }
     }
 }
 

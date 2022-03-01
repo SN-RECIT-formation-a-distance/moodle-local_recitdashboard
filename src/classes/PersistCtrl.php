@@ -466,7 +466,12 @@ class PersistCtrl extends recitcommon\MoodlePersistCtrl
     }
 
     public function getStudentFollowUp($courseId, $groupId = 0, $cmVisible = 1){
-        global $CFG;
+        global $CFG, $USER;
+
+        $options = $this->getUserOptions($USER->id);
+        $daysWithoutConnect = intval($options['dayswithoutconnect']);
+        $daysDueIntervalMin = intval($options['daysdueintervalmin']);
+        $daysDueIntervalMax = intval($options['daysdueintervalmax']);
 
         $stmtStudentRole = $this->getStmtStudentRole('t4.id', 't2.courseid');
 
@@ -486,7 +491,7 @@ class PersistCtrl extends recitcommon\MoodlePersistCtrl
         from {$this->prefix}user_enrolments as t1
         inner join {$this->prefix}enrol as t2 on t1.enrolid = t2.id
         inner join {$this->prefix}user as t4 on t1.userid = t4.id and t4.deleted = 0 and t4.suspended = 0
-        where t2.courseid = $courseId and (DATEDIFF(now(), from_unixtime(t4.lastaccess)) >= 5) and $stmtStudentRole $groupStmt)
+        where t2.courseid = $courseId and (DATEDIFF(now(), from_unixtime(t4.lastaccess)) >= $daysWithoutConnect) and $stmtStudentRole $groupStmt)
         union
         (SELECT t4.id as userId, concat(t4.firstname, ' ', t4.lastname) as username,  
         JSON_OBJECT('cmId', t5.id, 'cmName', t3.name, 'nbDaysLate', DATEDIFF(now(), from_unixtime(t3.duedate)), 'url', concat('{$CFG->wwwroot}/mod/assign/view.php?id=', t5.id)) as issue
@@ -497,7 +502,7 @@ class PersistCtrl extends recitcommon\MoodlePersistCtrl
         inner join {$this->prefix}course_modules as t5 on t3.id = t5.instance and t5.module = (select id from {$this->prefix}modules where name = 'assign') and t5.course = t2.courseid
         where 
             t2.courseid = $courseId and 
-            (t3.duedate > 0 and from_unixtime(t3.duedate) < now() and DATEDIFF(now(), from_unixtime(t3.duedate)) between 0 and 7) and 
+            (t3.duedate > 0 and from_unixtime(t3.duedate) < now() and DATEDIFF(now(), from_unixtime(t3.duedate)) between $daysDueIntervalMin and $daysDueIntervalMax) and 
             not EXISTS((select id from {$this->prefix}assign_submission as st1 where st1.assignment = t3.id and st1.userid = t4.id ))
             and $stmtStudentRole $visibleStmt $groupStmt
         )
@@ -511,7 +516,7 @@ class PersistCtrl extends recitcommon\MoodlePersistCtrl
         inner join {$this->prefix}course_modules as t5 on t3.id = t5.instance and t5.module = (select id from {$this->prefix}modules where name = 'quiz') and t5.course = t2.courseid
         where 
             t2.courseid = $courseId and 
-            (t3.timeclose > 0 and from_unixtime(t3.timeclose) < now() and DATEDIFF(now(), from_unixtime(t3.timeclose)) between 0 and 7) and 
+            (t3.timeclose > 0 and from_unixtime(t3.timeclose) < now() and DATEDIFF(now(), from_unixtime(t3.timeclose)) between $daysDueIntervalMax and $daysDueIntervalMax) and 
             not EXISTS((select id from {$this->prefix}quiz_attempts as st1 where st1.quiz = t3.id and st1.userid = t4.id ))
             and $stmtStudentRole $visibleStmt $groupStmt
         )";
@@ -872,5 +877,41 @@ class PersistCtrl extends recitcommon\MoodlePersistCtrl
         }
 
         return $result;
+    }
+
+    public function getUserOptions($userId){
+        global $DB;
+
+        $defaultValues = array(
+            'showstudentfollowupwidget' => 1,
+            'showworkfollowupwidget' => 1,
+            'showgroupsoverviewwidget' => 1,
+            'dayswithoutconnect' => 7,
+            'daysdueintervalmin' => 0,
+            'daysdueintervalmax' => 7,
+        );
+
+        $options = array();
+        $rst = $DB->get_records('recitdashboard_options', array('userid' => $userId));
+        if (!empty($rst)){
+            foreach ($rst as $v){
+                $options[$v->name] = $v->value;
+            }
+        }
+
+        foreach($defaultValues as $k => $v){
+            if (!isset($options[$k])){
+                $options[$k] = $v;
+            }
+        }
+
+        return $options;
+    }
+
+    public function setUserOption($userId, $key, $value){
+        global $DB;
+        $DB->execute("insert into {recitdashboard_options} (userid, name, value)
+        values(?, ?, ?)
+        ON DUPLICATE KEY UPDATE value = ?", [$userId, $key, $value, $value]);
     }
 }
