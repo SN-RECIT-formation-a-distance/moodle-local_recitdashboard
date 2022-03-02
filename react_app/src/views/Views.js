@@ -181,18 +181,20 @@ class DashboardView extends Component{
     constructor(props){
         super(props);
         this.state = {options: null};
-    }
+    } 
 
     render() {
         if (!this.state.options) return null;
         let main =
             <div>
                 <Header options={this.props.options} title={"Tableau de bord"}/>
-                <NavDropdown variant="outline-primary" style={{textAlign:'right'}} title="Afficher un gadget">
-                    <NavDropdown.Item onClick={(e) => this.onHide('showworkfollowupwidget', 1)}>Suivi des travaux</NavDropdown.Item>
-                    <NavDropdown.Item onClick={(e) => this.onHide('showstudentfollowupwidget', 1)}>Suivi des élèves</NavDropdown.Item>
-                    <NavDropdown.Item onClick={(e) => this.onHide('showgroupsoverviewwidget', 1)}>Aperçu rapide de mes groupes</NavDropdown.Item>
-                </NavDropdown>
+                <div style={{display: 'flex', justifyContent: 'right'}}>
+                    <NavDropdown variant="outline-primary" style={{textAlign:'right'}} title="Afficher un gadget">
+                        <NavDropdown.Item onClick={(e) => this.onHide('showworkfollowupwidget', 1)}>Suivi des travaux</NavDropdown.Item>
+                        <NavDropdown.Item onClick={(e) => this.onHide('showstudentfollowupwidget', 1)}>Suivi des élèves</NavDropdown.Item>
+                        <NavDropdown.Item onClick={(e) => this.onHide('showgroupsoverviewwidget', 1)}>Aperçu rapide de mes groupes</NavDropdown.Item>
+                    </NavDropdown>
+                </div>
                 <br/>
                 <GadgetWorkFollowup options={this.props.options} onClose={() => this.onHide("showworkfollowupwidget", 0)} show={this.state.options.showworkfollowupwidget == 1}/> 
                 <br/>
@@ -204,7 +206,7 @@ class DashboardView extends Component{
         return (main);
     }
 
-    componentDidMount(){
+    componentDidMount(){ 
         OptionManager.loadOptions((options) => {
             this.setState({options: options});
         });
