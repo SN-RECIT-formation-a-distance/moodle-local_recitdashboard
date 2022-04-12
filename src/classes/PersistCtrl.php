@@ -435,6 +435,18 @@ class PersistCtrl extends recitcommon\MoodlePersistCtrl
         and t1.course = $courseId and t2.notifyteacher = 1 $whereStmt and $stmtStudentRole
         group by t3.id, t1.id)
         union
+        (SELECT t3.id as cmId, t1.name as cmName, '' as dueDate, FROM_UNIXTIME(t1.timemodified) as timeModified, count(*) as nbItems, group_concat(tuser.userid) as userIds,
+        concat('{$CFG->wwwroot}/mod/recitcahiertraces/view.php?id=', t3.id, '&tab=1') as url,
+        JSON_OBJECT('description', 'à ajouter une rétroaction') as extra
+        FROM {$this->prefix}recitcahiertraces as t1
+        inner join {$this->prefix}recitct_groups as t2 on t1.id = t2.ctid
+        left join {$this->prefix}recitct_notes as t4 on t2.id = t4.gid
+        left join {$this->prefix}recitct_user_notes as tuser on t4.id = tuser.nid
+        inner join {$this->prefix}course_modules as t3 on t1.id = t3.instance and t3.module = (select id from {$this->prefix}modules where name = 'recitcahiertraces') and t1.course = t3.course
+        where if(tuser.id > 0 and length(tuser.note) > 0 and (length(REGEXP_REPLACE(trim(coalesce(tuser.feedback, '')), '<[^>]*>+', '')) = 0), 1, 0) = 1 
+        and t1.course = $courseId and t4.notifyteacher = 1 $whereStmt and $stmtStudentRole
+        group by t3.id, t1.id)
+        union
         (select cmId, cmName, dueDate, timeModified, count(*) as nbItems, min(userIds), url, extra from 
         (SELECT  t1.id as cmId, t2.name as cmName, '' as dueDate, max(t3.timemodified) as timeModified,  group_concat(distinct t3.userid) as userIds, t3.attempt as quizAttempt, t4.questionusageid, 
         concat('{$CFG->wwwroot}/mod/quiz/report.php?id=',t1.id,'&mode=grading') as url, group_concat(tuser.state order by tuser.sequencenumber) as states,
