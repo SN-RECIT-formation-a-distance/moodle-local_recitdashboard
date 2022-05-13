@@ -66,78 +66,6 @@ class WebApi extends recitcommon\MoodleApi
         }
     }
 
-    /*public function getCourseProgressionOverview($request){
-        try{
-            $courseId = intval($request['courseId']);
-            $groupId = (isset($request['groupId']) ? intval($request['groupId']) : 0);
-
-            $this->canUserAccess('a', 0, 0, $courseId);
-            
-            $result = new stdClass();
-            $result->details = PersistCtrl::getInstance()->getCourseProgressionOverview($courseId, $groupId);				
-            $this->prepareJson($result);
-            
-            return new WebApiResult(true, $result->details);
-        }
-        catch(Exception $ex){
-            return new WebApiResult(false, false, $ex->GetMessage());
-        }     
-    } */
-    
-    /*public function getCourseProgressionDetails($request){
-        try{
-            $courseId = intval($request['courseId']);
-            $userId = intval($request['userId']);
-
-            $this->canUserAccess('s', 0, $userId, $courseId);
-            
-            $result = new stdClass();
-            $result->details = PersistCtrl::getInstance()->getCourseProgressionDetails($courseId, $userId);			
-            $this->prepareJson($result);
-            
-            return new WebApiResult(true, $result->details);
-        }
-        catch(Exception $ex){
-            return new WebApiResult(false, false, $ex->GetMessage());
-        }     
-    } */
-    
-    /*public function getCourseAttendance($request){
-        try{
-            $courseId = intval($request['courseId']);
-            $groupId = (isset($request['groupId']) ? intval($request['groupId']) : 0);
-
-            $this->canUserAccess('a', 0, 0, $courseId);
-            
-            $result = new stdClass();
-            $result->details = PersistCtrl::getInstance()->getCourseAttendance($courseId, $groupId);				
-            $this->prepareJson($result);
-            
-            return new WebApiResult(true, $result->details);
-        }
-        catch(Exception $ex){
-            return new WebApiResult(false, false, $ex->GetMessage());
-        }     
-    } */
-
-    /*public function getStudentAssiduity($request){
-        try{
-            $courseId = intval($request['courseId']);
-            $userId = intval($request['userId']);
-
-            $this->canUserAccess('s', 0, $userId, $courseId);
-            
-            $result = new stdClass();
-            $result->details = PersistCtrl::getInstance()->getStudentAssiduity($courseId, $userId);				
-            $this->prepareJson($result);
-            
-            return new WebApiResult(true, $result->details);
-        }
-        catch(Exception $ex){
-            return new WebApiResult(false, false, $ex->GetMessage());
-        }    
-    }*/
-
     public function getGroupsOverview($request){
         try{
             $courseId = intval($request['courseId']);
@@ -155,42 +83,6 @@ class WebApi extends recitcommon\MoodleApi
             return new WebApiResult(false, false, $ex->GetMessage());
         }     
     } 
-
-    /*public function getStudentTracking($request){
-        try{
-            $courseId = intval($request['courseId']);
-            $userId = intval($request['userId']);
-            $onlyMyGroups = (intval($request['onlyMyGroups']) == 1 ? true : false);
-
-            $this->canUserAccess('s', 0, $userId, $courseId);
-            
-            $result = new stdClass();
-            $result->details = PersistCtrl::getInstance()->getStudentTracking($courseId, $userId, $onlyMyGroups);
-            $this->prepareJson($result);
-            
-            return new WebApiResult(true, $result->details);
-        }
-        catch(Exception $ex){
-            return new WebApiResult(false, false, $ex->GetMessage());
-        }     
-    } */
-
-    /*public function getUserProfile($request){
-        try{
-            $courseId = intval($request['courseId']);
-            $userId = intval($request['userId']);
-
-            $this->canUserAccess('s', 0, $userId, $courseId);
-            
-            $result = PersistCtrl::getInstance()->getUserProfile($userId);
-            $this->prepareJson($result);
-            
-            return new WebApiResult(true, $result);
-        }
-        catch(Exception $ex){
-            return new WebApiResult(false, false, $ex->GetMessage());
-        }     
-    }*/ 
 
     public function getWorkFollowup($request){
         try{

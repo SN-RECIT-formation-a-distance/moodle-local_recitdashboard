@@ -89,141 +89,6 @@ class PersistCtrl extends recitcommon\MoodlePersistCtrl
         return $result;
     }
     
-    /*public function getCourseProgressionDetails($courseId, $userId){
-        $dateHourFormat = "'%Y-%m-%d %H:%i:%s'";
-
-        $query = "
-            select *, datediff(completionExpected, now()) as daysDeadline from
-            (select t1.courseid as courseId, t2.userid as userId, concat(t3.firstname, ' ', t3.lastname) as studentName, t5.name as module, 
-            coalesce(t6.completionstate,0) as completionState, 
-            if(t6.completionstate = 0 and t4.completionexpected > 0, FROM_UNIXTIME(t4.completionexpected), null) as completionExpected, 
-            (case t5.name 
-            when 'quiz' then (select JSON_OBJECT('name', st1.name, 'maxGrade', st1.grade, 'studentGrade', coalesce(st2.grade,0), 
-                                                    'extra', JSON_OBJECT('timeModified', st2.timemodified)
-                                                )  
-                                from {$this->prefix}quiz as st1 left join {$this->prefix}quiz_grades as st2 on (st1.id = st2.quiz and st2.userid = $userId) where st1.id = t4.instance)
-
-            when 'assign' then (select JSON_OBJECT('name', name, 'maxGrade', st1.grade, 'studentGrade', coalesce(st2.grade,0), 
-                                                    'extra', JSON_OBJECT('timeModified', from_unixtime(st2.timemodified, $dateHourFormat))
-                                                    )
-                                from {$this->prefix}assign as st1 left join {$this->prefix}assign_grades as st2 on (st1.id = st2.assignment and st2.userid = $userId) where st1.id = t4.instance) 
-
-            when 'recitcahiercanada' then (select JSON_OBJECT('name', name, 'maxGrade', -1, 'studentGrade', -1, 'extra', '') 
-                                            from {$this->prefix}recitcahiercanada where id = t4.instance) 
-
-            when 'lesson' then (select JSON_OBJECT('name', name, 'maxGrade', st1.grade, 'studentGrade', coalesce(st2.grade,0), 
-                                                'extra', JSON_OBJECT('timeModified', from_unixtime(st3.lessontime, $dateHourFormat), 'completed', st3.completed)
-                                                )
-                                    from {$this->prefix}lesson as st1 left join {$this->prefix}lesson_grades as st2 on (st1.id = st2.lessonid and st2.userid = $userId) 
-                                    left join {$this->prefix}lesson_timer as st3 on (st1.id = st3.lessonid and st3.userid = $userId) 
-                                    where st1.id = t4.instance order by st3.id desc limit 1) 
-
-            when 'book' then (select JSON_OBJECT('name', name, 'maxGrade', -1, 'studentGrade', -1) 
-                                from {$this->prefix}book where id = t4.instance)
-
-            when 'page' then (select JSON_OBJECT('name', name, 'maxGrade', -1, 'studentGrade', -1, 
-                                'extra', (select JSON_OBJECT('nbViews', count(*), 'timeCreated', from_unixtime(st2.timecreated, $dateHourFormat))
-                                from {$this->prefix}logstore_standard_log as st2 where st2.userid = $userId and st2.component = 'mod_page' and st2.crud = 'r' and st2.contextinstanceid = t4.id)) 
-                                from {$this->prefix}page as st1 where st1.id = t4.instance)
-
-            else null end) as activity,
-            t4_1.id as sectionId, t4_1.name as sectionName
-            from {$this->prefix}enrol as t1
-            inner join {$this->prefix}user_enrolments as t2 on t1.id = t2.enrolid
-            inner join {$this->prefix}user as t3 on t2.userid = t3.id
-            inner join {$this->prefix}course_modules as t4 on t1.courseid = t4.course
-            inner join {$this->prefix}course_sections as t4_1 on t4.section = t4_1.id
-            inner join {$this->prefix}modules as t5 on t5.id = t4.module
-            left join {$this->prefix}course_modules_completion as t6 on t4.id = t6.coursemoduleid and t6.userid = t2.userid
-            where t1.courseid = $courseId and (t4.visible = 1 and t4.completion = 1) and t4_1.visible = 1 and t2.userId = $userId
-            order by completionExpected desc) as tab
-            where  activity is not null";
-            
-        $result = $this->mysqlConn->execSQLAndGetObjects($query);
-        
-        foreach($result as &$item){
-            $item->activity = json_decode($item->activity);
-            
-            //$item->activity->timeModified = $this->mysqlConn->convertMySQLToPHPDataTypes(12, $item->activity->timeModified);
-        }
-
-        return $result;
-        
-        //returns all the values from the array and indexes the array numerically
-        //$result = array_values($result);
-    }*/
-
-    /*public function getCourseAttendance($courseId, $groupId = 0){	
-        $whereStmt = " and 1 ";
-        if($groupId > 0){
-            $whereStmt = " and t1_2.id = $groupId ";
-        }
-
-        $query = "SELECT distinct t1.id as userId, concat(t1.firstname, ' ', t1.lastname) as username, t3.timecreated as timeCreated, t3.courseid as courseId,
-                yearweek(from_unixtime(t3.timecreated)) as weekNumber, coalesce(group_concat(distinct t1_2.name order by t1_2.name),'') as groupList,
-                STR_TO_DATE(concat(year(from_unixtime(t3.timecreated)), week(from_unixtime(t3.timecreated)), 'Monday'), '%X %V %W') as weekMonday
-                FROM {$this->prefix}user as t1
-                left join {$this->prefix}groups_members as t1_1 on t1.id = t1_1.userid
-                left join {$this->prefix}groups as t1_2 on t1_1.groupid = t1_2.id 
-                inner join {$this->prefix}logstore_standard_log as t3 on t1.id = t3.userid
-                where t3.courseid = $courseId $whereStmt
-                and exists(select t4.id from {$this->prefix}role_assignments as t4 inner join {$this->prefix}role as t5 on t4.roleid = t5.id inner join {$this->prefix}context as t6 on t4.contextid and t6.id where t4.userid = t1.id and t5.shortname = 'student' and t6.contextlevel = 50 and t6.instanceid = 7)
-                group by userId, username, timeCreated, courseId, weekNumber
-                order by timeCreated asc";
-    
-        $tmp = $this->mysqlConn->execSQLAndGetObjects($query);
-        
-        $threshold = 300; // 5 minutes
-        $nbItems = count($tmp);
-        for($i = 0; $i < $nbItems; $i++){
-            if(isset($tmp[$i+1])){
-                $diff = $tmp[$i+1]->timeCreated - $tmp[$i]->timeCreated;	
-                if($diff <= $threshold){
-                    $tmp[$i]->amountSec = $diff;
-                }
-                else{
-                    $tmp[$i]->amountSec = 0;
-                }
-            }
-            else{
-                $tmp[$i]->amountSec = 0;
-            }
-        }
-        
-        $tmp2 = array();
-        foreach($tmp as $item){
-            if(!isset($tmp2[$item->userId][$item->courseId][$item->weekNumber])){
-                $tmp2[$item->userId][$item->courseId][$item->weekNumber] = new stdClass();
-                $tmp2[$item->userId][$item->courseId][$item->weekNumber]->amountSec = 0;
-                $tmp2[$item->userId][$item->courseId][$item->weekNumber]->userId = $item->userId;
-                $tmp2[$item->userId][$item->courseId][$item->weekNumber]->username = $item->username;
-                $tmp2[$item->userId][$item->courseId][$item->weekNumber]->courseId = $item->courseId;
-                $tmp2[$item->userId][$item->courseId][$item->weekNumber]->weekNumber = $item->weekMonday->format("y-M-d");
-                $tmp2[$item->userId][$item->courseId][$item->weekNumber]->groups = $item->groupList;
-            }
-            
-            $tmp2[$item->userId][$item->courseId][$item->weekNumber]->amountSec += $item->amountSec;
-        }
-                                
-        //returns all the values from the array and indexes the array numerically
-        $tmp2 = array_values($tmp2);
-        
-        return $tmp2;
-    }*/
-
-    /*public function getStudentAssiduity($courseId, $userId){
-        $query = "SELECT distinct t1.id as userId, concat(t1.firstname, ' ', t1.lastname) as username,  DATE_FORMAT(from_unixtime(t3.timeCreated), '%Y-%m-%d') as timeCreated, 
-        count(*) as nbRequest
-        FROM {$this->prefix}user as t1
-        inner join {$this->prefix}logstore_standard_log as t3 on t1.id = t3.userid
-        where t3.courseid = $courseId and t3.userid = $userId        
-        group by t3.courseid, t3.userid, timeCreated
-        order by timeCreated asc
-        limit 15";
-
-        return $this->mysqlConn->execSQLAndGetObjects($query);
-    }*/
-    
     public function getCourseProgressionOverviewByGroups($courseId, $groupId = 0){
         $data = $this->getCourseProgressionOverview($courseId, $groupId);
 
@@ -331,77 +196,6 @@ class PersistCtrl extends recitcommon\MoodlePersistCtrl
         return $result;
     }
 
-/* public function getStudentTracking($courseId, $userId = 0, $onlyMyGroups = true){
-        $whereStmt = " and 1 ";
-        if($userId > 0){
-            $whereStmt = " and t3.id = $userId ";
-        }
-
-        if($onlyMyGroups){
-            $whereStmt = " and t3_1.userid = {$this->signedUser->id} ";
-        }*/
-        
-        /*  
-        *   PENDING MESSAGES (NOT NOTIFICATIONS)
-        *   (select count(*) FROM {$this->prefix}messages 
-        *   inner join {$this->prefix}message_conversation_members on {$this->prefix}messages.conversationid = {$this->prefix}message_conversation_members.conversationid
-        *   left join {$this->prefix}message_user_actions on {$this->prefix}messages.id = {$this->prefix}message_user_actions.messageid
-        *   where {$this->prefix}message_conversation_members.userid = t3.id and {$this->prefix}message_user_actions.id is null) as pendingMessages
-        */
-
-    /* $query = "SELECT distinct t3_2.id as groupId, coalesce(t3_2.name,'') as groupName, t3.id as userId, concat(t3.firstname, ' ', t3.lastname) as studentName,
-        if(t4.id is not null, 1, 0) as contractSigned,
-        if(t3.firstaccess = 0, 1, 0) as newStudent,
-        sum(if(t6.completionstate = 0 and t5.completionexpected > 0 and datediff(now(),FROM_UNIXTIME(t5.completionexpected)) > 0, 1, 0)) as nbLateActivities,
-        (if(datediff(now(),FROM_UNIXTIME(t3.lastaccess)) > 1, 1, 0)) as extendedAbsence,
-        (select count(*) FROM {$this->prefix}notifications t7 where t7.useridto = t3.id and t7.timeread is null and t7.useridfrom != t7.useridto) as pendingMessages        
-        from {$this->prefix}enrol as t1
-        inner join {$this->prefix}user_enrolments as t2 on t1.id = t2.enrolid
-        inner join {$this->prefix}user as t3 on t2.userid = t3.id
-        left join {$this->prefix}groups_members as t3_1 on t3.id = t3_1.userid
-        left join {$this->prefix}groups as t3_2 on t3_1.groupid = t3_2.id 
-        left join {$this->prefix}format_treetopics_contract as t4 on t3.id = t4.userid
-        left join {$this->prefix}course_modules as t5 on  t5.course = t1.courseid
-        left join {$this->prefix}course_modules_completion as t6 on t5.id = t6.coursemoduleid and t6.userid = t3.id
-        WHERE t1.courseid = $courseId $whereStmt
-        group by t3_2.id, t3.id, t4.id";
-
-        $tmp = $this->mysqlConn->execSQLAndGetObjects($query);
-
-        $result = array();
-        foreach($tmp as $item){
-            if(!isset($result[$item->groupName])){
-                $result[$item->groupName] = new stdClass();
-                $result[$item->groupName]->groupId = $item->groupId;
-                $result[$item->groupName]->groupName = $item->groupName;
-                $result[$item->groupName]->students = array();
-            }
-
-            $result[$item->groupName]->students[] = $item;
-        }
-
-        $result = array_values($result);
-
-        // if it is a call to an user, then we return only one group result (because the user could belong to more than one group)
-        return ($userId > 0 ? array(current($result)) : $result);
-    }*/
-
-    /*public function getUserProfile($userId){    
-        global $CFG;
-        
-        $query = "SELECT id as userId, concat(firstname, ' ', lastname) as name, email, if(lastlogin = 0, '', from_unixtime(lastlogin)) as lastLogin, picture FROM `{$this->prefix}user` WHERE id = $userId";
-        $result = $this->mysqlConn->execSQLAndGetObject($query);
-
-        $context = context_user::instance($result->userId, IGNORE_MISSING);
-        $path = "/{$CFG->theme}/";
-        $filename = 'f1';
-        $url = moodle_url::make_pluginfile_url($context->id, 'user', 'icon', NULL, $path, $filename);
-        $url->param('rev', $result->picture);
-        $result->avatar = $url->out(true);
-
-        return $result;
-    }*/
-
     public function getWorkFollowup($courseId, $groupId = 0){
         global $CFG;
 
@@ -422,30 +216,7 @@ class PersistCtrl extends recitcommon\MoodlePersistCtrl
         left join {$this->prefix}assign_grades as t4 on t4.assignment = tuser.assignment and t4.userid = tuser.userid
         -- il ramasse tous les devoirs où il y a besoin d'évaluation et la note n'est pas encore assignée ou si c'est une réévaluation
         where t1.course = $courseId and tuser.status = 'submitted' and (coalesce(t4.grade,0) <= 0 or tuser.timemodified > coalesce(t4.timemodified,0)) $whereStmt and $stmtStudentRole
-        group by t3.id, t1.id)
-        union
-        (SELECT t3.id as cmId, t1.name as cmName, '' as dueDate, FROM_UNIXTIME(t1.timemodified) as timeModified, count(*) as nbItems, group_concat(tuser.userid) as userIds,
-        concat('{$CFG->wwwroot}/mod/recitcahiercanada/view.php?id=', t3.id, '&tab=1') as url,
-        JSON_OBJECT('description', 'à ajouter une rétroaction') as extra
-        FROM {$this->prefix}recitcahiercanada as t1
-        inner join {$this->prefix}recitcc_cm_notes as t2 on t1.id = t2.ccid
-        left join {$this->prefix}recitcc_user_notes as tuser on t2.id = tuser.cccmid
-        inner join {$this->prefix}course_modules as t3 on t1.id = t3.instance and t3.module = (select id from {$this->prefix}modules where name = 'recitcahiercanada') and t1.course = t3.course
-        where if(tuser.id > 0 and length(tuser.note) > 0 and (length(REGEXP_REPLACE(trim(coalesce(tuser.feedback, '')), '<[^>]*>+', '')) = 0), 1, 0) = 1 
-        and t1.course = $courseId and t2.notifyteacher = 1 $whereStmt and $stmtStudentRole
-        group by t3.id, t1.id)
-        union
-        (SELECT t3.id as cmId, t1.name as cmName, '' as dueDate, FROM_UNIXTIME(t1.timemodified) as timeModified, count(*) as nbItems, group_concat(tuser.userid) as userIds,
-        concat('{$CFG->wwwroot}/mod/recitcahiertraces/view.php?id=', t3.id, '&tab=1') as url,
-        JSON_OBJECT('description', 'à ajouter une rétroaction') as extra
-        FROM {$this->prefix}recitcahiertraces as t1
-        inner join {$this->prefix}recitct_groups as t2 on t1.id = t2.ctid
-        left join {$this->prefix}recitct_notes as t4 on t2.id = t4.gid
-        left join {$this->prefix}recitct_user_notes as tuser on t4.id = tuser.nid
-        inner join {$this->prefix}course_modules as t3 on t1.id = t3.instance and t3.module = (select id from {$this->prefix}modules where name = 'recitcahiertraces') and t1.course = t3.course
-        where if(tuser.id > 0 and length(tuser.note) > 0 and (length(REGEXP_REPLACE(trim(coalesce(tuser.feedback, '')), '<[^>]*>+', '')) = 0), 1, 0) = 1 
-        and t1.course = $courseId and t4.notifyteacher = 1 $whereStmt and $stmtStudentRole
-        group by t3.id, t1.id)
+        group by t3.id, t1.id)       
         union
         (select cmId, cmName, dueDate, timeModified, count(*) as nbItems, min(userIds), url, extra from 
         (SELECT  t1.id as cmId, t2.name as cmName, '' as dueDate, max(t3.timemodified) as timeModified,  group_concat(distinct t3.userid) as userIds, t3.attempt as quizAttempt, t4.questionusageid, 
@@ -467,6 +238,35 @@ class PersistCtrl extends recitcommon\MoodlePersistCtrl
         group by t1.id, t2.id, t3.id, t4.id) as tab
         where right(states, 12) = 'needsgrading'
         group by cmId)";
+
+        if(file_exists("{$CFG->dirroot}/mod/recitcahiercanada/")){
+            $query .= " union
+            (SELECT t3.id as cmId, t1.name as cmName, '' as dueDate, FROM_UNIXTIME(t1.timemodified) as timeModified, count(*) as nbItems, group_concat(tuser.userid) as userIds,
+            concat('{$CFG->wwwroot}/mod/recitcahiercanada/view.php?id=', t3.id, '&tab=1') as url,
+            JSON_OBJECT('description', 'à ajouter une rétroaction') as extra
+            FROM {$this->prefix}recitcahiercanada as t1
+            inner join {$this->prefix}recitcc_cm_notes as t2 on t1.id = t2.ccid
+            left join {$this->prefix}recitcc_user_notes as tuser on t2.id = tuser.cccmid
+            inner join {$this->prefix}course_modules as t3 on t1.id = t3.instance and t3.module = (select id from {$this->prefix}modules where name = 'recitcahiercanada') and t1.course = t3.course
+            where if(tuser.id > 0 and length(tuser.note) > 0 and (length(REGEXP_REPLACE(trim(coalesce(tuser.feedback, '')), '<[^>]*>+', '')) = 0), 1, 0) = 1 
+            and t1.course = $courseId and t2.notifyteacher = 1 $whereStmt and $stmtStudentRole
+            group by t3.id, t1.id)";
+        }
+
+        if(file_exists("{$CFG->dirroot}/mod/recitcahiertraces/")){
+            $query .= " union
+            (SELECT t3.id as cmId, t1.name as cmName, '' as dueDate, FROM_UNIXTIME(t1.timemodified) as timeModified, count(*) as nbItems, group_concat(tuser.userid) as userIds,
+            concat('{$CFG->wwwroot}/mod/recitcahiertraces/view.php?id=', t3.id, '&tab=1') as url,
+            JSON_OBJECT('description', 'à ajouter une rétroaction') as extra
+            FROM {$this->prefix}recitcahiertraces as t1
+            inner join {$this->prefix}recitct_groups as t2 on t1.id = t2.ctid
+            left join {$this->prefix}recitct_notes as t4 on t2.id = t4.gid
+            left join {$this->prefix}recitct_user_notes as tuser on t4.id = tuser.nid
+            inner join {$this->prefix}course_modules as t3 on t1.id = t3.instance and t3.module = (select id from {$this->prefix}modules where name = 'recitcahiertraces') and t1.course = t3.course
+            where if(tuser.id > 0 and length(tuser.note) > 0 and (length(REGEXP_REPLACE(trim(coalesce(tuser.feedback, '')), '<[^>]*>+', '')) = 0), 1, 0) = 1 
+            and t1.course = $courseId and t4.notifyteacher = 1 $whereStmt and $stmtStudentRole
+            group by t3.id, t1.id)";
+        }
 
         $result = $this->mysqlConn->execSQLAndGetObjects($query);
 

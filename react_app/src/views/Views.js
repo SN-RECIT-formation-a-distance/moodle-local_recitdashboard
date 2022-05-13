@@ -12,7 +12,7 @@ import {ReportDiagnosticTags} from './reports/ReportDiagnosticTags';
 import {ReportSectionResults} from './reports/ReportSectionResults';
 import {ReportQuiz} from './reports/ReportQuiz';
 import {ReportActivityCompletion} from './reports/ReportActivityCompletion';
-import { OptionManager } from '../common/OptionManager';
+import { OptionManager } from '../common/Options';
 import { ComboBoxPlus } from '../libs/components/ComboBoxPlus';
 
 export class MainView extends Component{

@@ -4,7 +4,7 @@ import {faSync, faTimesCircle, faThumbsUp, faInfo, faCog, faSlidersH} from '@for
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {$glVars} from '../../common/common';
 import { JsNx } from '../../libs/utils/Utils';
-import { OptionManager } from '../../common/OptionManager';
+import { OptionManager } from '../../common/Options';
 import { FeedbackCtrl } from '../../libs/components/Feedback';
 
 export class GadgetStudentFollowup extends Component{
