@@ -22,18 +22,14 @@
 namespace recitdashboard;
 
 require_once(dirname(__FILE__).'../../../../config.php');
-require_once "$CFG->dirroot/local/recitcommon/php/WebApi.php";
-require_once dirname(__FILE__).'/PersistCtrl.php';
-require_once "$CFG->dirroot/local/recitcommon/php/ReportDiagTag.php";
+require_once(dirname(__FILE__)."/recitcommon/WebApi.php");
+require_once dirname(__FILE__).'/recitcommon/ReportDiagTag.php';
+require_once(dirname(__FILE__).'/PersistCtrl.php');
 
-use recitcommon;
-use recitcommon\WebApiResult;
-use recitcommon\ReportDiagTagContent;
-use recitcommon\ReportDiagTagCSVWriter;
 use Exception;
 use stdClass;
 
-class WebApi extends recitcommon\MoodleApi
+class WebApi extends MoodleApi
 {
     public function __construct($DB, $COURSE, $USER){
         parent::__construct($DB, $COURSE, $USER);

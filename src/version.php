@@ -21,12 +21,9 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2022020901;       // The current module version (Date: YYYYMMDDXX)
-$plugin->release = 'v1.15.2';
+$plugin->version   = 2022020902;       // The current module version (Date: YYYYMMDDXX)
+$plugin->release = 'v1.15.3';
 $plugin->requires  = 2020061500.00; // Moodle 3.9.0
 $plugin->component = 'local_recitdashboard';        // Full name of the plugin (used for diagnostics)
 $plugin->cron      = 0;
-$plugin->dependencies = [
-    'local_recitcommon' => 2022020901
-];
 $plugin->maturity = MATURITY_BETA; // MATURITY_ALPHA, MATURITY_BETA, MATURITY_RC or MATURITY_STABLE

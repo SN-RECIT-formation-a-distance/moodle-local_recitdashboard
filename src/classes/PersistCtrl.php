@@ -22,18 +22,15 @@
 
 namespace recitdashboard;
 
-require_once "$CFG->dirroot/local/recitcommon/php/PersistCtrl.php";
-require_once "$CFG->dirroot/local/recitcommon/php/Utils.php";
+require_once __DIR__ . '/recitcommon/PersistCtrl.php';
 
-use recitcommon;
-use recitcommon\Utils;
 use stdClass;
 use DateTime;
 
 /**
  * Singleton class
  */
-class PersistCtrl extends recitcommon\MoodlePersistCtrl
+class PersistCtrl extends MoodlePersistCtrl
 {
     protected static $instance = null;
     
@@ -595,7 +592,7 @@ class PersistCtrl extends recitcommon\MoodlePersistCtrl
                 $obj->defaultMark = $item->defaultMark;
                 $obj->questionName = $item->questionName;
                 $obj->questionText = $item->questionText;
-                $obj->gradeWeight = $item->defaultMark * Utils::divide($item->quizMaxGrade, $item->quizSumGrades);
+                $obj->gradeWeight = $item->defaultMark * ($item->quizSumGrades > 0 ? $item->quizMaxGrade/$item->quizSumGrades : 0);
                 
                 $obj->tags = explode(",", $item->tags);
                 $result->questions[$item->slot] = $obj;
