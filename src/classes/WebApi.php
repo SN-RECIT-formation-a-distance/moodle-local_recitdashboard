@@ -145,7 +145,7 @@ class WebApi extends MoodleApi
     protected function reportSectionResultsAsCSV($data){
         try{                
             // header
-            $arr = array("Prénom", "Nom");
+            $arr = array(get_string('firstname'), get_string('lastname'));
 
             $student = current($data);
             foreach($student->grades as $grade){ 
@@ -163,7 +163,7 @@ class WebApi extends MoodleApi
                 $fileContent[] = $arr;
             }
 
-            $filename = sys_get_temp_dir() . '/rapport-resultats-par-section.csv';
+            $filename = sys_get_temp_dir() . '/'.get_string('report', 'local_recitdashboard').'.csv';
             $file = $this->createCSVFile($filename, $fileContent);
             return new WebApiResult(true, $file, "", 'application/csv');
             
@@ -202,7 +202,7 @@ class WebApi extends MoodleApi
     protected function reportActivityCompletionAsCSV($data){
         try{                
             // header
-            $arr = array("Prénom", "Nom");
+            $arr = array(get_string('firstname'), get_string('lastname'));
 
             $student = current($data);
             foreach($student->activityList as $item){ 
@@ -224,7 +224,7 @@ class WebApi extends MoodleApi
                 $fileContent[] = $arr;
             }
 
-            $filename = sys_get_temp_dir() . '/rapport-achevement-activites.csv';
+            $filename = sys_get_temp_dir() . '/'.get_string('report', 'local_recitdashboard').'.csv';
             $file = $this->createCSVFile($filename, $fileContent);
             return new WebApiResult(true, $file, "", 'application/csv');
         }
@@ -263,13 +263,13 @@ class WebApi extends MoodleApi
     protected function reportQuizAsCSV($data){
         try{                
             // header
-            $arr = array("Prénom", "Nom");
-            $arr[] = "Tentatives";
-            $arr[] = "État";
-            $arr[] = "Commencé le";
-            $arr[] = "Terminé";
-            $arr[] = "Temps utilisé";
-            $arr[] = "Note/". number_format($data->quizMaxGrade, 2);
+            $arr = array(get_string('firstname'), get_string('lastname'));
+            $arr[] = get_string('attempts', 'local_recitdashboard');
+            $arr[] = get_string('state', 'local_recitdashboard');
+            $arr[] = get_string('beganat', 'local_recitdashboard');
+            $arr[] = get_string('end', 'local_recitdashboard');
+            $arr[] = get_string('timeconsumed', 'local_recitdashboard');
+            $arr[] = get_string('grade', 'local_recitdashboard')."/". number_format($data->quizMaxGrade, 2);
 
             foreach($data->questions as $item){ 
                 $arr[] = "Q.{$item->slot}/" . round($item->gradeWeight,2);
@@ -277,7 +277,7 @@ class WebApi extends MoodleApi
 
             $fileContent[] = $arr;
             
-            $arr = array("Tags", "", "", "", "", "", "", "");
+            $arr = array(get_string('tags', 'local_recitdashboard'), "", "", "", "", "", "", "");
 
             foreach($data->questions as $item){ 
                 $arr[] = implode(",", $item->tags);
@@ -302,7 +302,7 @@ class WebApi extends MoodleApi
                 }
             }
 
-            $filename = sys_get_temp_dir() . '/rapport-test.csv';
+            $filename = sys_get_temp_dir() . '/'.get_string('quiz', 'local_recitdashboard').'-'.get_string('report', 'local_recitdashboard').'.csv';
             $file = $this->createCSVFile($filename, $fileContent);
             return new WebApiResult(true, $file, "", 'application/csv');
         }
@@ -330,15 +330,14 @@ class WebApi extends MoodleApi
                 $result->courseName = $this->course->fullname;
                 
                 if(in_array('question', $options)){
-                    $result->reportName = get_string('recitdiagtagquestion', 'quiz_recitdiagtagquestion');
+                    $result->reportName = get_string('question', 'local_recitdashboard');
                 }
                 else{
-                    $result->reportName = get_string('pluginname', 'report_recitdiagtag');
+                    $result->reportName = get_string('report', 'local_recitdashboard');
                 }
 
-                $writer = new ReportDiagTagCSVWriter($result, 'mod_recitcahiercanada');
+                $writer = new ReportDiagTagCSVWriter($result, 'local_recitdashboard');
                 $writer->writeReport();
-                //$this->downloadFile(, 'application/csv', 'ISO-8859-1');
                 $data = new stdClass();
                 $data->filename = $writer->getFilename();
                 $data->charset = 'ISO-8859-1';

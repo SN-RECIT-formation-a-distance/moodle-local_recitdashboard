@@ -23,7 +23,6 @@
 
 namespace recitdashboard;
 
-require_once __DIR__ . '/MySQLiConn.php';
 require_once __DIR__ . '/PersistCtrl.php';
 
 use stdClass;
@@ -410,7 +409,7 @@ class ReportDiagTagCSVWriter extends ReportDiagTagWriter
             $fileContent[] = array();
 
             // header
-            $arr = array("Prénom", "Nom", "Courriel");
+            $arr = array(get_string("firstname"), get_string("lastname"), get_string("email"));
 
             $student = current($this->content->students);
             foreach($student->tags as $tag){ 

@@ -64,7 +64,7 @@ export class ReportQuiz  extends Component{
                                 <DataGrid.Header.Cell style={{minWidth: "110px"}}>{"Début"}</DataGrid.Header.Cell>
                                 <DataGrid.Header.Cell style={{minWidth: "110px"}}>{"Terminé"}</DataGrid.Header.Cell>
                                 <DataGrid.Header.Cell style={{minWidth: "100px"}}>{"Temps"}</DataGrid.Header.Cell>
-                                <DataGrid.Header.Cell style={{minWidth: "140px"}}>{`Note/${dataProvider.quizMaxGrade.toFixed(2)}`}</DataGrid.Header.Cell>
+                                <DataGrid.Header.Cell style={{minWidth: "140px"}}>{`Note/${parseFloat(dataProvider.quizMaxGrade).toFixed(2)}`}</DataGrid.Header.Cell>
                                 {dataProvider.questions.map((item, index) => {
                                     const popover = (
                                         <Popover>
@@ -77,7 +77,7 @@ export class ReportQuiz  extends Component{
                                     let result = 
                                         <DataGrid.Header.Cell key={index} style={{textAlign: "center", width: "100px"}} >
                                             <OverlayTrigger trigger="click" placement="bottom" overlay={popover} rootClose={true}>
-                                                <span className="btn btn-link">{`Q.${item.slot}/${item.gradeWeight.toFixed(2)} `}</span>
+                                                <span className="btn btn-link">{`Q.${item.slot}/${parseFloat(item.gradeWeight).toFixed(2)} `}</span>
                                             </OverlayTrigger>
                                         </DataGrid.Header.Cell>
 
@@ -133,15 +133,15 @@ export class ReportQuiz  extends Component{
                                     items.push(<DataGrid.Body.Cell key={items.length} style={{textAlign: "center"}} >{this.formatElapsedTime(quizAttempt.elapsedTime)}</DataGrid.Body.Cell>);
 
                                     let finalGrade = 0;
-                                    if(quizAttempt.finalGrade >= 0){
-                                        finalGrade = quizAttempt.finalGrade.toFixed(2);
+                                    if(parseFloat(quizAttempt.finalGrade) >= 0){
+                                        finalGrade = parseFloat(quizAttempt.finalGrade).toFixed(2);
                                     }
                                     else{
                                         finalGrade = "Pas encore évalué";
                                     }
 
                                     cell = 
-                                    <DataGrid.Body.Cell key={items.length} style={{backgroundColor: this.getCellContext(quizAttempt, dataProvider.quizMaxGrade), textAlign: "center"}}>
+                                    <DataGrid.Body.Cell key={items.length} style={{backgroundColor: this.getCellContext(quizAttempt, parseFloat(dataProvider.quizMaxGrade)), textAlign: "center"}}>
                                         <a href={`${M.cfg.wwwroot}/mod/quiz/review.php?attempt=${quizAttempt.quizAttemptId}`} target="_blank">{finalGrade}</a>
                                     </DataGrid.Body.Cell>
                                     items.push(cell);
@@ -169,8 +169,8 @@ export class ReportQuiz  extends Component{
     getCell(quizAttempt, question, index){
         let text, title, color, weightedGrade, grade;
 
-        weightedGrade = question.weightedGrade.toFixed(2);
-        grade = question.weightedGrade; // question.grade
+        weightedGrade = parseFloat(question.weightedGrade).toFixed(2);
+        grade = parseFloat(question.weightedGrade); // question.grade
         
         if(quizAttempt.attemptTimeFinish.length === 0){
             text = null;
@@ -183,7 +183,7 @@ export class ReportQuiz  extends Component{
             color = AppCommon.Colors.green;
             title = "Réussi";
         }
-        else if((grade < question.gradeWeight) && (grade > 0)){
+        else if((grade < parseFloat(question.gradeWeight)) && (grade > 0)){
             text = [<FontAwesomeIcon icon={faCheckSquare} key={0}/>, " ", weightedGrade];
             color = AppCommon.Colors.blue;
             title = "Partiellement correct";
@@ -200,7 +200,7 @@ export class ReportQuiz  extends Component{
         }
         
         let cell = 
-            <DataGrid.Body.Cell  sortValue={question.weightedGrade.toFixed(2)} style={{textAlign: "center", verticalAlign: "middle"}} key={index}>
+            <DataGrid.Body.Cell sortValue={parseFloat(question.weightedGrade).toFixed(2)} style={{textAlign: "center", verticalAlign: "middle"}} key={index}>
                 <Button variant="link" title={title} onClick={() => this.openQuestion(quizAttempt, question)} style={{color: color}}>
                     {text}
                 </Button>
@@ -215,9 +215,9 @@ export class ReportQuiz  extends Component{
     }
 
     getCellContext(quizAttempt, quizMaxGrade){
-        if(quizAttempt.finalGrade < 0){ return "inherit";}
+        let grade = parseFloat(quizAttempt.finalGrade);
 
-        let grade = quizAttempt.finalGrade;
+        if(grade < 0){ return "inherit";}
 
         let context = "";
 

@@ -267,7 +267,7 @@ abstract class MoodleApi extends AWebApi
             return true;
         }
         else{
-            throw new Exception("L’accès a ce ressource est restreint.");
+            throw new Exception(get_string('accessdenied'));
         }
     }
 

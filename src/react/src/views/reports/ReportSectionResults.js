@@ -168,7 +168,7 @@ export class ReportSectionResults  extends Component{
         if(item.finalGrade < 0){ return "";}
 
         let finalGrade = parseFloat(item.finalGrade).toFixed(1);
-        let gradeMax = item.gradeMax.toFixed(1);
+        let gradeMax = parseFloat(item.gradeMax).toFixed(1);
         let ret = `${finalGrade}/${gradeMax}`;
         if((item.itemModule === 'quiz') && (item.extra !== null)){
             return <a href={`${M.cfg.wwwroot}/mod/quiz/review.php?attempt=${item.extra.attempt}`} target='_blank'>{ret}</a>
