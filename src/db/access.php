@@ -14,15 +14,27 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * @package   local_recitdashboard
- * @copyright 2019 RÉCIT 
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2022020903;       // The current module version (Date: YYYYMMDDXX)
-$plugin->release = 'v1.15.3';
-$plugin->requires  = 2020061500.00; // Moodle 3.9.0
-$plugin->component = 'local_recitdashboard';        // Full name of the plugin (used for diagnostics)
-$plugin->maturity = MATURITY_BETA; // MATURITY_ALPHA, MATURITY_BETA, MATURITY_RC or MATURITY_STABLE
+defined('MOODLE_INTERNAL') || die();
+require_once(__DIR__ . '/../lib.php');
+
+$capabilities = [
+    RECITDASHBOARD_ACCESS_CAPABILITY => [
+        'riskbitmask' => RISK_PERSONAL,
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes' => [
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW,
+        ]
+    ],
+    RECITDASHBOARD_STUDENT_CAPABILITY => [
+        'riskbitmask' => RISK_PERSONAL,
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes' => [
+            'student' => CAP_ALLOW,
+        ]
+    ],
+];

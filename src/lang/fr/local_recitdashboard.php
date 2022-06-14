@@ -1,5 +1,7 @@
 <?php
 $string['pluginname'] = 'RÉCIT Apprentimètre';
+$string['recitdashboard:access'] = 'L\'utilisateur a accès à l\'apprendimètre';
+$string['recitdashboard:student'] = 'L\'utilisateur est un étudiant';
 $string['work'] = 'Travail';
 $string['time'] = 'Temps';
 $string['tobegraded'] = 'à corriger';

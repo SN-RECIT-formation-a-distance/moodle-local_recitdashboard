@@ -25,6 +25,7 @@ require_once(dirname(__FILE__).'../../../../config.php');
 require_once(dirname(__FILE__)."/recitcommon/WebApi.php");
 require_once dirname(__FILE__).'/recitcommon/ReportDiagTag.php';
 require_once(dirname(__FILE__).'/PersistCtrl.php');
+require_once(dirname(__FILE__).'/../lib.php');
 
 use Exception;
 use stdClass;
@@ -34,6 +35,27 @@ class WebApi extends MoodleApi
     public function __construct($DB, $COURSE, $USER){
         parent::__construct($DB, $COURSE, $USER);
         PersistCtrl::getInstance($DB, $USER);
+    }
+    /**
+     * $level [a = admin | s = student]
+     */
+    public function canUserAccess($level, $cmId = 0, $userId = 0, $courseId = 0){
+        global $DB;
+        $userId = $this->signedUser->id;
+        $isTeacher = $DB->record_exists_sql('select id from {role_assignments} where userid=:userid and roleid in (select roleid from {role_capabilities} where capability=:name1)', ['userid' => $userId, 'name1' => RECITDASHBOARD_ACCESS_CAPABILITY]);
+
+        
+         // if the level is admin then the user must have access to CAPABILITY
+        if(($level == 'a') && $isTeacher){
+            return true;
+        }
+        // if the user is student then it has access only if it is accessing its own stuff
+        else if(($level == 's') && ($userId == $this->signedUser->id)){
+            return true;
+        }
+        else{
+            throw new Exception(get_string('accessdenied'));
+        }
     }
     
     public function getUserOptions($request){

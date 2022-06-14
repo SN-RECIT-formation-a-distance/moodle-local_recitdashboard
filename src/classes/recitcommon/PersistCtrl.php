@@ -158,10 +158,11 @@ abstract class MoodlePersistCtrl extends APersistCtrl{
         return $result;
     }
 
-    protected function getStmtStudentRole($userId, $courseId){
+    protected function getStmtStudentRole($userId, $courseId, $varCapability){
         // contextlevel = 50 = course context
         // user has role student and it is enrolled in the course
         $stmt = "(exists(select st1.id from {role} st1 inner join {role_assignments} st2 on st1.id = st2.roleid
+        inner join {role_capabilities} st3 on st3.roleid = st1.id and st3.capability = $varCapability
         where st2.userid = $userId and st2.contextid in (select id from {context} where instanceid = $courseId and contextlevel = 50) and st1.shortname in ('student'))
         and exists(select st1.id from {enrol} st1 inner join {user_enrolments} st2 on st1.id = st2.enrolid where st1.courseid = $courseId and st2.userid = $userId limit 1))";
 

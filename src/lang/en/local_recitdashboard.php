@@ -1,5 +1,7 @@
 <?php
 $string['pluginname'] = 'RÉCIT Dashboard';
+$string['recitdashboard:access'] = 'Whether or not the user can access RÉCIT Dashboard';
+$string['recitdashboard:student'] = 'Whether or not the user is a student';
 $string['work'] = 'Work';
 $string['time'] = 'Time';
 $string['tobegraded'] = 'to be graded';

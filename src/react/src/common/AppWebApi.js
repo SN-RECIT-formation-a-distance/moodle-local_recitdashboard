@@ -139,9 +139,9 @@ export class AppWebApi extends WebApi
         let data = {groupId: groupId, courseId: courseId, service: "getWorkFollowup"};
 
         let onSuccessTmp = function(result){
-            for(let i = 0; i < result.data.length; i++){
+            /*for(let i = 0; i < result.data.length; i++){
                 result.data[i].extra = JSON.parse(result.data[i].extra);
-            }
+            }*/ //Not neeeded with moodle db functions
 
             onSuccess(result);
         }
