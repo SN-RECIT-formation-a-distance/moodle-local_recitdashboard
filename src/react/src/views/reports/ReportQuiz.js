@@ -4,6 +4,7 @@ import {OverlayTrigger, Popover, Button, Badge} from 'react-bootstrap';
 import {$glVars, Options, AppCommon} from '../../common/common';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {faCheck, faTimes, faCheckSquare} from '@fortawesome/free-solid-svg-icons';
+import { i18n } from '../../common/i18n';
 
 export class ReportQuiz  extends Component{
     static defaultProps = {        
@@ -39,7 +40,7 @@ export class ReportQuiz  extends Component{
             this.setState({dataProvider: result.data});
         }
         else{
-            $glVars.feedback.showError($glVars.i18n.tags.appname, result.msg);
+            $glVars.feedback.showError(i18n.get_string('pluginname'), result.msg);
         }
     }
 
@@ -57,14 +58,14 @@ export class ReportQuiz  extends Component{
                     <DataGrid orderBy={true}>
                         <DataGrid.Header>
                             <DataGrid.Header.Row>
-                                <DataGrid.Header.Cell style={{minWidth: "120px"}}>{"Prénom"}</DataGrid.Header.Cell>
-                                <DataGrid.Header.Cell style={{minWidth: "100px"}}>{"Nom"}</DataGrid.Header.Cell>
-                                <DataGrid.Header.Cell style={{minWidth: "70px"}} title="Tentatives">{"#"}</DataGrid.Header.Cell>
-                                <DataGrid.Header.Cell style={{minWidth: "100px"}}>{"État"}</DataGrid.Header.Cell>
-                                <DataGrid.Header.Cell style={{minWidth: "110px"}}>{"Début"}</DataGrid.Header.Cell>
-                                <DataGrid.Header.Cell style={{minWidth: "110px"}}>{"Terminé"}</DataGrid.Header.Cell>
-                                <DataGrid.Header.Cell style={{minWidth: "100px"}}>{"Temps"}</DataGrid.Header.Cell>
-                                <DataGrid.Header.Cell style={{minWidth: "140px"}}>{`Note/${parseFloat(dataProvider.quizMaxGrade).toFixed(2)}`}</DataGrid.Header.Cell>
+                                <DataGrid.Header.Cell style={{minWidth: "120px"}}>{i18n.get_string('firstname')}</DataGrid.Header.Cell>
+                                <DataGrid.Header.Cell style={{minWidth: "100px"}}>{i18n.get_string('lastname')}</DataGrid.Header.Cell>
+                                <DataGrid.Header.Cell style={{minWidth: "70px"}} title={i18n.get_string('attempts')}>{"#"}</DataGrid.Header.Cell>
+                                <DataGrid.Header.Cell style={{minWidth: "100px"}}>{i18n.get_string('state')}</DataGrid.Header.Cell>
+                                <DataGrid.Header.Cell style={{minWidth: "110px"}}>{i18n.get_string('beganat')}</DataGrid.Header.Cell>
+                                <DataGrid.Header.Cell style={{minWidth: "110px"}}>{i18n.get_string('end')}</DataGrid.Header.Cell>
+                                <DataGrid.Header.Cell style={{minWidth: "100px"}}>{i18n.get_string('timeconsumed')}</DataGrid.Header.Cell>
+                                <DataGrid.Header.Cell style={{minWidth: "140px"}}>{i18n.get_string('grade')}/{parseFloat(dataProvider.quizMaxGrade).toFixed(2)}</DataGrid.Header.Cell>
                                 {dataProvider.questions.map((item, index) => {
                                     const popover = (
                                         <Popover>
@@ -86,7 +87,7 @@ export class ReportQuiz  extends Component{
                             )}
                             </DataGrid.Header.Row>
                             <DataGrid.Body.Row>
-                                <DataGrid.Header.Cell>Tags</DataGrid.Header.Cell>
+                                <DataGrid.Header.Cell>{i18n.get_string('tags')}</DataGrid.Header.Cell>
                                 <DataGrid.Body.Cell></DataGrid.Body.Cell>
                                 <DataGrid.Body.Cell></DataGrid.Body.Cell>
                                 <DataGrid.Body.Cell></DataGrid.Body.Cell>
@@ -137,7 +138,7 @@ export class ReportQuiz  extends Component{
                                         finalGrade = parseFloat(quizAttempt.finalGrade).toFixed(2);
                                     }
                                     else{
-                                        finalGrade = "Pas encore évalué";
+                                        finalGrade = i18n.get_string('needsgrading');
                                     }
 
                                     cell = 
@@ -181,22 +182,22 @@ export class ReportQuiz  extends Component{
         else if (grade.toString() === question.gradeWeight.toString()){
             text = [<FontAwesomeIcon icon={faCheck} key={0}/>, " ", weightedGrade];
             color = AppCommon.Colors.green;
-            title = "Réussi";
+            title = i18n.get_string('success');
         }
         else if((grade < parseFloat(question.gradeWeight)) && (grade > 0)){
             text = [<FontAwesomeIcon icon={faCheckSquare} key={0}/>, " ", weightedGrade];
             color = AppCommon.Colors.blue;
-            title = "Partiellement correct";
+            title = i18n.get_string('partiallycorrect');
         }
         else if(grade < 0){
-            text = "Nécessite évaluation";
+            text = i18n.get_string('needsgrading');
             color = AppCommon.Colors.blue;
-            title = "Nécessite évaluation";
+            title = i18n.get_string('needsgrading');
         }
         else{
             text = [<FontAwesomeIcon icon={faTimes} key={0}/>, " ", weightedGrade];
             color = AppCommon.Colors.red;
-            title = "Échoué";
+            title = i18n.get_string('fail');
         }
         
         let cell = 

@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import {DataGrid} from '../../libs/components/Components';
 import {JsNx} from '../../libs/utils/Utils';
 import {$glVars, Options, AppCommon} from '../../common/common';
+import { i18n } from '../../common/i18n';
 
 export class ReportSectionResults  extends Component{
     static defaultProps = {        
@@ -40,7 +41,7 @@ export class ReportSectionResults  extends Component{
             this.setState({dataProvider: result.data});
         }
         else{
-            $glVars.feedback.showError($glVars.i18n.tags.appname, result.msg);
+            $glVars.feedback.showError(i18n.get_string('pluginname'), result.msg);
         }
     }
 
@@ -64,8 +65,8 @@ export class ReportSectionResults  extends Component{
                     <DataGrid orderBy={true}>
                         <DataGrid.Header>
                             <DataGrid.Header.Row>
-                                <DataGrid.Header.Cell style={{minWidth: "120px"}}>{"Prénom"}</DataGrid.Header.Cell>
-                                <DataGrid.Header.Cell style={{minWidth: "100px"}}>{"Nom"}</DataGrid.Header.Cell>
+                                <DataGrid.Header.Cell style={{minWidth: "120px"}}>{i18n.get_string('firstname')}</DataGrid.Header.Cell>
+                                <DataGrid.Header.Cell style={{minWidth: "100px"}}>{i18n.get_string('lastname')}</DataGrid.Header.Cell>
                                 {grades.map((item, index) => {
                                     if(!this.filterSectionAndCm(item)){ return null;}
 

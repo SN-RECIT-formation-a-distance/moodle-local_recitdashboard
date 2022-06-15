@@ -23,6 +23,7 @@
 namespace recitdashboard;
 
 require(__DIR__ . '/../../config.php');
+require(__DIR__ . '/lib.php');
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -56,6 +57,7 @@ require_login();
 $PAGE->set_url("/local/recitdashboard/view.php");
 $PAGE->requires->css(new moodle_url($CFG->wwwroot . '/local/recitdashboard/react/build/index.css'), true);
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/local/recitdashboard/react/build/index.js'), true);
+local_recitdashboard_strings_for_js();
 
 // Set page context.
 $PAGE->set_context(\context_system::instance());

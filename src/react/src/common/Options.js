@@ -1,7 +1,6 @@
 import packageJson from "../../package.json";
 import { $glVars } from "./common";
 
-//import {$i18n} from "./i18n.js";
 
 export class Options
 {

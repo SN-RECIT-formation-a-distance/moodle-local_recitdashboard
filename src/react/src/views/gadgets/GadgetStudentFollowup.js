@@ -6,6 +6,7 @@ import {$glVars} from '../../common/common';
 import { JsNx } from '../../libs/utils/Utils';
 import { OptionManager } from '../../common/Options';
 import { FeedbackCtrl } from '../../libs/components/Feedback';
+import { i18n } from '../../common/i18n';
 
 export class GadgetStudentFollowup extends Component{
     static defaultProps = {        
@@ -24,9 +25,9 @@ export class GadgetStudentFollowup extends Component{
 
         this.state = {dataProvider: [], show: true, options: {}, optionPopup: false};
         this.optionList = [
-            {label: 'Nombre de jours sans se connecter', type: 'number', min: 1, max: 365, name: 'dayswithoutconnect'},
-            {label: 'Interval de jours minimum pour travaux à remettre', type: 'number', min: 0, max: 365, name: 'daysdueintervalmin'},
-            {label: 'Interval de jours maximum pour travaux à remettre', type: 'number', min: 1, max: 365, name: 'daysdueintervalmax'},
+            {label: i18n.get_string('dayswithoutconnect'), type: 'number', min: 1, max: 365, name: 'dayswithoutconnect'},
+            {label: i18n.get_string('daysdueintervalmin'), type: 'number', min: 0, max: 365, name: 'daysdueintervalmin'},
+            {label: i18n.get_string('daysdueintervalmax'), type: 'number', min: 1, max: 365, name: 'daysdueintervalmax'},
         ];
     }
 
@@ -52,7 +53,7 @@ export class GadgetStudentFollowup extends Component{
             this.setState({dataProvider: result.data, show: true});
         }
         else{
-            $glVars.feedback.showError($glVars.i18n.tags.appname, result.msg);
+            $glVars.feedback.showError(i18n.get_string('pluginname'), result.msg);
             this.setState({dataProvider: [], show: false});
         }
     }
@@ -66,14 +67,14 @@ export class GadgetStudentFollowup extends Component{
             <Card className='gadget' key="1">
                 <Card.Body>
                     <Card.Title>
-                        <span>{`Suivi des élèves`}</span>
-                        <span><Badge pill variant="primary">{this.state.dataProvider.length}</Badge>{` élève(s) à suivre`}</span>
-                        <ButtonToolbar aria-label="Toolbar with Buttons">
+                        <span>{i18n.get_string('studenttracking')}</span>
+                        <span><Badge pill variant="primary">{this.state.dataProvider.length}</Badge>{' '+i18n.get_string('studenttotrack')}</span>
+                        <ButtonToolbar>
                             <ButtonGroup className="mr-2">
-                                <Button  variant="outline-secondary" onClick={() => this.openPopup(true)} title="Options"><FontAwesomeIcon icon={faSlidersH}/></Button>
-                                <Button  variant="outline-secondary" onClick={this.getData} title="Mettre à jour le gadget"><FontAwesomeIcon icon={faSync}/></Button>
-                                <Button  variant="outline-secondary" onClick={this.onClose} title="Enlever le gadget"><FontAwesomeIcon icon={faTimesCircle}/></Button>
-                                <OverlayTrigger placement="left" delay={{ show: 250 }} overlay={<Tooltip>{`Cette zone alerte l'enseignant lors des situations suivantes : L'élève n'a pas remis un devoir ou un test n'a pas été répondu alors que la date d'échéance est dépassée.  Ces messages d'alerte s'effacent après une période déterminée. Une alerte apparaît lorsque l'élève ne s'est pas connecté à la plateforme depuis plus que 5 jours.`}</Tooltip>}>
+                                <Button variant="outline-secondary" onClick={() => this.openPopup(true)} title={i18n.get_string('options')}><FontAwesomeIcon icon={faSlidersH}/></Button>
+                                <Button variant="outline-secondary" onClick={this.getData} title={i18n.get_string('updategadget')}><FontAwesomeIcon icon={faSync}/></Button>
+                                <Button variant="outline-secondary" onClick={this.onClose} title={i18n.get_string('removegadget')}><FontAwesomeIcon icon={faTimesCircle}/></Button>
+                                <OverlayTrigger placement="left" delay={{ show: 250 }} overlay={<Tooltip>{i18n.get_string('studenttrackinfo')}</Tooltip>}>
                                     <Button variant="outline-secondary"><FontAwesomeIcon icon={faInfo}/></Button>
                                 </OverlayTrigger>
                             </ButtonGroup>
@@ -90,7 +91,7 @@ export class GadgetStudentFollowup extends Component{
                             return result;
                         })}
 
-                        {this.state.dataProvider.length === 0 &&  <Alert variant="success">{"Pas de suivi à faire. "}<FontAwesomeIcon icon={faThumbsUp}/></Alert>}
+                        {this.state.dataProvider.length === 0 && <Alert variant="success">{i18n.get_string('nofollowuptodo')} <FontAwesomeIcon icon={faThumbsUp}/></Alert>}
                     </div>
                 </Card.Body>
             </Card>;
@@ -117,8 +118,8 @@ export class GadgetStudentFollowup extends Component{
     getUsers(item){        
         let result = 
             <span>
-                {"L'élève "}<a href={`${M.cfg.wwwroot}/user/view.php?id=${item.userId}&course=${this.props.options.course.id}`} target='_blank'>{item.username}</a>
-                {` a besoin du suivi :`}
+                {i18n.get_string('student')} <a href={`${M.cfg.wwwroot}/user/view.php?id=${item.userId}&course=${this.props.options.course.id}`} target='_blank'>{item.username}</a>
+                {i18n.get_string('needfollowup')}
                 <ul>
                 {item.issues.map((issue, index) => {
                     let result = null;
@@ -127,7 +128,7 @@ export class GadgetStudentFollowup extends Component{
                         result = <li key={index} ><a target="_blank" href={`${M.cfg.wwwroot}/report/log/user.php?id=${item.userId}&course=${this.props.options.course.id}&mode=all`}>{`${issue.nbDaysLastAccess} jours`}</a>{` sans se connecter au cours.`}</li>;
                     }
                     else if(issue.hasOwnProperty('nbDaysLate')){
-                        result = <li key={index} >{`L'activité `}<a target='_blank' href={issue.url}>{issue.cmName}</a>{` est ${issue.nbDaysLate} jour en retard.`}</li>;
+                        result = <li key={index} >{i18n.get_string('activity')} <a target='_blank' href={issue.url}>{issue.cmName}</a>: {issue.nbDaysLate} {i18n.get_string('dayslate')}</li>;
                     }
                     
                     return result;
@@ -163,7 +164,7 @@ export class OptionPopup extends Component{
 
             let popup = <Modal key="2" onHide={this.props.onHide} show={this.props.show}>
                 <Modal.Header closeButton>
-                <Modal.Title>Options</Modal.Title>
+                <Modal.Title>{i18n.get_string('options')}</Modal.Title>
                 </Modal.Header>
             
                 {this.state.options && <Modal.Body>
@@ -176,8 +177,8 @@ export class OptionPopup extends Component{
                 </Modal.Body>}
             
                 <Modal.Footer>
-                    <Button variant="secondary" onClick={this.props.onHide}>Annuler</Button>
-                    <Button variant="success" onClick={() => this.onSave()}>Enregistrer</Button>
+                    <Button variant="secondary" onClick={this.props.onHide}>{i18n.get_string('cancel')}</Button>
+                    <Button variant="success" onClick={() => this.onSave()}>{i18n.get_string('save')}</Button>
                 </Modal.Footer>
             </Modal>
 
@@ -197,7 +198,7 @@ export class OptionPopup extends Component{
             let val = this.state.options[key];
             OptionManager.setValue(key, val);
         }
-        FeedbackCtrl.instance.showInfo($glVars.i18n.tags.appName, $glVars.i18n.tags.msgSuccess, 3);
+        FeedbackCtrl.instance.showInfo(i18n.get_string('pluginname'), i18n.get_string('msgsuccess'), 3);
         this.props.onHide(true);
     }
 }

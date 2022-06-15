@@ -14,6 +14,7 @@ import {ReportQuiz} from './reports/ReportQuiz';
 import {ReportActivityCompletion} from './reports/ReportActivityCompletion';
 import { OptionManager } from '../common/Options';
 import { ComboBoxPlus } from '../libs/components/ComboBoxPlus';
+import { i18n } from '../common/i18n';
 
 export class MainView extends Component{
     static defaultProps = { 
@@ -40,19 +41,19 @@ export class MainView extends Component{
                 report: {id: 0, name: "", validation: null, require: {course: true, group: true, student: false, section: false, cm: false}}                
             },
             reportList: [
-                {text: "Achèvement d'activités", value: 3, require:{course: true, group: true, student: true, section: true, cm: false}, validation: function(options){
+                {text: i18n.get_string('activityachievements'), value: 3, require:{course: true, group: true, student: true, section: true, cm: false}, validation: function(options){
                     return (options.course.id > 0 && options.group.id > 0)
                     }
                 },
-                {text: 'Résultats par section', value: 2, require:{course: true, group: true, student: true, section: true, cm: false}, validation: function(options){
+                {text: i18n.get_string('resultsbysection'), value: 2, require:{course: true, group: true, student: true, section: true, cm: false}, validation: function(options){
                     return (options.course.id > 0 && options.group.id > 0)
                     }
                 },
-                {text: "Résultats d'un test", value: 4, require:{course: true, group: true, student: true, section: true, cm: true}, validation: function(options){
+                {text: i18n.get_string('quizresults'), value: 4, require:{course: true, group: true, student: true, section: true, cm: true}, validation: function(options){
                         return (options.course.id > 0 && options.group.id > 0 && options.cm.id > 0)
                     }
                 },
-                {text: 'Analyse par tag', value: 1, require:{course: true, group: true, student: false, section: true, cm: true}, validation: function(options){
+                {text: i18n.get_string('taganalysis'), value: 1, require:{course: true, group: true, student: false, section: true, cm: true}, validation: function(options){
                         return (options.course.id > 0 && options.group.id > 0)
                     }
                 }
@@ -64,13 +65,13 @@ export class MainView extends Component{
         let main = 
             <div>
                 <Jumbotron className='bg-light' style={{padding: "2rem 2rem", marginTop: "1rem"}}>
-                    <h1><img src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHYAAAB0CAMAAABnsTYoAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAMAUExURQAAAABpvwJqvyp9vwRrwAZswAduwAhtwQhuwQtvwgtwwQ5wwQ1wwg5xww9ywxBywxJ0wxN0xBd1whR1xBZ2xBl2wRh3xRp4xR95wR56xR56xh97xyJ8xyV8wiR9xyV+yCZ/yTKBvz+HvSeAySiAySyCyi6Dyy+Eyi+EyzCFyzKGyzaIzDeJzTiJzTiKzTuMzj2MzkGGu2WTr3KVpkCOz0KQz0OR0ESQ0EaS0EeS0UmT0UqU0UyV0kyW0U2W0k6X01KZ01Oa01Oa1FWa1Fid1Vqd1lqe1Vue1l6g1l+h12Ki12Sj2Gak2Gqn2Wqn2muo2Wuo2m2o2m6q2nGq23Ks23St3Hau3Hev3Xiv3Xqw3Xux3n6y3n+03rugbPGgL/qiKvmiK/qjLPqjLfqjLvqkL/qnNfqoOPmqP8efXtqfSMOfYcKfZNegS9GgVdWgUNupX9eoYeGgQvqrQPqsQvquR/qvSPqvSfqwS/qzUfqzUvuzVPu1V/u2V/u2WPu4Xfu5X/u6YPu6Yvu+a/u+bPvEePvEefvGfPzEePzEeZacjJychZidjKGvroC034O24Ia34Ie44Ie44Ym64Yy74o284o+945C945C+45TA5JfB5ZfC5JjC5JrC5ZrE5ZvE5pzF5p/G56DH5qDG56HI56PJ6KTJ6KXK6KjM6arN6qzO6q/Q6q/Q67DQ6rLR67PS7LTT7LbU7LjV7brW7bzX7r3Y7r7Z77/a7/vHgPzIgvzJhPzJhfzKhfzKhvzKh/zLiPzLivzOj/zPk/zQk/zQlPzRlf3ZqP3brv3guf3iu/3hvP3ivMDa78Pb8MPc8Mbd8Mfe8Mje8cvg8szg8s7i89Ll89Lk9NTm89bm9Nno9dvq9d3q9t7s9v7kwP3nyf3oy/7r0v7s0/7t1v7t1/7w3eHt9+Pu+OTv+OXw+Obw+ejx+eny+erz+uz0+u71+/7y4/705fD2+/L3/PP4/PT5/Pb6/f/58v/68//89/j7/fr8/v/8+f/9/P/+/P3+/v7+/wAAAFY5PcMAAAEAdFJOU////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////wBT9wclAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAAGHRFWHRTb2Z0d2FyZQBwYWludC5uZXQgNC4wLjVlhTJlAAAGpklEQVRoQ+2Zd3gURRiHb2MiERIDEj0NEVBaIBpOBSOgB4ooiVgIRTHqKdh7B+wtiiWKiBIQLKBobCiCimADGwlqJCgQxI5SFWJUojLnlN9e9mZ3Lsu5k3sen7z8wXxl92Vv2+zgCzfOOzdfOSbkLY1q3zwXnZ7SiPbts9DnMbG1V6HLc2JqR6PJe2Jp0aKDGNoz0aIDtfYcdGhBqb0VDXpQalHXhEo7HnVNqLQo60KhXYiyLhTasSjrQqFFVRvNWgqq2mjWUlDVhqQd1rdbFmWfveNl3/0PvvcC7DsGVm3fJMMb9rv7DOxeRYO2G7bxhD3viT1JMLVD0O8ZB10BgyPQdkezh+xxPhROCG02Wj2l1YVwOMC1XdCoJCUA2iPhilaXQmKHaQeiTc1AIqjrjIQ7dlFe0EyLphi8CO1JiN1yCCw2qNaPHjVt6oV1DmLXJF8MjQzVoiUGJwrrxkzErsgvLSsrvQ8aGV/YxemqEtrDEbqiVGzzATwSPhcH20HsYRpCd2wUG/3p/KXqRiv+4StSEboijW9Dcf5W9fVDXwxeYZuv27lHip87KZiDvr54CecmEfpc7O0xuvX8dghckiqkhJwnPGGES0Toa4G+GKQWDs3F0D0/Cs3mS4RH1qLLc4qE5v6LhKeptEbO0AceHJZnnC48jWkzggMC0bOMzB6B/ED3tojstM4NDgj26aK40BXaNRzzYZv7xG+09jQiw+hR+kmt6Ccbnitw2POhM2pQ37FySh6SVhRaEW1lz72Wx1WLaJjYwjjicxGbbBmZggo4ZiUq4NMACkZ6MbgsFLq6ZMIdv6KjouSuCRNKSqAls42uZdswJh35lhnPI7Sw3Pre8M9H1sIknKB2iMm4UKgEQwumlizH35Q1fEP/KoRR1DR4O65DLoqnRNGt1kIZ2y5N+v1MqszrbXfHfxYhp/JqHNog2+5JBDbME1+GWKaev9J2XrudXbC5COjVNqOgd4/ehTPrEG8S13O7HYhtPMvLCNxr57LNXkJAprVkIcX/GTIFPJyIiGwv65W1W3r74HR26zHq2S2+M9rK4d0zjL3Ydew3j2USd3AycQeLqY15u26LPK7br0dqMA1ca7c/aplnYBpDNlufELNErpZdVJ3EmJDhosY4EqmpdGzV3rL044rfEf6wtGJpRUVFRDsn6g1YjuzjiDmDkGTT6gKM69JFjbNV5ObRoVXL+B7hYhFGtOyXaQCvLRL1aZSD5FF0PAXj+aIkqBS5L+hQpY1+OErayEu6FxKcDCSH0vEcjCeKkqDwYU4xHcal7YgkyUGCsyuSbLfmw0T1pShrv0MYUxtAkowcbAVJdnVvxpg/WhyI62jzkXTmIdqBIYm8ciTi0gaRdIb+yOkYuta6+pH7IOlMPFpXN1Dk3Doy4j9o3V1SjhTp0nZFkgRzHGij60fORDL6vrWCOslHLBPX0SYhSQ5AwsYmNByNWCYurbEB2f4iBPiR2SzTfErRy6uBEdXV1XT2u5IO49MuQ9acwXBSkDyZjs1pwExREswUuZ/pUKV9T4QKrTlRmoWYY348nkDH5htotSgJ5opcrKN9X4QK7RBk1yPm9EOSvfjM5zOxrN8l4YRX0bFK+5EIFdpsZIn1q3s6cuzyxsICIeWixjAfqS/Qsaz9BuHft/NQoTW+RHoVvUlBFywT1SWzKDJLZmeak2lOrybTQNZ+hZCQX75eu3atSjsKaVIzkFvosfyEzMs8xEoM5bVjO7f2d+o/yXwX8ptK1i5BCFTa9MgHEdk2b3bZ1HJTSsgg3uDHsdupz6BlWXsjQqDSGqchb6MGRz8ZsY1nWFXWhr5FLFBqU/DRaeMwNLQ0T7/EFr64YtPe8A8SHKXWyHL8oLM8lrJXIxXF1p68aNOGFiHBUWuNLKz5WakrRJHR1pw+WliG6bZdG3rjL6QoMbRG8vHSx+aOcmkVKyidiarIjM5BG7r2wz+QDPuKgPOKZ17xq+aXTW3lKIels56PrMDnUm1lsWUVPg27LbocTs6Y6267c9Fb9I+LBaLU7JwDA13Vi7qpnQPB/DzVqjSWTCT0rUuBZm1obGK0CxKjDSdEe01itOGEaMclRDs6nBAt+8/MptcuSIh2IbM2tfZsLm1q7Y2wNql2PJyUptKOvv5dGDnatfBINGs9BR6JZq2XpMEjoVvbBx4J3VpoZP6f2iA0Mpq1sNjQqx0Miw2tWj8kdnRqk+FwQKM2CQon9GlTYXBEm7YDBM5o0rYoxv4VaNG2HYm9K/Fam5LV6xTsWk04/C+LOCax9YczEgAAAABJRU5ErkJggg==' width='32' height='32'/> Apprentimètre</h1>
-                    <p>Faites le suivi rapide de vos dossiers en utilisant le Tableau de bord ou consultez les détails en utilisant les rapports RÉCIT.</p>
+                    <h1><img src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHYAAAB0CAMAAABnsTYoAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAMAUExURQAAAABpvwJqvyp9vwRrwAZswAduwAhtwQhuwQtvwgtwwQ5wwQ1wwg5xww9ywxBywxJ0wxN0xBd1whR1xBZ2xBl2wRh3xRp4xR95wR56xR56xh97xyJ8xyV8wiR9xyV+yCZ/yTKBvz+HvSeAySiAySyCyi6Dyy+Eyi+EyzCFyzKGyzaIzDeJzTiJzTiKzTuMzj2MzkGGu2WTr3KVpkCOz0KQz0OR0ESQ0EaS0EeS0UmT0UqU0UyV0kyW0U2W0k6X01KZ01Oa01Oa1FWa1Fid1Vqd1lqe1Vue1l6g1l+h12Ki12Sj2Gak2Gqn2Wqn2muo2Wuo2m2o2m6q2nGq23Ks23St3Hau3Hev3Xiv3Xqw3Xux3n6y3n+03rugbPGgL/qiKvmiK/qjLPqjLfqjLvqkL/qnNfqoOPmqP8efXtqfSMOfYcKfZNegS9GgVdWgUNupX9eoYeGgQvqrQPqsQvquR/qvSPqvSfqwS/qzUfqzUvuzVPu1V/u2V/u2WPu4Xfu5X/u6YPu6Yvu+a/u+bPvEePvEefvGfPzEePzEeZacjJychZidjKGvroC034O24Ia34Ie44Ie44Ym64Yy74o284o+945C945C+45TA5JfB5ZfC5JjC5JrC5ZrE5ZvE5pzF5p/G56DH5qDG56HI56PJ6KTJ6KXK6KjM6arN6qzO6q/Q6q/Q67DQ6rLR67PS7LTT7LbU7LjV7brW7bzX7r3Y7r7Z77/a7/vHgPzIgvzJhPzJhfzKhfzKhvzKh/zLiPzLivzOj/zPk/zQk/zQlPzRlf3ZqP3brv3guf3iu/3hvP3ivMDa78Pb8MPc8Mbd8Mfe8Mje8cvg8szg8s7i89Ll89Lk9NTm89bm9Nno9dvq9d3q9t7s9v7kwP3nyf3oy/7r0v7s0/7t1v7t1/7w3eHt9+Pu+OTv+OXw+Obw+ejx+eny+erz+uz0+u71+/7y4/705fD2+/L3/PP4/PT5/Pb6/f/58v/68//89/j7/fr8/v/8+f/9/P/+/P3+/v7+/wAAAFY5PcMAAAEAdFJOU////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////wBT9wclAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAAGHRFWHRTb2Z0d2FyZQBwYWludC5uZXQgNC4wLjVlhTJlAAAGpklEQVRoQ+2Zd3gURRiHb2MiERIDEj0NEVBaIBpOBSOgB4ooiVgIRTHqKdh7B+wtiiWKiBIQLKBobCiCimADGwlqJCgQxI5SFWJUojLnlN9e9mZ3Lsu5k3sen7z8wXxl92Vv2+zgCzfOOzdfOSbkLY1q3zwXnZ7SiPbts9DnMbG1V6HLc2JqR6PJe2Jp0aKDGNoz0aIDtfYcdGhBqb0VDXpQalHXhEo7HnVNqLQo60KhXYiyLhTasSjrQqFFVRvNWgqq2mjWUlDVhqQd1rdbFmWfveNl3/0PvvcC7DsGVm3fJMMb9rv7DOxeRYO2G7bxhD3viT1JMLVD0O8ZB10BgyPQdkezh+xxPhROCG02Wj2l1YVwOMC1XdCoJCUA2iPhilaXQmKHaQeiTc1AIqjrjIQ7dlFe0EyLphi8CO1JiN1yCCw2qNaPHjVt6oV1DmLXJF8MjQzVoiUGJwrrxkzErsgvLSsrvQ8aGV/YxemqEtrDEbqiVGzzATwSPhcH20HsYRpCd2wUG/3p/KXqRiv+4StSEboijW9Dcf5W9fVDXwxeYZuv27lHip87KZiDvr54CecmEfpc7O0xuvX8dghckiqkhJwnPGGES0Toa4G+GKQWDs3F0D0/Cs3mS4RH1qLLc4qE5v6LhKeptEbO0AceHJZnnC48jWkzggMC0bOMzB6B/ED3tojstM4NDgj26aK40BXaNRzzYZv7xG+09jQiw+hR+kmt6Ccbnitw2POhM2pQ37FySh6SVhRaEW1lz72Wx1WLaJjYwjjicxGbbBmZggo4ZiUq4NMACkZ6MbgsFLq6ZMIdv6KjouSuCRNKSqAls42uZdswJh35lhnPI7Sw3Pre8M9H1sIknKB2iMm4UKgEQwumlizH35Q1fEP/KoRR1DR4O65DLoqnRNGt1kIZ2y5N+v1MqszrbXfHfxYhp/JqHNog2+5JBDbME1+GWKaev9J2XrudXbC5COjVNqOgd4/ehTPrEG8S13O7HYhtPMvLCNxr57LNXkJAprVkIcX/GTIFPJyIiGwv65W1W3r74HR26zHq2S2+M9rK4d0zjL3Ydew3j2USd3AycQeLqY15u26LPK7br0dqMA1ca7c/aplnYBpDNlufELNErpZdVJ3EmJDhosY4EqmpdGzV3rL044rfEf6wtGJpRUVFRDsn6g1YjuzjiDmDkGTT6gKM69JFjbNV5ObRoVXL+B7hYhFGtOyXaQCvLRL1aZSD5FF0PAXj+aIkqBS5L+hQpY1+OErayEu6FxKcDCSH0vEcjCeKkqDwYU4xHcal7YgkyUGCsyuSbLfmw0T1pShrv0MYUxtAkowcbAVJdnVvxpg/WhyI62jzkXTmIdqBIYm8ciTi0gaRdIb+yOkYuta6+pH7IOlMPFpXN1Dk3Doy4j9o3V1SjhTp0nZFkgRzHGij60fORDL6vrWCOslHLBPX0SYhSQ5AwsYmNByNWCYurbEB2f4iBPiR2SzTfErRy6uBEdXV1XT2u5IO49MuQ9acwXBSkDyZjs1pwExREswUuZ/pUKV9T4QKrTlRmoWYY348nkDH5htotSgJ5opcrKN9X4QK7RBk1yPm9EOSvfjM5zOxrN8l4YRX0bFK+5EIFdpsZIn1q3s6cuzyxsICIeWixjAfqS/Qsaz9BuHft/NQoTW+RHoVvUlBFywT1SWzKDJLZmeak2lOrybTQNZ+hZCQX75eu3atSjsKaVIzkFvosfyEzMs8xEoM5bVjO7f2d+o/yXwX8ptK1i5BCFTa9MgHEdk2b3bZ1HJTSsgg3uDHsdupz6BlWXsjQqDSGqchb6MGRz8ZsY1nWFXWhr5FLFBqU/DRaeMwNLQ0T7/EFr64YtPe8A8SHKXWyHL8oLM8lrJXIxXF1p68aNOGFiHBUWuNLKz5WakrRJHR1pw+WliG6bZdG3rjL6QoMbRG8vHSx+aOcmkVKyidiarIjM5BG7r2wz+QDPuKgPOKZ17xq+aXTW3lKIels56PrMDnUm1lsWUVPg27LbocTs6Y6267c9Fb9I+LBaLU7JwDA13Vi7qpnQPB/DzVqjSWTCT0rUuBZm1obGK0CxKjDSdEe01itOGEaMclRDs6nBAt+8/MptcuSIh2IbM2tfZsLm1q7Y2wNql2PJyUptKOvv5dGDnatfBINGs9BR6JZq2XpMEjoVvbBx4J3VpoZP6f2iA0Mpq1sNjQqx0Miw2tWj8kdnRqk+FwQKM2CQon9GlTYXBEm7YDBM5o0rYoxv4VaNG2HYm9K/Fam5LV6xTsWk04/C+LOCax9YczEgAAAABJRU5ErkJggg==' width='32' height='32'/> {i18n.get_string('pluginname')}</h1>
+                    <p>{i18n.get_string('dashboarddesc')}</p>
                     <Nav variant="pills" activeKey={this.state.selectedView} onSelect={this.onSelect}>
                         <Nav.Item>
-                            <Nav.Link href="#" eventKey={0}><FontAwesomeIcon icon={faTachometerAlt}/> Tableau de bord</Nav.Link>
+                            <Nav.Link href="#" eventKey={0}><FontAwesomeIcon icon={faTachometerAlt}/> {i18n.get_string('dashboard')}</Nav.Link>
                         </Nav.Item>
-                        <NavDropdown variant="outline-primary"   title={<span><FontAwesomeIcon icon={faFileAlt}/>{this.state.options.report.name.length === 0 ? " Rapports" : ` ${this.state.options.report.name} `}</span>} id="btnReports" >
+                        <NavDropdown variant="outline-primary" title={<span><FontAwesomeIcon icon={faFileAlt}/> {this.state.options.report.name.length === 0 ? i18n.get_string('report') : this.state.options.report.name}</span>} id="btnReports" >
                             {this.state.reportList.map((item, index) => {
                                 return <NavDropdown.Item eventKey={item.value} key={index}>{item.text}</NavDropdown.Item>;
                             })}
@@ -187,12 +188,12 @@ class DashboardView extends Component{
         if (!this.state.options) return null;
         let main =
             <div>
-                <Header options={this.props.options} title={"Tableau de bord"}/>
+                <Header options={this.props.options} title={i18n.get_string('pluginname')}/>
                 <div style={{display: 'flex', justifyContent: 'right'}}>
-                    <NavDropdown variant="outline-primary" style={{textAlign:'right'}} title="Afficher un gadget">
-                        <NavDropdown.Item onClick={(e) => this.onHide('showworkfollowupwidget', 1)}>Suivi des travaux</NavDropdown.Item>
-                        <NavDropdown.Item onClick={(e) => this.onHide('showstudentfollowupwidget', 1)}>Suivi des élèves</NavDropdown.Item>
-                        <NavDropdown.Item onClick={(e) => this.onHide('showgroupsoverviewwidget', 1)}>Aperçu rapide de mes groupes</NavDropdown.Item>
+                    <NavDropdown variant="outline-primary" style={{textAlign:'right'}} title={i18n.get_string('gadget')}>
+                        <NavDropdown.Item onClick={(e) => this.onHide('showworkfollowupwidget', 1)}>{i18n.get_string('worktracking')}</NavDropdown.Item>
+                        <NavDropdown.Item onClick={(e) => this.onHide('showstudentfollowupwidget', 1)}>{i18n.get_string('studenttracking')}</NavDropdown.Item>
+                        <NavDropdown.Item onClick={(e) => this.onHide('showgroupsoverviewwidget', 1)}>{i18n.get_string('overviewofmygroups')}</NavDropdown.Item>
                     </NavDropdown>
                 </div>
                 <br/>
@@ -327,40 +328,40 @@ class FilterOptions extends Component{
 
         let main = 
                 <div className='filter-options'>
-                    <h6>Options de filtrage <Button variant="link" size="sm" onClick={() => {this.setState({collapse: !this.state.collapse})}}>{this.state.collapse ? <FontAwesomeIcon icon={faMinus}/> : <FontAwesomeIcon icon={faPlus}/>}</Button></h6>
+                    <h6>{i18n.get_string('filteroptions')} <Button variant="link" size="sm" onClick={() => {this.setState({collapse: !this.state.collapse})}}>{this.state.collapse ? <FontAwesomeIcon icon={faMinus}/> : <FontAwesomeIcon icon={faPlus}/>}</Button></h6>
                     <Collapse in={this.state.collapse}>
                         <div>
                             <div className='filter-container'>
                                 <div className='filter-item'>
-                                    <strong>Cours</strong>
-                                    <ComboBoxPlus disabled={!options.report.require.course} placeholder={"Sélectionnez votre option"} options={this.state.courseList} onChange={this.onDataChange} name="course.id" value={options.course.id}/>
+                                    <strong>{i18n.get_string('course')}</strong>
+                                    <ComboBoxPlus disabled={!options.report.require.course} placeholder={i18n.get_string('selectyouroption')} options={this.state.courseList} onChange={this.onDataChange} name="course.id" value={options.course.id}/>
                                 </div>
                                 <div className='filter-item'>
                                     <div>
-                                        <strong>Groupe</strong>
-                                        <ComboBoxPlus disabled={!options.report.require.group} placeholder={"Tous les groupes"} options={this.state.groupList} onChange={this.onDataChange} name="group.id" value={options.group.id}/>
+                                        <strong>{i18n.get_string('groups')}</strong>
+                                        <ComboBoxPlus disabled={!options.report.require.group} placeholder={i18n.get_string('all')} options={this.state.groupList} onChange={this.onDataChange} name="group.id" value={options.group.id}/>
                                     </div>  
                                     <br/>
                                     <div>
-                                        <strong>Élèves</strong>
-                                        <ComboBoxPlus disabled={!options.report.require.student} placeholder={"Tous les élèves"} options={studentList} onChange={this.onDataChange} name="student.id" value={options.student.id}/>
+                                        <strong>{i18n.get_string('students')}</strong>
+                                        <ComboBoxPlus disabled={!options.report.require.student} placeholder={i18n.get_string('all')} options={studentList} onChange={this.onDataChange} name="student.id" value={options.student.id}/>
                                     </div>  
                                 </div>
                                 <div className='filter-item'>
                                     <div>
-                                        <strong>Sections</strong>
-                                        <ComboBoxPlus disabled={!options.report.require.section} placeholder={"Toutes les sections"} options={this.state.sectionList} onChange={this.onDataChange} name="section.id" value={options.section.id}/>
+                                        <strong>{i18n.get_string('sections')}</strong>
+                                        <ComboBoxPlus disabled={!options.report.require.section} placeholder={i18n.get_string('all')} options={this.state.sectionList} onChange={this.onDataChange} name="section.id" value={options.section.id}/>
                                     </div>
                                     <br/>
                                     <div>
-                                        <strong>Activités</strong>
-                                        <ComboBoxPlus disabled={!options.report.require.cm} placeholder={"Toutes les activités"} options={this.state.activityList} onChange={this.onDataChange} name="cm.id" value={options.cm.id}/>
+                                        <strong>{i18n.get_string('activities')}</strong>
+                                        <ComboBoxPlus disabled={!options.report.require.cm} placeholder={i18n.get_string('all')} options={this.state.activityList} onChange={this.onDataChange} name="cm.id" value={options.cm.id}/>
                                     </div>  
                                 </div>
 
                                 <div className='filter-item'>
                                     <Button variant='primary' onClick={this.props.onGo} disabled={this.disableBtnGo()}>
-                                        <FontAwesomeIcon icon={faSearchPlus}/>  Allez
+                                        <FontAwesomeIcon icon={faSearchPlus}/>  {i18n.get_string('go')}
                                     </Button>
                                 </div>
                             </div>
@@ -453,7 +454,7 @@ class FilterOptions extends Component{
             this.setState({groupList: groupList, studentList: studentList});
         }
         else{
-            $glVars.feedback.showError($glVars.i18n.tags.appname, result.msg);
+            $glVars.feedback.showError(i18n.get_string('pluginname'), result.msg);
             this.setState({groupList: [], studentList: []});
         }
     }

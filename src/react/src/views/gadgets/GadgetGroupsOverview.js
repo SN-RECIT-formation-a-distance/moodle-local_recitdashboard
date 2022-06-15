@@ -5,6 +5,7 @@ import { ResponsivePie } from '@nivo/pie';
 import {faSync, faTimesCircle} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {$glVars, AppCommon} from '../../common/common';
+import { i18n } from '../../common/i18n';
 
 export class GadgetGroupsOverview extends Component{
     static defaultProps = {        
@@ -47,7 +48,7 @@ export class GadgetGroupsOverview extends Component{
             this.setState({dataProvider: result.data, show: true});
         }
         else{
-            $glVars.feedback.showError($glVars.i18n.tags.appname, result.msg);
+            $glVars.feedback.showError(i18n.get_string('pluginname'), result.msg);
             this.setState({dataProvider: [], show: false});
         }
     }
@@ -61,12 +62,12 @@ export class GadgetGroupsOverview extends Component{
             <Card className="gadget-groups-overview">
                 <Card.Body>
                     <Card.Title>
-                        <div>{"Aperçu rapide de mes groupes "}</div>
+                        <div>{i18n.get_string('overviewofmygroups')}</div>
                         
-                        <ButtonToolbar aria-label="Toolbar with Buttons">
-                            <ButtonGroup  >
-                                <Button  variant="outline-secondary" onClick={this.getData} title="Mettre à jour le gadget"><FontAwesomeIcon icon={faSync}/></Button>
-                                <Button  variant="outline-secondary" onClick={this.onClose} title="Enlever le gadget"><FontAwesomeIcon icon={faTimesCircle}/></Button>
+                        <ButtonToolbar>
+                            <ButtonGroup>
+                                <Button  variant="outline-secondary" onClick={this.getData} title={i18n.get_string('updategadget')}><FontAwesomeIcon icon={faSync}/></Button>
+                                <Button  variant="outline-secondary" onClick={this.onClose} title={i18n.get_string('removegadget')}><FontAwesomeIcon icon={faTimesCircle}/></Button>
                             </ButtonGroup>
                         </ButtonToolbar>                              
                     </Card.Title>
@@ -96,15 +97,15 @@ class PieChart extends Component{
 
     render(){
         let item = this.props.data.grades || this.props.data.progress;
-        let title = (item.group.name.length > 0 ? `Groupe ${item.group.name}` : `Pas de groupe`)
+        let title = (item.group.name.length > 0 ? i18n.get_string('group') + ' ' + item.group.name : i18n.get_string('nogroup'))
 
         let main = 
             <div className='item'>
                 <h6 className='item-title'>{title}</h6>
                 
                 <div className='charts'>
-                    {this.getChart(this.props.data.progress, 'Progrès')}
-                    {this.getChart(this.props.data.grades, 'Notes')}
+                    {this.getChart(this.props.data.progress, i18n.get_string('progress'))}
+                    {this.getChart(this.props.data.grades, i18n.get_string('grades'))}
                 </div>
             </div>;
         return main;

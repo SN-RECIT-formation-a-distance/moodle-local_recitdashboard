@@ -4,6 +4,7 @@ import { faCheck, faTimes} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {JsNx} from '../../libs/utils/Utils';
 import {$glVars, Options} from '../../common/common';
+import { i18n } from '../../common/i18n';
 
 export class ReportActivityCompletion  extends Component{
     static defaultProps = {        
@@ -42,7 +43,7 @@ export class ReportActivityCompletion  extends Component{
             this.setState({dataProvider: result.data});
         }
         else{
-            $glVars.feedback.showError($glVars.i18n.tags.appname, result.msg);
+            $glVars.feedback.showError(i18n.get_string('pluginname'), result.msg);
         }
     }
 
@@ -66,8 +67,8 @@ export class ReportActivityCompletion  extends Component{
                     <DataGrid orderBy={true}>
                         <DataGrid.Header>
                             <DataGrid.Header.Row>
-                                <DataGrid.Header.Cell style={{minWidth: "120px"}}>{"Prénom"}</DataGrid.Header.Cell>
-                                <DataGrid.Header.Cell style={{minWidth: "100px"}}>{"Nom"}</DataGrid.Header.Cell>
+                                <DataGrid.Header.Cell style={{minWidth: "120px"}}>{i18n.get_string('firstname')}</DataGrid.Header.Cell>
+                                <DataGrid.Header.Cell style={{minWidth: "100px"}}>{i18n.get_string('lastname')}</DataGrid.Header.Cell>
                                 {activityList.map((item, index) => {
                                     if(!this.filterSectionAndCm(item)){ return null;}
 

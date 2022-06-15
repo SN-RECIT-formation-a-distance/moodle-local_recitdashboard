@@ -7,6 +7,7 @@ import {DataGrid, MultipleSelect} from '../../libs/components/Components';
 import {JsNx} from '../../libs/utils/Utils';
 import {Cookies} from '../../libs/utils/Cookies';
 import {$glVars, Options, AppCommon} from '../../common/common';
+import { i18n } from '../../common/i18n';
 
 export class ReportDiagnosticTags extends Component{
     static defaultProps = {
@@ -57,7 +58,7 @@ export class ReportDiagnosticTags extends Component{
             this.setState({data: result.data, tagList: tagList});
         }
         else{
-            $glVars.feedback.showError($glVars.i18n.tags.appname, result.msg);
+            $glVars.feedback.showError(i18n.get_string('pluginname'), result.msg);
         }
     }
 
@@ -92,25 +93,25 @@ export class ReportDiagnosticTags extends Component{
         <div>
             <br/>
             <br/>
-            <h5>Options d'affichage <Button variant="link" size="sm" onClick={() => {this.setState({collapse: !this.state.collapse})}}>{this.state.collapse ? <FontAwesomeIcon icon={faMinus}/> : <FontAwesomeIcon icon={faPlus}/>}</Button></h5>
+            <h5>{i18n.get_string('viewoptions')} <Button variant="link" size="sm" onClick={() => {this.setState({collapse: !this.state.collapse})}}>{this.state.collapse ? <FontAwesomeIcon icon={faMinus}/> : <FontAwesomeIcon icon={faPlus}/>}</Button></h5>
             <Collapse in={this.state.collapse}>
                 <div style={{padding: '.5rem', marginBottom: ".5rem"}}>
                     <div style={{display: "flex", justifyContent: "left", padding: '1rem'}}>                
-                        <AlertRange title="Intervalle de danger" width="330px" min={this.state.data.htmlCellContext.minDanger} max={this.state.data.htmlCellContext.maxDanger} suffix="Danger" onDataChange={this.onOptionChange}/>
-                        <AlertRange title="Intervalle d'alerte" width="330px"  min={this.state.data.htmlCellContext.minWarning} max={this.state.data.htmlCellContext.maxWarning} suffix="Warning" onDataChange={this.onOptionChange}/>
-                        <AlertRange title="Intervalle de réussite" width="330px" min={this.state.data.htmlCellContext.minSuccess} max={this.state.data.htmlCellContext.maxSuccess} suffix="Success" onDataChange={this.onOptionChange}/>
+                        <AlertRange title={i18n.get_string('intervaldanger')} width="330px" min={this.state.data.htmlCellContext.minDanger} max={this.state.data.htmlCellContext.maxDanger} suffix="Danger" onDataChange={this.onOptionChange}/>
+                        <AlertRange title={i18n.get_string('intervalalert')} width="330px"  min={this.state.data.htmlCellContext.minWarning} max={this.state.data.htmlCellContext.maxWarning} suffix="Warning" onDataChange={this.onOptionChange}/>
+                        <AlertRange title={i18n.get_string('intervalsuccess')} width="330px" min={this.state.data.htmlCellContext.minSuccess} max={this.state.data.htmlCellContext.maxSuccess} suffix="Success" onDataChange={this.onOptionChange}/>
                     </div>
-                    <MultipleSelect style={{padding: ".5rem"}} values={this.state.options.tagFilter} placeholder="Filtrez par tags..." name="tagFilter" options={this.state.tagList} onDataChange={this.onOptionChange}/>
+                    <MultipleSelect style={{padding: ".5rem"}} values={this.state.options.tagFilter} placeholder={i18n.get_string('filterbytags')} name="tagFilter" options={this.state.tagList} onDataChange={this.onOptionChange}/>
                 </div>
             </Collapse>
             <hr/>
             <br/>
-            <h5>Aperçu des élèves</h5>
+            <h5>{i18n.get_string('studentsoverview')}</h5>
             <DataGrid orderBy={true}>
                 <DataGrid.Header>
                     <DataGrid.Header.Row>
-                        <DataGrid.Header.Cell style={{minWidth: "120px"}}>{"Prénom"}</DataGrid.Header.Cell>
-                        <DataGrid.Header.Cell style={{minWidth: "100px"}}>{"Nom"}</DataGrid.Header.Cell>
+                        <DataGrid.Header.Cell style={{minWidth: "120px"}}>{i18n.get_string('firstname')}</DataGrid.Header.Cell>
+                        <DataGrid.Header.Cell style={{minWidth: "100px"}}>{i18n.get_string('lastname')}</DataGrid.Header.Cell>
                         {tagList.map((item, index) => {
                             return <DataGrid.Header.Cell key={index}>{item}</DataGrid.Header.Cell>
                         })}
@@ -138,7 +139,7 @@ export class ReportDiagnosticTags extends Component{
                 </DataGrid.Body>
             </DataGrid>
             <br/>
-            <h5>Aperçu du groupe</h5>
+            <h5>{i18n.get_string('groupoverview')}</h5>
             {data.groups.map((group, index) => {
                 let groupCard = 
                     <Card key={index}>

@@ -3,6 +3,7 @@ import {Card, ButtonGroup, Button, Badge, Alert, ButtonToolbar, OverlayTrigger, 
 import {faSync, faTimesCircle, faThumbsUp, faInfo} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {$glVars} from '../../common/common';
+import { i18n } from '../../common/i18n';
 
 export class GadgetWorkFollowup extends Component{
     static defaultProps = {        
@@ -43,7 +44,7 @@ export class GadgetWorkFollowup extends Component{
             this.setState({dataProvider: result.data, show: true});
         }
         else{
-            $glVars.feedback.showError($glVars.i18n.tags.appname, result.msg);
+            $glVars.feedback.showError(i18n.get_string('pluginname'), result.msg);
             this.setState({dataProvider: [], show: false});
         }
     }
@@ -56,20 +57,20 @@ export class GadgetWorkFollowup extends Component{
         let nbItems = 0;
 
         for(let item of this.state.dataProvider){
-            nbItems += item.nbItems;
+            nbItems += parseFloat(item.nbItems);
         }
         
         let main = 
             <Card className='gadget'>
                 <Card.Body>
                     <Card.Title>
-                        <span>{`Suivi des travaux`}</span>
-                        <span><Badge pill variant="primary">{nbItems}</Badge>{` item(s) à suivre`}</span>
-                        <ButtonToolbar aria-label="Toolbar with Buttons">
+                        <span>{i18n.get_string('worktracking')}</span>
+                        <span><Badge pill variant="primary">{nbItems}</Badge> {i18n.get_string('itemtofollow')}</span>
+                        <ButtonToolbar>
                             <ButtonGroup className="mr-2">
-                                <Button  variant="outline-secondary" onClick={this.getData} title="Mettre à jour le gadget"><FontAwesomeIcon icon={faSync}/></Button>
-                                <Button  variant="outline-secondary"  onClick={this.onClose} title="Enlever le gadget"><FontAwesomeIcon icon={faTimesCircle}/></Button>
-                                <OverlayTrigger placement="left" delay={{ show: 250 }} overlay={<Tooltip>{`La pastille de couleur passe du jaune au rouge lorsqu'un travail remis par l'élève date de plus de 7 jours.`}</Tooltip>}>
+                                <Button variant="outline-secondary" onClick={this.getData} title={i18n.get_string('updategadget')}><FontAwesomeIcon icon={faSync}/></Button>
+                                <Button variant="outline-secondary"  onClick={this.onClose} title={i18n.get_string('removegadget')}><FontAwesomeIcon icon={faTimesCircle}/></Button>
+                                <OverlayTrigger placement="left" delay={{ show: 250 }} overlay={<Tooltip>{i18n.get_string('worktrackinfo')}</Tooltip>}>
                                     <Button variant="outline-secondary"><FontAwesomeIcon icon={faInfo}/></Button>
                                 </OverlayTrigger>
                             </ButtonGroup>
@@ -89,7 +90,7 @@ export class GadgetWorkFollowup extends Component{
 
                             let result = 
                                 <Alert variant={variant} key={index} style={{margin: '.5rem'}}>
-                                    <b>Activité: <a href={item.url} target={"_blank"}>{`${item.cmName} `}</a></b>
+                                    <b>{i18n.get_string('activity')}: <a href={item.url} target={"_blank"}>{`${item.cmName} `}</a></b>
                                     <br/>
                                     <h2 style={{display: 'inline'}}><Badge pill variant="primary">{item.nbItems}</Badge></h2>
                                     <span>{` ${item.extra.description}.`}</span>
@@ -97,7 +98,7 @@ export class GadgetWorkFollowup extends Component{
                             return result;
                         })}
 
-                        {this.state.dataProvider.length === 0 &&  <Alert variant="success">{"Pas de suivi à faire. "}<FontAwesomeIcon icon={faThumbsUp}/></Alert>}
+                        {this.state.dataProvider.length === 0 &&  <Alert variant="success">{i18n.get_string('nofollowuptodo')}<FontAwesomeIcon icon={faThumbsUp}/></Alert>}
                     </div>
                 </Card.Body>
             </Card>;

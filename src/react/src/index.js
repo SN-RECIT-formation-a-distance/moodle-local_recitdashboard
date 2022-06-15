@@ -12,7 +12,6 @@ import {VisualFeedback, Loading} from "./libs/components/Components";
 import {MainView} from "./views/Views";
 import {$glVars} from "./common/common";
 import "./common/style.scss";
-export * from "./common/i18n";
 
 class App extends Component {
     static defaultProps = {
