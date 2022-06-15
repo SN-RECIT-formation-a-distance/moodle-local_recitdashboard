@@ -209,7 +209,7 @@ class DashboardView extends Component{
         if (!this.state.options) return null;
         let main =
             <div>
-                <Header options={this.props.options} title={i18n.get_string('pluginname')}/>
+                <Header options={this.props.options} title={i18n.get_string('dashboard')}/>
                 <div style={{display: 'flex', justifyContent: 'right'}}>
                     <NavDropdown variant="outline-primary" style={{textAlign:'right'}} title={i18n.get_string('gadget')}>
                         <NavDropdown.Item onClick={(e) => this.onHide('showworkfollowupwidget', 1)}>{i18n.get_string('worktracking')}</NavDropdown.Item>
