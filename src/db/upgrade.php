@@ -12,15 +12,14 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Define plugin data upgrade.
- *
- * @package     dashboard
- * @copyright   RECITFAD
- * @author      RECITFAD
- * @license     {@link http://www.gnu.org/licenses/gpl-3.0.html} GNU GPL v3 or later
+ * RÉCIT Dashboard 
+ * 
+ * @package   local_recitdashboard
+ * @copyright 2019 RÉCIT 
+ * @license   {@link http://www.gnu.org/licenses/gpl-3.0.html} GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
