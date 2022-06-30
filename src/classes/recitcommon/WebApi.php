@@ -48,7 +48,7 @@ abstract class AWebApi
             }
             
             flush();
-            echo json_encode( new WebApiResult(false, null, AWebApi::$lastError['message']));
+            echo json_encode(new WebApiResult(false, null, AWebApi::$lastError['message']));
         }
     }
 
@@ -70,8 +70,9 @@ abstract class AWebApi
     }
 
     public function preProcessRequest(){
+        require_sesskey();
         if(!isset($this->request['service'])){
-            $msg =  "Service web non spécifié.";
+            $msg = get_string('notfound');
             $success = false;
 
             if($_SERVER['REQUEST_METHOD'] == "OPTIONS"){
@@ -84,7 +85,7 @@ abstract class AWebApi
         }
 		
         if(!PersistCtrl::getInstance()->checkSession()){
-            $this->lastResult = new WebApiResult(false, null, "Utilisateur non connecté.");
+            $this->lastResult = new WebApiResult(false, null, get_string('notloggedin'));
             return false;
         }
 

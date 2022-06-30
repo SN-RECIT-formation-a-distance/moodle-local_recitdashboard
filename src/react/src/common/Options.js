@@ -30,7 +30,7 @@ export class Options
     static appVersion(){ return packageJson.version; }
 
     static getGateway(){
-        return `${M.cfg.wwwroot}/local/recitdashboard/classes/WebApi.php`;
+        return `${M.cfg.wwwroot}/local/recitdashboard/classes/WebApi.php?sesskey=${M.cfg.sesskey}`;
     }
 }
 
