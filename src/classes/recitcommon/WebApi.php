@@ -63,14 +63,9 @@ abstract class AWebApi
     }
 
     public function getRequest(){
-        if(empty($_REQUEST)){
-            $this->request = json_decode(file_get_contents('php://input'), true);
-            if($this->request == null){
-                $this->request = array();
-            }
-        }
-        else{
-            $this->request = $_REQUEST;
+        $this->request = json_decode(file_get_contents('php://input'), true);
+        if($this->request == null){
+            $this->request = array();
         }
     }
 
