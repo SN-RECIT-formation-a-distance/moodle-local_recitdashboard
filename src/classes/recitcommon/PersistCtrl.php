@@ -344,7 +344,7 @@ class DiagTagPersistCtrl extends MoodlePersistCtrl
         inner join {tag_instance} t6 on t6.itemid = t5.id and t6.itemtype = 'course_modules'
         inner join {tag} t7 on t6.tagid = t7.id
         where t1.course = $courseId and $userStmt and $groupStmt
-        group by t1.id, t1.name, t2.timeseen, timeEnd, t4.id, t4.firstname, t4.lastname, t5.id, t7.id, t7.name";
+        group by t1.id, t1.name, t2.timeseen, time_end, t4.id, t4.firstname, t4.lastname, t5.id, t7.id, t7.name";
 
         $tmp = $this->getRecordsSQL($query);
         return (empty($tmp) ? array() : $tmp);

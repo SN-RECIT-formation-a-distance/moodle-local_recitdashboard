@@ -37,7 +37,7 @@ abstract class AWebApi
             AWebApi::$lastError = error_get_last(); 
         }
 
-        if(AWebApi::$lastError != NULL) {
+        if(AWebApi::$lastError != NULL && php_sapi_name() !== "cli") {
             $headers = AWebApi::getDefaultHeaders();
             $headers[] = 'Status: 500 Internal Server Error';
             $headers[] = "Content-type: application/json; charset=utf-8";  

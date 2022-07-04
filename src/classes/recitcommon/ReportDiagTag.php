@@ -122,6 +122,18 @@ class ReportDiagTagContent
         usort($this->students, array($this, "sortStudents"));
     }
 
+    public function getData(){
+        $data = new stdClass();
+        
+        $data->reportName = $this->reportName;
+        $data->students = $this->students;
+        $data->groups = $this->groups;
+        $data->groupList = $this->groupList;
+        $data->tagList = $this->tagList;
+        $data->htmlCellContext = $this->htmlCellContext;
+        return $data;
+    }
+
     protected function sortStudents($a, $b){
         $str1 = $a->firstName . " " . $a->lastName;
         $str2 = $b->firstName . " " . $b->lastName;

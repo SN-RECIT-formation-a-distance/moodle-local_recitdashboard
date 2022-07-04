@@ -368,8 +368,9 @@ class WebApi extends MoodleApi
                 return new WebApiResult(true, $data, "", 'application/csv');
             }
             else{
-                $this->prepareJson($result);
-                return new WebApiResult(true, $result);
+                $data = $result->getData();
+                $this->prepareJson($data);
+                return new WebApiResult(true, $data);
             }
         }
         catch(Exception $ex){

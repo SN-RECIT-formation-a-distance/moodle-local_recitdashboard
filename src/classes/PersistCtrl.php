@@ -190,12 +190,10 @@ class PersistCtrl extends MoodlePersistCtrl
 
         $result = array_values($result);
 
-        function cmp($a, $b) {
-            return strcmp($a->progress->group->name, $b->progress->group->name);
-        }
-
         // sort by student name and question slot
-        usort($result, "recitdashboard\cmp");
+        usort($result, function($a, $b) {
+            return strcmp($a->progress->group->name, $b->progress->group->name);
+        });
 
         return $result;
     }
