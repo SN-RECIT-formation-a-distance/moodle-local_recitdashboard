@@ -70,12 +70,12 @@ abstract class AWebApi
     }
 
     public function preProcessRequest(){
-        require_sesskey();
+        //require_sesskey();
         if(!isset($this->request['service'])){
             $msg = get_string('notfound');
             $success = false;
 
-            if($_SERVER['REQUEST_METHOD'] == "OPTIONS"){
+            if(isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] == "OPTIONS"){
                 $msg = "Replying OPTIONS request";
                 $success = true;
             }

@@ -377,9 +377,3 @@ class WebApi extends MoodleApi
         }     
     }  
 }
-
-///////////////////////////////////////////////////////////////////////////////////
-$webapi = new WebApi($DB, $COURSE, $USER);
-$webapi->getRequest($_REQUEST);
-$webapi->processRequest();
-$webapi->replyClient();
