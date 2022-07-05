@@ -296,12 +296,13 @@ class FilterOptions extends Component{
 
         this.state = {
             collapse: true,
-            dataProvider: [],             
-            courseList: [], 
+            dataProvider: [],
+            courseList: [],
             sectionList: [],
             activityList: [],           
             groupList: [],
-            studentList: []
+            studentList: [],
+            loaded: false
         };
     }
 
@@ -317,11 +318,11 @@ class FilterOptions extends Component{
         if(result.success){
             let courseList = [];
             for(let item of result.data){
-                if(JsNx.getItem(courseList, 'value', item.courseId, null) === null){
-                    courseList.push({text: item.courseName, value: item.courseId, data: item});
+                if(JsNx.getItem(courseList, 'value', parseInt(item.courseId), null) === null){
+                    courseList.push({text: item.courseName, value: parseInt(item.courseId), data: item});
                 }
             }
-            this.setState({dataProvider: result.data, courseList: courseList, sectionList: [], activityList: []}, this.onAfterDataResult);
+            this.setState({dataProvider: result.data, courseList: courseList, sectionList: [], activityList: [], loaded: true}, this.onAfterDataResult);
         }
         else{
             $glVars.feedback.showError($glVars.i18n.tags.appname, result.msg);
@@ -340,6 +341,8 @@ class FilterOptions extends Component{
     }
     
     render(){
+        if (!this.state.loaded) return null;
+
         let options = this.props.options;
 
         let studentList = this.state.studentList;

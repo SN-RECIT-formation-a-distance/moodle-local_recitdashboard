@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import Select from 'react-select'
+import { JsNx } from '../utils/Utils';
 
 export class ComboBoxPlus extends Component {
     static defaultProps = {        
@@ -27,6 +28,8 @@ export class ComboBoxPlus extends Component {
     
     render() {     
         let options = this.props.options;
+
+        let val = JsNx.getItem(options, 'value', this.state.value, null);
         for (let o of options){
             o.label = o.text;
         }
@@ -37,7 +40,7 @@ export class ComboBoxPlus extends Component {
         }
 
         let main = 
-            <Select {...spreadAttr} onChange={this.onChange} defaultValue={this.props.value} placeholder={this.props.placeholder}>
+            <Select {...spreadAttr} onChange={this.onChange} defaultValue={val} placeholder={this.props.placeholder}>
             </Select>;            
         return (main);
     }   
