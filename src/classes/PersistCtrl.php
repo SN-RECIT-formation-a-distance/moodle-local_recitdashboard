@@ -749,7 +749,7 @@ class PersistCtrl extends MoodlePersistCtrl
         );
 
         $options = array();
-        $rst = $DB->get_records('recitdashboard_options', array('userid' => $userId));
+        $rst = $DB->get_records('local_recitdashboard_options', array('userid' => $userId));
         if (!empty($rst)){
             foreach ($rst as $v){
                 $options[$v->name] = $v->value;
@@ -767,7 +767,7 @@ class PersistCtrl extends MoodlePersistCtrl
 
     public function setUserOption($userId, $key, $value){
         global $DB;
-        $DB->execute("insert into {recitdashboard_options} (userid, name, value)
+        $DB->execute("insert into {local_recitdashboard_options} (userid, name, value)
         values(?, ?, ?)
         ON DUPLICATE KEY UPDATE value = ?", [$userId, $key, $value, $value]);
     }

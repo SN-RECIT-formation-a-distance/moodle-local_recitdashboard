@@ -34,9 +34,14 @@ function xmldb_local_recitdashboard_upgrade($oldversion) {
     global $DB;
     $dbman = $DB->get_manager();
 
-    $newversion = 2022020901;
+    $newversion = 2022020904;
     if($oldversion < $newversion){
-        $table = new xmldb_table('recitdashboard_options');
+        $oldtable = new xmldb_table('recitdashboard_options');
+        $table = new xmldb_table('local_recitdashboard_options');
+
+        if ($dbman->table_exists($oldtable)) {
+            $dbman->rename_table($oldtable, 'local_recitdashboard_options');
+        }
 
         if (!$dbman->table_exists($table)) {
             $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
@@ -50,7 +55,7 @@ function xmldb_local_recitdashboard_upgrade($oldversion) {
             new xmldb_field('value', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, null, null),
         );
 
-        // Conditionally launch add field jsoncontent.
+        // Conditionally launch add fields
         foreach ($fields as $field){
             if (!$dbman->field_exists($table, $field)) {
                 $dbman->add_field($table, $field);
@@ -59,7 +64,7 @@ function xmldb_local_recitdashboard_upgrade($oldversion) {
 
         $table->add_key('unique_option', XMLDB_KEY_UNIQUE, array('userid', 'name'));
 
-        upgrade_plugin_savepoint(true,  $newversion, 'local', 'recitdashboard');
+        upgrade_plugin_savepoint(true, $newversion, 'local', 'recitdashboard');
     }
 
 
