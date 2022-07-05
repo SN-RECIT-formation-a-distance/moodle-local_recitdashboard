@@ -44,10 +44,19 @@ class MainView{
         $this->selectedCourseId = $selectedCourseId;
     }
 
-    public function display(){    
+    public function display(){
         $studentId = $this->user->id;
         $selectedCourseId = ($this->selectedCourseId > 1 ? $this->selectedCourseId : 0);
-        echo sprintf("<div id='recit_dashboard' data-student-id='%ld' data-course-id='%ld'></div>", $studentId, $selectedCourseId);
+        if ($this->hasAccess()){
+            echo sprintf("<div id='recit_dashboard' data-student-id='%ld' data-course-id='%ld'></div>", $studentId, $selectedCourseId);
+        }else{
+            print_error('accessdenied', 'admin');
+        }
+    }
+
+    public function hasAccess(){
+        global $DB;
+        return $DB->record_exists_sql('select id from {role_assignments} where userid=:userid and roleid in (select roleid from {role_capabilities} where capability=:name1)', ['userid' => $this->user->id, 'name1' => RECITDASHBOARD_ACCESS_CAPABILITY]);
     }
 }
 
