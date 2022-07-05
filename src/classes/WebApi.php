@@ -15,8 +15,8 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * RÉCIT Dashboard 
- * 
+ * RÉCIT Dashboard
+ *
  * @package   local_recitdashboard
  * @copyright 2019 RÉCIT 
  * @license   {@link http://www.gnu.org/licenses/gpl-3.0.html} GNU GPL v3 or later
@@ -32,6 +32,9 @@ require_once(dirname(__FILE__).'/../lib.php');
 use Exception;
 use stdClass;
 
+/**
+ * Web API class
+ */
 class WebApi extends MoodleApi
 {
     public function __construct($DB, $COURSE, $USER){
@@ -39,7 +42,12 @@ class WebApi extends MoodleApi
         PersistCtrl::getInstance($DB, $USER);
     }
     /**
-     * $level [a = admin | s = student]
+     * This function checks if user has access to access resource
+     * 
+     * @param string $level [a = admin | s = student]
+     * @param int $cmId
+     * @param int $userId
+     * @param int $courseId
      */
     public function canUserAccess($level, $cmId = 0, $userId = 0, $courseId = 0){
         global $DB;
@@ -60,6 +68,11 @@ class WebApi extends MoodleApi
         }
     }
     
+    /**
+     * This function gets user options
+     * 
+     * @param array $request Array of parameters populated by API call
+     */
     public function getUserOptions($request){
         try{
             $result = new stdClass();
@@ -72,7 +85,12 @@ class WebApi extends MoodleApi
             return new WebApiResult(false, false, $ex->GetMessage());
         }
     }
-    
+ 
+    /**
+     * This function sets user options
+     * 
+     * @param array $request Array of parameters populated by API call
+     */   
     public function setUserOption($request){
         try{
             $result = new stdClass();
@@ -86,6 +104,11 @@ class WebApi extends MoodleApi
         }
     }
 
+    /**
+     * This function gets course group info
+     * 
+     * @param array $request Array of parameters populated by API call
+     */
     public function getGroupsOverview($request){
         try{
             $courseId = intval($request['courseId']);
@@ -104,6 +127,11 @@ class WebApi extends MoodleApi
         }     
     } 
 
+    /**
+     * This function gets work follow up
+     * 
+     * @param array $request Array of parameters populated by API call
+     */
     public function getWorkFollowup($request){
         try{
             $courseId = intval($request['courseId']);
@@ -122,6 +150,11 @@ class WebApi extends MoodleApi
         }     
     } 
 
+    /**
+     * This function gets student follow up
+     * 
+     * @param array $request Array of parameters populated by API call
+     */
     public function getStudentFollowup($request){
         try{
             $courseId = intval($request['courseId']);
@@ -140,6 +173,11 @@ class WebApi extends MoodleApi
         }     
     } 
 
+    /**
+     * This function generates a report of grades by section
+     * 
+     * @param array $request Array of parameters populated by API call
+     */
     public function reportSectionResults($request){
         try{
             $courseId = intval($request['courseId']);
@@ -166,6 +204,11 @@ class WebApi extends MoodleApi
         }     
     } 
 
+    /**
+     * This function generates a CSV from a report
+     * 
+     * @param array $data
+     */
     protected function reportSectionResultsAsCSV($data){
         try{                
             // header
@@ -197,6 +240,11 @@ class WebApi extends MoodleApi
         }     
     }   
 
+    /**
+     * This function generates a report of completed activities by students
+     * 
+     * @param array $request Array of parameters populated by API call
+     */
     public function reportActivityCompletion($request){
         try{
             $courseId = intval($request['courseId']);
@@ -221,8 +269,13 @@ class WebApi extends MoodleApi
         catch(Exception $ex){
             return new WebApiResult(false, false, $ex->GetMessage());
         }     
-    } 
+    }
 
+    /**
+     * This function generates a CSV
+     * 
+     * @param array $data
+     */
     protected function reportActivityCompletionAsCSV($data){
         try{                
             // header
@@ -254,9 +307,14 @@ class WebApi extends MoodleApi
         }
         catch(Exception $ex){
             throw $ex;
-        }     
+        }
     }   
 
+    /**
+     * This function generates a quiz report
+     * 
+     * @param array $request Array of parameters populated by API call
+     */
     public function reportQuiz($request){
         try{
             $courseId = intval($request['courseId']);
@@ -284,6 +342,11 @@ class WebApi extends MoodleApi
         }     
     } 
     
+    /**
+     * This function generates a CSV
+     * 
+     * @param object $data
+     */
     protected function reportQuizAsCSV($data){
         try{                
             // header
@@ -335,6 +398,11 @@ class WebApi extends MoodleApi
         }     
     }   
 
+    /**
+     * This function generates a report of used tags
+     * 
+     * @param array $request Array of parameters populated by API call
+     */
     public function getReportDiagTag($request){
         try{
             $courseId = (isset($request['courseId']) ? intval($request['courseId']) : 0);

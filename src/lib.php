@@ -15,8 +15,8 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * RÉCIT Dashboard 
- * 
+ * RÉCIT Dashboard
+ *
  * @package   local_recitdashboard
  * @copyright 2019 RÉCIT 
  * @license   {@link http://www.gnu.org/licenses/gpl-3.0.html} GNU GPL v3 or later

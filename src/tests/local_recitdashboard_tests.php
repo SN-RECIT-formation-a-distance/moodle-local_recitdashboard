@@ -42,7 +42,6 @@ class local_recitdashboard_ctrl_testcase extends advanced_testcase {
         $this->context = context_course::instance($this->course->id);
         $this->section1 = $this->getDataGenerator()->create_course_section(array('course'=> $this->course->id, 'section' => 1));
         $DB->set_field('course_sections', 'name', 'Section 0', array('id' => $this->section1->id));
-        
 
         // Create a course.
         $user = $this->getDataGenerator()->create_and_enrol($this->course, 'student');
@@ -52,7 +51,7 @@ class local_recitdashboard_ctrl_testcase extends advanced_testcase {
         groups_add_member($this->group->id, $user->id);
         $editingteacher = $this->getDataGenerator()->create_and_enrol($this->course, 'editingteacher');
 
-        // Create quiz
+        // Create quiz.
         $quizgenerator = $this->getDataGenerator()->get_plugin_generator('mod_quiz');
 
         $quiz1 = $quizgenerator->create_instance(array('course' => $course->id, 'questionsperpage' => 0,

@@ -30,18 +30,17 @@ defined('MOODLE_INTERNAL') || die();
 
 use moodle_url;
 
+/*
+* Class to generate React div
+*/
 class MainView{
-    public $cfg = null;
+    /** @var object $user store user */
     public $user = null;
-    public $page = null;
-    public $output = null;
+    /** @var int $selectedCourseId store selected course */
     public $selectedCourseId = 0;
 
-    public function __construct($cfg, $page, $user, $output, $selectedCourseId){
-        $this->cfg = $cfg;
+    public function __construct($user, $selectedCourseId){
         $this->user = $user;
-        $this->page = $page;
-        $this->output = $output;
         $this->selectedCourseId = $selectedCourseId;
     }
 
@@ -71,7 +70,7 @@ $PAGE->set_heading(get_string('pluginname', 'local_recitdashboard'));
 
 echo $OUTPUT->header();
 $courseId = (isset($_GET['courseId']) ? $_GET['courseId'] : 0);
-$recitDashboard = new MainView($CFG, $PAGE, $USER, $OUTPUT, $courseId);
+$recitDashboard = new MainView($USER, $courseId);
 $recitDashboard->display();
 
 echo $OUTPUT->footer();
