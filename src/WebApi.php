@@ -26,6 +26,7 @@ namespace recitdashboard;
 require_once(dirname(__FILE__)."/classes/WebApi.php");
 
 ///////////////////////////////////////////////////////////////////////////////////
+require_login();
 $webapi = new WebApi($DB, $COURSE, $USER);
 $webapi->getRequest($_REQUEST);
 $webapi->processRequest();
