@@ -184,7 +184,7 @@ export class ReportDiagnosticTags extends Component{
             <br/>
             <hr/>
             <div>
-                <a href={`${Options.getGateway()}?service=getReportDiagTag&cmId=${this.props.options.cm.id}&groupId=${this.props.options.group.id}&output=csv&options=question`} target='_blank'>{"Télécharger en CSV"}</a>
+                <a href={`${Options.getGateway(true)}&service=getReportDiagTag&cmId=${this.props.options.cm.id}&groupId=${this.props.options.group.id}&output=csv&options=question`} target='_blank'>{i18n.get_string('downloadcsv')}</a>
             </div>
         </div>;
 

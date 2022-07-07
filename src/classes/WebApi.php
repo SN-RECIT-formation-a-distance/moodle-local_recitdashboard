@@ -230,7 +230,7 @@ class WebApi extends MoodleApi
                 $fileContent[] = $arr;
             }
 
-            $filename = sys_get_temp_dir() . '/'.get_string('report', 'local_recitdashboard').'.csv';
+            $filename = sys_get_temp_dir() . '/'.get_string('report', 'local_recitdashboard') . ' ' . get_string('resultsbysection', 'local_recitdashboard') .'.csv';
             $file = $this->createCSVFile($filename, $fileContent);
             return new WebApiResult(true, $file, "", 'application/csv');
             
@@ -301,7 +301,7 @@ class WebApi extends MoodleApi
                 $fileContent[] = $arr;
             }
 
-            $filename = sys_get_temp_dir() . '/'.get_string('report', 'local_recitdashboard').'.csv';
+            $filename = sys_get_temp_dir() . '/'.get_string('report', 'local_recitdashboard').' '. get_string('activityachievements', 'local_recitdashboard') .'.csv';
             $file = $this->createCSVFile($filename, $fileContent);
             return new WebApiResult(true, $file, "", 'application/csv');
         }
@@ -389,7 +389,7 @@ class WebApi extends MoodleApi
                 }
             }
 
-            $filename = sys_get_temp_dir() . '/'.get_string('quiz', 'local_recitdashboard').'-'.get_string('report', 'local_recitdashboard').'.csv';
+            $filename = sys_get_temp_dir() . '/'. get_string('report', 'local_recitdashboard') . ' ' . get_string('quizresults', 'local_recitdashboard').'.csv';
             $file = $this->createCSVFile($filename, $fileContent);
             return new WebApiResult(true, $file, "", 'application/csv');
         }
@@ -421,12 +421,7 @@ class WebApi extends MoodleApi
             if($output == "csv"){
                 $result->courseName = $this->course->fullname;
                 
-                if(in_array('question', $options)){
-                    $result->reportName = get_string('question', 'local_recitdashboard');
-                }
-                else{
-                    $result->reportName = get_string('report', 'local_recitdashboard');
-                }
+                $result->reportName =  get_string('report', 'local_recitdashboard') . ' ' . get_string('taganalysis', 'local_recitdashboard');
 
                 $writer = new ReportDiagTagCSVWriter($result, 'local_recitdashboard');
                 $writer->writeReport();

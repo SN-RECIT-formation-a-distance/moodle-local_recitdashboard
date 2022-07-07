@@ -140,7 +140,7 @@ export class ReportSectionResults  extends Component{
                     <br/>
                     <hr/>
                     <div>
-                        <a href={`${Options.getGateway()}?service=reportSectionResults&courseId=${this.props.options.course.id}&groupId=${this.props.options.group.id}&output=csv`} target='_blank'>{"Télécharger en CSV"}</a>
+                        <a href={`${Options.getGateway(true)}&service=reportSectionResults&courseId=${this.props.options.course.id}&groupId=${this.props.options.group.id}&output=csv`} target='_blank'>{i18n.get_string('downloadcsv')}</a>
                     </div>                           
                     <br/>
                 </div>;

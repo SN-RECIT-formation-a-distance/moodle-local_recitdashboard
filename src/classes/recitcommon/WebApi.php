@@ -63,16 +63,27 @@ abstract class AWebApi
     }
 
     public function getRequest(){
-        $this->request = json_decode(file_get_contents('php://input'), true);
-        if($this->request == null){
-            $this->request = array();
+        if(empty($_REQUEST)){
+            $this->request = json_decode(file_get_contents('php://input'), true);
+            if($this->request == null){
+                $this->request = array();
+            }
+        }
+        else{
+            $this->request = $_REQUEST;
         }
     }
 
     public function preProcessRequest(){
-        //require_sesskey();
+        $sesskey = (isset($this->request['sesskey']) ? strval($this->request['sesskey']) : 'nosesskey'); 
+
+        if(!confirm_sesskey($sesskey)){
+            $this->lastResult = new WebApiResult(false, null, get_string('invalidsesskey', 'local_recitdashboard'));
+            return false;
+        }
+
         if(!isset($this->request['service'])){
-            $msg = get_string('notfound');
+            $msg = get_string('servicenotfound', 'local_recitdashboard');
             $success = false;
 
             if(isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] == "OPTIONS"){

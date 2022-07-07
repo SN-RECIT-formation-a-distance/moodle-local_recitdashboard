@@ -104,6 +104,7 @@ function local_recitdashboard_strings_for_js() {
         "activityachievements",
         "resultsbysection",
         "quizresults",
-        "taganalysis"
+        "taganalysis",
+        "downloadcsv"
     ), 'local_recitdashboard');
 }

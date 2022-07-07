@@ -29,8 +29,14 @@ export class Options
 {
     static appVersion(){ return packageJson.version; }
 
-    static getGateway(){
-        return `${M.cfg.wwwroot}/local/recitdashboard/WebApi.php?sesskey=${M.cfg.sesskey}`;
+    static getGateway(addSesskey){
+        let result = `${M.cfg.wwwroot}/local/recitdashboard/WebApi.php`;
+
+        if(addSesskey){
+            result += `?sesskey=${M.cfg.sesskey}`;
+        }
+
+        return result;
     }
 }
 

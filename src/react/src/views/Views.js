@@ -325,7 +325,7 @@ class FilterOptions extends Component{
             this.setState({dataProvider: result.data, courseList: courseList, sectionList: [], activityList: [], loaded: true}, this.onAfterDataResult);
         }
         else{
-            $glVars.feedback.showError($glVars.i18n.tags.appname, result.msg);
+            $glVars.feedback.showError(i18n.get_string('pluginname'), result.msg);
             this.setState({dataProvider: [], sectionProvider: [], courseList: [], sectionList: [], activityList: []}, this.onAfterDataResult);
         }
     }

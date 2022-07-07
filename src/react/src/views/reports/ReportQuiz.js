@@ -181,7 +181,7 @@ export class ReportQuiz  extends Component{
                     <br/>
                     <hr/>
                     <div>
-                        <a href={`${Options.getGateway()}?service=reportQuiz&courseId=${this.props.options.course.id}&groupId=${this.props.options.group.id}&cmId=${this.props.options.cm.id}&output=csv`} target='_blank'>{"Télécharger en CSV"}</a>
+                        <a href={`${Options.getGateway(true)}&service=reportQuiz&courseId=${this.props.options.course.id}&groupId=${this.props.options.group.id}&cmId=${this.props.options.cm.id}&output=csv`} target='_blank'>{i18n.get_string('downloadcsv')}</a>
                     </div>                           
                     <br/>
                 </div>;
