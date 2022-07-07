@@ -95,11 +95,6 @@ abstract class AWebApi
 			return false;
         }
 		
-        if(!PersistCtrl::getInstance()->checkSession()){
-            $this->lastResult = new WebApiResult(false, null, get_string('notloggedin'));
-            return false;
-        }
-
         return true;
     }
 
@@ -244,50 +239,13 @@ abstract class MoodleApi extends AWebApi
     /**
      * $level [a = admin | s = student]
      */
-    public function canUserAccess($level, $cmId = 0, $userId = 0, $courseId = 0){
-        $userRoles = array();
-
-        if($courseId > 0){
-            $userRoles = Utils::getUserRoles($courseId, $this->signedUser->id);
-        }
-        else if($cmId > 0){
-            list($course, $cm) = get_course_and_cm_from_cmid($cmId);
-            $userRoles = Utils::getUserRoles($course->id, $this->signedUser->id);
-        }
-        else{
-            $userRoles = Utils::getUserRoles($this->course->id, $this->signedUser->id);
-        }
-
-        //$desc = print_r($userRoles, true);
-        //throw new Exception($desc);
-
-        // if the user is admin then it has access to all
-        if(Utils::isAdminRole($userRoles)){
-            return true;
-        }
-         // if the level is admin then the user must have a admin role to have access
-        else if(($level == 'a') && Utils::isAdminRole($userRoles)){
-            return true;
-        }
-        // if the user is student then it has access only if it is accessing its own stuff
-        else if(($level == 's') && ($userId == $this->signedUser->id)){
-            return true;
-        }
-        else{
-            throw new Exception(get_string('accessdenied'));
-        }
-    }
+    abstract public function canUserAccess($level);
 
     public function getCourseList($request){   
         try{
             $enrolled = (isset($request['enrolled']) ? intval($request['enrolled']) : 0);
             
-            if($enrolled == 1){
-                $this->canUserAccess('s', 0, $this->signedUser->id);
-            }
-            else{
-                $this->canUserAccess('a');
-            }
+            $this->canUserAccess('a');
            
             $result = PersistCtrl::getInstance()->getCourseList($enrolled);
 			$this->prepareJson($result);            
@@ -320,7 +278,7 @@ abstract class MoodleApi extends AWebApi
             $cmId = intval($request['cmId']);
             $courseId = (isset($request['courseId']) ? intval($request['courseId']) : 0);
 
-            $this->canUserAccess('a', $cmId, 0, $courseId);
+            $this->canUserAccess('a');
 
             $tmp = PersistCtrl::getInstance()->getEnrolledUserList($cmId, 0, $courseId);
             $result = array();

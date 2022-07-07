@@ -45,11 +45,8 @@ class WebApi extends MoodleApi
      * This function checks if user has access to access resource
      * 
      * @param string $level [a = admin | s = student]
-     * @param int $cmId
-     * @param int $userId
-     * @param int $courseId
      */
-    public function canUserAccess($level, $cmId = 0, $userId = 0, $courseId = 0){
+    public function canUserAccess($level){
         global $DB;
         $userId = $this->signedUser->id;
         $isTeacher = $DB->record_exists_sql('select id from {role_assignments} where userid=:userid and roleid in (select roleid from {role_capabilities} where capability=:name1)', ['userid' => $userId, 'name1' => RECITDASHBOARD_ACCESS_CAPABILITY]);
@@ -60,9 +57,9 @@ class WebApi extends MoodleApi
             return true;
         }
         // if the user is student then it has access only if it is accessing its own stuff
-        else if(($level == 's') && ($userId == $this->signedUser->id)){
+        /*else if(($level == 's') && $isStudent){
             return true;
-        }
+        }*/
         else{
             throw new Exception(get_string('accessdenied'));
         }
@@ -75,6 +72,8 @@ class WebApi extends MoodleApi
      */
     public function getUserOptions($request){
         try{
+            $this->canUserAccess('a');
+
             $result = new stdClass();
             $result->options = PersistCtrl::getInstance()->getUserOptions($this->signedUser->id);	
             $this->prepareJson($result);
@@ -93,6 +92,8 @@ class WebApi extends MoodleApi
      */   
     public function setUserOption($request){
         try{
+            $this->canUserAccess('a');
+
             $result = new stdClass();
             $result->options = PersistCtrl::getInstance()->setUserOption($this->signedUser->id, $request['key'], $request['value']);	
             $this->prepareJson($result);
@@ -114,7 +115,7 @@ class WebApi extends MoodleApi
             $courseId = intval($request['courseId']);
             $groupId = intval($request['groupId']);
 
-            $this->canUserAccess('a', 0, 0, $courseId);
+            $this->canUserAccess('a');
             
             $result = new stdClass();
             $result->details = PersistCtrl::getInstance()->getGroupsOverview($courseId, $groupId);
@@ -137,7 +138,7 @@ class WebApi extends MoodleApi
             $courseId = intval($request['courseId']);
             $groupId = intval($request['groupId']);
 
-            $this->canUserAccess('a', 0, 0, $courseId);
+            $this->canUserAccess('a');
             
             $result = new stdClass();
             $result->details = PersistCtrl::getInstance()->getWorkFollowup($courseId, $groupId);
@@ -160,7 +161,7 @@ class WebApi extends MoodleApi
             $courseId = intval($request['courseId']);
             $groupId = intval($request['groupId']);
 
-            $this->canUserAccess('a', 0, 0, $courseId);
+            $this->canUserAccess('a');
             
             $result = new stdClass();
             $result->details = PersistCtrl::getInstance()->getStudentFollowUp($courseId, $groupId, 1);
@@ -184,7 +185,7 @@ class WebApi extends MoodleApi
             $groupId = intval($request['groupId']);
             $output = (isset($request['output']) ? $request['output'] : 'json');
 
-            $this->canUserAccess('a', 0, 0, $courseId);
+            $this->canUserAccess('a');
             
             switch($output){
                 case 'json':
@@ -251,7 +252,7 @@ class WebApi extends MoodleApi
             $groupId = intval($request['groupId']);
             $output = (isset($request['output']) ? $request['output'] : 'json');
 
-            $this->canUserAccess('a', 0, 0, $courseId);
+            $this->canUserAccess('a');
             
             switch($output){
                 case 'json':
@@ -322,7 +323,7 @@ class WebApi extends MoodleApi
             $cmId = intval($request['cmId']);
             $output = (isset($request['output']) ? $request['output'] : 'json');
 
-            $this->canUserAccess('a', 0, 0, $courseId);
+            $this->canUserAccess('a');
             
             switch($output){
                 case 'json':
@@ -413,7 +414,7 @@ class WebApi extends MoodleApi
             $output = (isset($request['output']) ? $request['output'] : 'json');
             $groupId = (isset($request['groupId']) ? intval($request['groupId']) : 0);
 
-            $this->canUserAccess('s', $cmId, $userId, $courseId);
+            $this->canUserAccess('a');
 
             $result = new ReportDiagTagContent($this->dbConn);
             $result->loadContent($courseId, $cmId, $userId, $options, $groupId, $sectionId);

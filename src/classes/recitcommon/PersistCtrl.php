@@ -39,10 +39,6 @@ abstract class APersistCtrl
         $this->signedUser = $signedUser;
     }
 
-	public function checkSession(){
-        return (isset($this->signedUser) && $this->signedUser->id > 0);
-    }
-
     public function getRecordsSQL($sql, $params = array()){
 
         $this->mysqlConn->execute("set @uniqueId = 0");
