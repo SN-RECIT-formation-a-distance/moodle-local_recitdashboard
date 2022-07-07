@@ -8,7 +8,6 @@ use Exception;
 use DateTimeZone;
 
 require_once(dirname(__FILE__)."/PersistCtrl.php");
-require_once(dirname(__FILE__)."/Utils.php");
 
 class WebApiResult
 {

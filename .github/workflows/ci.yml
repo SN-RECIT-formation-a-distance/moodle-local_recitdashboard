@@ -18,13 +18,24 @@ jobs:
         ports:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval 10s --health-timeout 5s --health-retries 3
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_USER: 'root'
+          MYSQL_ALLOW_EMPTY_PASSWORD: "true"
+          MYSQL_CHARACTER_SET_SERVER: "utf8mb4"
+          MYSQL_COLLATION_SERVER: "utf8mb4_unicode_ci"
+
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval 10s --health-timeout 5s --health-retries 3
 
     strategy:
       fail-fast: false
       matrix:
         php: ['7.4', '8.0']
-        moodle-branch: ['MOODLE_310_STABLE','MOODLE_311_STABLE']
-        database: [mariadb]
+        moodle-branch: ['MOODLE_39_STABLE','MOODLE_310_STABLE','MOODLE_311_STABLE']
+        database: [mariadb, mysql]
 
     steps:
       - name: Check out repository code
@@ -42,7 +53,6 @@ jobs:
 
       - name: Initialise moodle-plugin-ci
         run: |
-          mv plugin/src/* plugin/
           composer create-project -n --no-dev --prefer-dist moodlehq/moodle-plugin-ci ci ^3
           echo $(cd ci/bin; pwd) >> $GITHUB_PATH
           echo $(cd ci/vendor/bin; pwd) >> $GITHUB_PATH
@@ -51,7 +61,7 @@ jobs:
 
       - name: Install moodle-plugin-ci
         run: |
-          moodle-plugin-ci install --plugin ./plugin --db-host=127.0.0.1
+          moodle-plugin-ci install --plugin ./plugin/src --db-host=127.0.0.1
         env:
           DB: ${{ matrix.database }}
           MOODLE_BRANCH: ${{ matrix.moodle-branch }}
