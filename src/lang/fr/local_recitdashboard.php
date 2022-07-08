@@ -1,5 +1,11 @@
 <?php
 $string['pluginname'] = 'RÉCIT Apprentimètre';
+$string['privacymetadata'] = 'Le plugin recitdashboard stocke des paramètres utilisateur';
+$string['privacy:metadata:local_recitdashboard_options'] = 'Contient les paramètres utilisateur';
+$string['privacy:metadata:local_recitdashboard_options:name'] = 'Nom du paramètre';
+$string['privacy:metadata:local_recitdashboard_options:value'] = 'Valeur du paramètre';
+$string['privacy:metadata:local_recitdashboard_options:userid'] = 'ID de l\'utilisateur du paramètre';
+
 $string['recitdashboard:access'] = 'L\'utilisateur a accès à l\'apprendimètre';
 $string['recitdashboard:student'] = 'L\'utilisateur est un étudiant';
 $string['work'] = 'Travail';
