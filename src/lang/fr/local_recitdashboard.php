@@ -27,6 +27,7 @@ $string['noresult'] = 'Pas de résultat';
 $string['filteroptions'] = 'Options de filtrage';
 $string['course'] = 'Cours';
 $string['groups'] = 'Groupes';
+$string['nogroup'] = 'Pas de groupe';
 $string['students'] = 'Élèves';
 $string['sections'] = 'Sections';
 $string['all'] = 'Tous';

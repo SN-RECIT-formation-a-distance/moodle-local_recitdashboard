@@ -125,8 +125,8 @@ abstract class MoodlePersistCtrl extends APersistCtrl{
         // In case a student has no group, the left join in the first query add them to the result with groupId = 0.
         // In case there are no groups in the course, the second query adds (by union set) the students without group.
 
-        $vars['str'] = get_string("nogroup");
-        $vars['str2'] = get_string("nogroup");
+        $vars['str'] = get_string("nogroup", 'local_recitdashboard');
+        $vars['str2'] = get_string("nogroup", 'local_recitdashboard');
         $query = "(select (@uniqueId := @uniqueId + 1) uniqueId, t1.enrol, t1.courseid course_id, t3.id user_id, concat(t3.firstname, ' ', t3.lastname) user_name, coalesce(t5.id,-1) group_id, 
             coalesce(t5.name, :str) group_name 
             from {enrol} t1

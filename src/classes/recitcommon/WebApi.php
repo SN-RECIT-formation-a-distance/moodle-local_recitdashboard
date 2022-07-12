@@ -242,7 +242,7 @@ abstract class MoodleApi extends AWebApi
 
     public function getCourseList($request){   
         try{
-            $enrolled = (isset($request['enrolled']) ? intval($request['enrolled']) : 0);
+            $enrolled = (isset($request['enrolled']) ? clean_param($request['enrolled'], PARAM_INT) : 0);
             
             $this->canUserAccess('a');
            
@@ -258,7 +258,7 @@ abstract class MoodleApi extends AWebApi
 
     public function getSectionActivityList($request){   
         try{
-            $courseId = intval($request['courseId']);
+            $courseId = clean_param($request['courseId'], PARAM_INT);
             
             $this->canUserAccess('a');
            
@@ -275,7 +275,7 @@ abstract class MoodleApi extends AWebApi
     public function getEnrolledUserList($request){   
         try{
             $cmId = intval($request['cmId']);
-            $courseId = (isset($request['courseId']) ? intval($request['courseId']) : 0);
+            $courseId = (isset($request['courseId']) ? clean_param($request['courseId'], PARAM_INT) : 0);
 
             $this->canUserAccess('a');
 

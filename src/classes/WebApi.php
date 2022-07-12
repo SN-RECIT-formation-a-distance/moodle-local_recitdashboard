@@ -75,7 +75,7 @@ class WebApi extends MoodleApi
             $this->canUserAccess('a');
 
             $result = new stdClass();
-            $result->options = PersistCtrl::getInstance()->getUserOptions($this->signedUser->id);	
+            $result->options = PersistCtrl::getInstance()->getUserOptions($this->signedUser->id);
             $this->prepareJson($result);
             
             return new WebApiResult(true, $result->options);
@@ -112,8 +112,8 @@ class WebApi extends MoodleApi
      */
     public function getGroupsOverview($request){
         try{
-            $courseId = intval($request['courseId']);
-            $groupId = intval($request['groupId']);
+            $courseId = clean_param($request['courseId'], PARAM_INT);
+            $groupId = clean_param($request['groupId'], PARAM_INT);
 
             $this->canUserAccess('a');
             
@@ -135,8 +135,8 @@ class WebApi extends MoodleApi
      */
     public function getWorkFollowup($request){
         try{
-            $courseId = intval($request['courseId']);
-            $groupId = intval($request['groupId']);
+            $courseId = clean_param($request['courseId'], PARAM_INT);
+            $groupId = clean_param($request['groupId'], PARAM_INT);
 
             $this->canUserAccess('a');
             
@@ -158,8 +158,8 @@ class WebApi extends MoodleApi
      */
     public function getStudentFollowup($request){
         try{
-            $courseId = intval($request['courseId']);
-            $groupId = intval($request['groupId']);
+            $courseId = clean_param($request['courseId'], PARAM_INT);
+            $groupId = clean_param($request['groupId'], PARAM_INT);
 
             $this->canUserAccess('a');
             
@@ -181,9 +181,9 @@ class WebApi extends MoodleApi
      */
     public function reportSectionResults($request){
         try{
-            $courseId = intval($request['courseId']);
-            $groupId = intval($request['groupId']);
-            $output = (isset($request['output']) ? $request['output'] : 'json');
+            $courseId = clean_param($request['courseId'], PARAM_INT);
+            $groupId = clean_param($request['groupId'], PARAM_INT);
+            $output = (isset($request['output']) ? clean_param($request['output'], PARAM_RAW) : 'json');
 
             $this->canUserAccess('a');
             
@@ -248,9 +248,9 @@ class WebApi extends MoodleApi
      */
     public function reportActivityCompletion($request){
         try{
-            $courseId = intval($request['courseId']);
-            $groupId = intval($request['groupId']);
-            $output = (isset($request['output']) ? $request['output'] : 'json');
+            $courseId = clean_param($request['courseId'], PARAM_INT);
+            $groupId = clean_param($request['groupId'], PARAM_INT);
+            $output = (isset($request['output']) ? clean_param($request['output'], PARAM_RAW) : 'json');
 
             $this->canUserAccess('a');
             
@@ -318,9 +318,9 @@ class WebApi extends MoodleApi
      */
     public function reportQuiz($request){
         try{
-            $courseId = intval($request['courseId']);
-            $groupId = intval($request['groupId']);
-            $cmId = intval($request['cmId']);
+            $courseId = clean_param($request['courseId'], PARAM_INT);
+            $groupId = clean_param($request['groupId'], PARAM_INT);
+            $cmId = clean_param($request['cmId'], PARAM_INT);
             $output = (isset($request['output']) ? $request['output'] : 'json');
 
             $this->canUserAccess('a');
@@ -406,13 +406,13 @@ class WebApi extends MoodleApi
      */
     public function getReportDiagTag($request){
         try{
-            $courseId = (isset($request['courseId']) ? intval($request['courseId']) : 0);
-            $cmId = (isset($request['cmId']) ? intval($request['cmId']) : 0);
-            $sectionId = (isset($request['sectionId']) ? intval($request['sectionId']) : 0);
-            $userId = (isset($request['userId']) ? intval($request['userId']) : 0);
-            $options = (isset($request['options']) ? explode(",", $request['options']) : array());
-            $output = (isset($request['output']) ? $request['output'] : 'json');
-            $groupId = (isset($request['groupId']) ? intval($request['groupId']) : 0);
+            $courseId = (isset($request['courseId']) ? clean_param($request['courseId'], PARAM_INT) : 0);
+            $cmId = (isset($request['cmId']) ? clean_param($request['cmId'], PARAM_INT) : 0);
+            $sectionId = (isset($request['sectionId']) ? clean_param($request['sectionId'], PARAM_INT) : 0);
+            $userId = (isset($request['userId']) ? clean_param($request['userId'], PARAM_INT) : 0);
+            $options = (isset($request['options']) ? explode(",", clean_param($request['options'], PARAM_TEXT)) : array());
+            $output = (isset($request['output']) ? clean_param($request['output'], PARAM_TEXT) : 'json');
+            $groupId = (isset($request['groupId']) ? clean_param($request['groupId'], PARAM_INT) : 0);
 
             $this->canUserAccess('a');
 
