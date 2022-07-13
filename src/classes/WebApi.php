@@ -103,8 +103,11 @@ class WebApi extends MoodleApi
         try{
             $this->canUserAccess('a');
 
+            $key = clean_param($request['key'], PARAM_TEXT);
+            $value = clean_param($request['value'], PARAM_TEXT);
+
             $result = new stdClass();
-            $result->options = PersistCtrl::getInstance()->setUserOption($this->signedUser->id, $request['key'], $request['value']);	
+            $result->options = PersistCtrl::getInstance()->setUserOption($this->signedUser->id, $key, $value);
             $this->prepareJson($result);
             
             return new WebApiResult(true, $result->options);
