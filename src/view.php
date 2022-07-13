@@ -25,6 +25,7 @@ namespace recitdashboard;
 
 require(__DIR__ . '/../../config.php');
 require(__DIR__ . '/lib.php');
+require(dirname(__FILE__) . '/classes/PersistCtrl.php');
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -55,8 +56,10 @@ class MainView{
     }
 
     public function hasAccess(){
-        global $DB;
-        return $DB->record_exists_sql('select id from {role_assignments} where userid=:userid and roleid in (select roleid from {role_capabilities} where capability=:name1)', ['userid' => $this->user->id, 'name1' => RECITDASHBOARD_ACCESS_CAPABILITY]);
+        global $DB, $USER;
+        $ctrl = PersistCtrl::getInstance($DB, $USER);
+        $courses = $ctrl->getCourseList();
+        return count($courses) > 0;
     }
 }
 

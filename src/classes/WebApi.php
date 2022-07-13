@@ -46,10 +46,19 @@ class WebApi extends MoodleApi
      * 
      * @param string $level [a = admin | s = student]
      */
-    public function canUserAccess($level){
+    public function canUserAccess($level, $courseId = null){
         global $DB;
         $userId = $this->signedUser->id;
-        $isTeacher = $DB->record_exists_sql('select id from {role_assignments} where userid=:userid and roleid in (select roleid from {role_capabilities} where capability=:name1)', ['userid' => $userId, 'name1' => RECITDASHBOARD_ACCESS_CAPABILITY]);
+        $isTeacher = false;
+
+        if ($courseId){
+            $ccontext = \context_course::instance($courseId);
+            $isTeacher = has_capability(RECITDASHBOARD_ACCESS_CAPABILITY, $ccontext);
+        }else{
+            $ctrl = PersistCtrl::getInstance();
+            $courses = $ctrl->getCourseList();
+            $isTeacher = count($courses) > 0;
+        }
 
         
          // if the level is admin then the user must have access to CAPABILITY
@@ -115,7 +124,7 @@ class WebApi extends MoodleApi
             $courseId = clean_param($request['courseId'], PARAM_INT);
             $groupId = clean_param($request['groupId'], PARAM_INT);
 
-            $this->canUserAccess('a');
+            $this->canUserAccess('a', $courseId);
             
             $result = new stdClass();
             $result->details = PersistCtrl::getInstance()->getGroupsOverview($courseId, $groupId);
@@ -138,7 +147,7 @@ class WebApi extends MoodleApi
             $courseId = clean_param($request['courseId'], PARAM_INT);
             $groupId = clean_param($request['groupId'], PARAM_INT);
 
-            $this->canUserAccess('a');
+            $this->canUserAccess('a', $courseId);
             
             $result = new stdClass();
             $result->details = PersistCtrl::getInstance()->getWorkFollowup($courseId, $groupId);
@@ -161,7 +170,7 @@ class WebApi extends MoodleApi
             $courseId = clean_param($request['courseId'], PARAM_INT);
             $groupId = clean_param($request['groupId'], PARAM_INT);
 
-            $this->canUserAccess('a');
+            $this->canUserAccess('a', $courseId);
             
             $result = new stdClass();
             $result->details = PersistCtrl::getInstance()->getStudentFollowUp($courseId, $groupId, 1);
@@ -185,7 +194,7 @@ class WebApi extends MoodleApi
             $groupId = clean_param($request['groupId'], PARAM_INT);
             $output = (isset($request['output']) ? clean_param($request['output'], PARAM_RAW) : 'json');
 
-            $this->canUserAccess('a');
+            $this->canUserAccess('a', $courseId);
             
             switch($output){
                 case 'json':
@@ -252,7 +261,7 @@ class WebApi extends MoodleApi
             $groupId = clean_param($request['groupId'], PARAM_INT);
             $output = (isset($request['output']) ? clean_param($request['output'], PARAM_RAW) : 'json');
 
-            $this->canUserAccess('a');
+            $this->canUserAccess('a', $courseId);
             
             switch($output){
                 case 'json':
@@ -323,7 +332,7 @@ class WebApi extends MoodleApi
             $cmId = clean_param($request['cmId'], PARAM_INT);
             $output = (isset($request['output']) ? $request['output'] : 'json');
 
-            $this->canUserAccess('a');
+            $this->canUserAccess('a', $courseId);
             
             switch($output){
                 case 'json':
@@ -414,7 +423,7 @@ class WebApi extends MoodleApi
             $output = (isset($request['output']) ? clean_param($request['output'], PARAM_TEXT) : 'json');
             $groupId = (isset($request['groupId']) ? clean_param($request['groupId'], PARAM_INT) : 0);
 
-            $this->canUserAccess('a');
+            $this->canUserAccess('a', $courseId);
 
             $result = new ReportDiagTagContent($this->dbConn);
             $result->loadContent($courseId, $cmId, $userId, $options, $groupId, $sectionId);

@@ -60,23 +60,15 @@ abstract class APersistCtrl
 }
 
 abstract class MoodlePersistCtrl extends APersistCtrl{
-    public function getCourseList($enrolled = null){
-        $whereStmt = "";
-        $vars = array();
-        if($enrolled == 1){
-            $whereStmt = "if(t5.userid is null, 0, 1) = :enrolled";
-            $vars['enrolled'] = $enrolled;
+    public function getCourseList(){
+        $courses = enrol_get_users_courses($this->signedUser->id);
+        $result = array();
+        foreach ($courses as $c) {
+            $ccontext = \context_course::instance($c->id);
+            if (has_capability(RECITDASHBOARD_ACCESS_CAPABILITY, $ccontext)) {
+                $result[] = array('courseId' => $c->id, 'courseName' => $c->fullname);
+            }
         }
-
-        $query = "select (@uniqueId := @uniqueId + 1) uniqueId, t1.id course_id, t1.fullname course_name, if(t5.userid is null, 0, 1) enrolled
-        from {course} t1
-        left join {enrol} t6 on t6.courseid = t1.id
-        left join {user_enrolments} t5 on t5.enrolid = t6.id and t5.userid = :user
-        where $whereStmt
-        order by course_name asc";
-        $vars['user'] = $this->signedUser->id;
-
-        $result = $this->getRecordsSQL($query, $vars);
 
         return $result;
     }
@@ -154,17 +146,6 @@ abstract class MoodlePersistCtrl extends APersistCtrl{
         }
 
         return $result;
-    }
-
-    protected function getStmtStudentRole($userId, $courseId, $varCapability){
-        // contextlevel = 50 = course context
-        // user has role student and it is enrolled in the course
-        $stmt = "(exists(select st1.id from {role} st1 inner join {role_assignments} st2 on st1.id = st2.roleid
-        inner join {role_capabilities} st3 on st3.roleid = st1.id and st3.capability = $varCapability
-        where st2.userid = $userId and st2.contextid in (select id from {context} where instanceid = $courseId and contextlevel = 50) and st1.shortname in ('student'))
-        and exists(select st1.id from {enrol} st1 inner join {user_enrolments} st2 on st1.id = st2.enrolid where st1.courseid = $courseId and st2.userid = $userId limit 1))";
-
-        return $stmt;
     }
 }
 

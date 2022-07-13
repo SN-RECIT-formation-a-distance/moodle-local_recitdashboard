@@ -228,23 +228,6 @@ abstract class ReportDiagTagItem
         $this->tagRawList[$rawItem->tagId][] = $item;
     }
 
-   /* public function normalizeTagList(array $tagList){
-        foreach($tagList as $item1){
-            $added = false;
-            foreach($this->tagRawList as $tagId => $items){
-                // the tag already exists then keep going
-                if($item1->tagId == $tagId){ 
-                    $added = true;
-                    continue;
-                }
-            }
-
-            if(!$added){
-                $this->addTag($item1);
-            }
-        }
-    }*/
-
     public function setTagSuccessRate(){
         foreach($this->tagRawList as $tagList){
             $item = new stdClass();

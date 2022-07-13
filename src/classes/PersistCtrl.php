@@ -51,6 +51,32 @@ class PersistCtrl extends MoodlePersistCtrl
     protected function __construct($mysqlConn, $signedUser){
         parent::__construct($mysqlConn, $signedUser);
     }
+
+    protected function isStudent($userId, $courseId){
+        $ccontext = \context_course::instance($courseId);
+        if (has_capability(RECITDASHBOARD_STUDENT_CAPABILITY, $ccontext, $userId)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    protected function filterStudents(array &$tmp, $courseId){
+        $cache = array();//Keep a cache so we dont check capabilities for the same user multiple times.
+        foreach($tmp as $item){
+            if (isset($cache[$item->userId]) && !$cache[$item->userId]){
+                unset($item);
+                continue;
+            }
+            if (!$this->isStudent($item->userId, $courseId)){
+                $cache[$item->userId] = false;
+                unset($item);
+                continue;
+            }else{
+                $cache[$item->userId] = true;
+            }
+        }
+    }
     
     public function getCourseProgressionOverview($courseId, $groupId = 0){
         $vars = array();
@@ -208,9 +234,6 @@ class PersistCtrl extends MoodlePersistCtrl
             $whereStmt = " and exists(select id from {groups_members} tgm where tgm.groupid = $groupId and tuser.userid = tgm.userid)";
         }
 
-        $vars['capability1'] = RECITDASHBOARD_STUDENT_CAPABILITY;
-        $vars['capability2'] = RECITDASHBOARD_STUDENT_CAPABILITY;
-        $stmtStudentRole = $this->getStmtStudentRole('tuser.userid', 't1.course', ':capability1');
 
         $query = "(SELECT (@uniqueId := @uniqueId + 1) uniqueId, t3.id cm_id, t1.name cm_name, FROM_UNIXTIME(t1.duedate) due_date, FROM_UNIXTIME(min(tuser.timemodified)) time_modified, count(*) nb_items, group_concat(tuser.userid) user_ids,
         concat(:assignurl, t3.id) url, 
@@ -220,7 +243,7 @@ class PersistCtrl extends MoodlePersistCtrl
         inner join {course_modules} t3 on t1.id = t3.instance and t3.module = (select id from {modules} where name = 'assign') and t1.course = t3.course
         left join {assign_grades} t4 on t4.assignment = tuser.assignment and t4.userid = tuser.userid
         -- gather allsignments that need to be (re)graded
-        where t1.course = :course1 and tuser.status = 'submitted' and (coalesce(t4.grade,0) <= 0 or tuser.timemodified > coalesce(t4.timemodified,0)) $whereStmt and $stmtStudentRole
+        where t1.course = :course1 and tuser.status = 'submitted' and (coalesce(t4.grade,0) <= 0 or tuser.timemodified > coalesce(t4.timemodified,0)) $whereStmt
         group by t3.id, t1.id)       
         union
         (select (@uniqueId := @uniqueId + 1) uniqueId, cm_id, cm_name, due_date, time_modified, count(*) nb_items, min(user_ids), url, state from 
@@ -234,13 +257,7 @@ class PersistCtrl extends MoodlePersistCtrl
         inner join {question_attempts} t4 on  t4.questionusageid = t3.uniqueid
         inner join {question_attempt_steps} tuser on t4.id = tuser.questionattemptid
         where t1.course = :course2 $whereStmt  
-        and t3.userid in (select st2.userid 
-            from {role} st1 
-            inner join {role_assignments} st2 on st1.id = st2.roleid 
-            inner join {role_capabilities} st5 on st5.roleid = st1.id
-            inner join {user_enrolments} st3 on st2.userid = st3.userid
-            inner join {enrol} st4 on st3.enrolid = st4.id
-            where st4.courseid = t1.course and st2.userid = t3.userid and st5.capability = :capability2 and st2.contextid in (select id from {context} where instanceid = t1.course and contextlevel = 50))
+        
         group by t1.id, t2.id, t3.id, t4.id) tab
         where right(states, 12) = 'needsgrading'
         group by cm_id)";
@@ -250,9 +267,6 @@ class PersistCtrl extends MoodlePersistCtrl
         $vars['course2'] = $courseId;
 
         if(file_exists("{$CFG->dirroot}/mod/recitcahiercanada/")){
-            $vars['capability3'] = RECITDASHBOARD_STUDENT_CAPABILITY;
-            $vars['course3'] = $courseId;
-            $stmtStudentRole = $this->getStmtStudentRole('tuser.userid', 't1.course', ':capability3');
             $query .= " union
             (SELECT (@uniqueId := @uniqueId + 1) uniqueId, t3.id cm_id, CONVERT(t1.name USING utf8) cm_name, '' due_date, FROM_UNIXTIME(t1.timemodified) time_modified, count(*) nb_items, group_concat(tuser.userid) user_ids,
             concat(:ccurl, t3.id, '&tab=1') url,
@@ -262,15 +276,13 @@ class PersistCtrl extends MoodlePersistCtrl
             left join {recitcc_user_notes} tuser on t2.id = tuser.cccmid
             inner join {course_modules} t3 on t1.id = t3.instance and t3.module = (select id from {modules} where name = 'recitcahiercanada') and t1.course = t3.course
             where if(tuser.id > 0 and length(tuser.note) > 0 and (length(REGEXP_REPLACE(trim(coalesce(tuser.feedback, '')), '<[^>]*>+', '')) = 0), 1, 0) = 1 
-            and t1.course = :course3 and t2.notifyteacher = 1 $whereStmt and $stmtStudentRole
+            and t1.course = :course3 and t2.notifyteacher = 1 $whereStmt
             group by t3.id, t1.id)";
             $vars['ccurl'] = $CFG->wwwroot.'/mod/recitcahiercanada/view.php?id=';
+            $vars['course3'] = $courseId;
         }
 
         if(file_exists("{$CFG->dirroot}/mod/recitcahiertraces/")){
-            $vars['capability4'] = RECITDASHBOARD_STUDENT_CAPABILITY;
-            $vars['course4'] = $courseId;
-            $stmtStudentRole = $this->getStmtStudentRole('tuser.userid', 't1.course', ':capability4');
             $query .= " union
             (SELECT (@uniqueId := @uniqueId + 1) uniqueId, t3.id cm_id, CONVERT(t1.name USING utf8) cm_name, '' due_date, FROM_UNIXTIME(t1.timemodified) time_modified, count(*) nb_items, group_concat(tuser.userid) user_ids,
             concat(:cturl, t3.id, '&tab=1') url,
@@ -281,12 +293,14 @@ class PersistCtrl extends MoodlePersistCtrl
             left join {recitct_user_notes} tuser on t4.id = tuser.nid
             inner join {course_modules} t3 on t1.id = t3.instance and t3.module = (select id from {modules} where name = 'recitcahiertraces') and t1.course = t3.course
             where if(tuser.id > 0 and length(tuser.note) > 0 and (length(REGEXP_REPLACE(trim(coalesce(tuser.feedback, '')), '<[^>]*>+', '')) = 0), 1, 0) = 1 
-            and t1.course = :course4 and t4.notifyteacher = 1 $whereStmt and $stmtStudentRole
+            and t1.course = :course4 and t4.notifyteacher = 1 $whereStmt
             group by t3.id, t1.id)";
             $vars['cturl'] = $CFG->wwwroot.'/mod/recitcahiertraces/view.php?id=';
+            $vars['course4'] = $courseId;
         }
 
         $result = $this->getRecordsSQL($query, $vars);
+        $cache = array();//Keep a cache so we dont check capabilities for the same user multiple times.
 
         foreach($result as $item){
             $item->extra = new stdClass();
@@ -296,7 +310,26 @@ class PersistCtrl extends MoodlePersistCtrl
             if ($item->state == 2){
                 $item->extra->description = get_string('toaddfeedback', 'local_recitdashboard');
             }
-        }
+
+            //Capability start
+            $ids = explode(',', $item->userIds);
+            foreach($ids as $i => $userId){
+                if (isset($cache[$userId])){
+                    if (!$cache[$userId]){
+                        unset($ids[$i]);
+                    }
+                    continue;
+                }
+                if (!$this->isStudent($userId, $courseId)){
+                    $cache[$userId] = false;
+                    unset($ids[$i]);
+                }else{
+                    $cache[$userId] = true;
+                }
+            }
+            $item->userIds = implode(',', $ids);
+            //Capability end
+        } 
 
         return $result;
     }
@@ -309,13 +342,6 @@ class PersistCtrl extends MoodlePersistCtrl
         $daysWithoutConnect = intval($options['dayswithoutconnect']);
         $daysDueIntervalMin = intval($options['daysdueintervalmin']);
         $daysDueIntervalMax = intval($options['daysdueintervalmax']);
-
-        $vars['capability1'] = RECITDASHBOARD_STUDENT_CAPABILITY;
-        $stmtStudentRole = $this->getStmtStudentRole('t4.id', 't2.courseid', ':capability1');
-        $vars['capability2'] = RECITDASHBOARD_STUDENT_CAPABILITY;
-        $stmtStudentRole2 = $this->getStmtStudentRole('t4.id', 't2.courseid', ':capability2');
-        $vars['capability3'] = RECITDASHBOARD_STUDENT_CAPABILITY;
-        $stmtStudentRole3 = $this->getStmtStudentRole('t4.id', 't2.courseid', ':capability3');
 
         $visibleStmt = "";
         if($cmVisible != null){
@@ -333,7 +359,7 @@ class PersistCtrl extends MoodlePersistCtrl
         from {user_enrolments} t1
         inner join {enrol} t2 on t1.enrolid = t2.id
         inner join {user} t4 on t1.userid = t4.id and t4.deleted = 0 and t4.suspended = 0
-        where t2.courseid = :course1 and (DATEDIFF(now(), from_unixtime(t4.lastaccess)) >= $daysWithoutConnect) and $stmtStudentRole $groupStmt)
+        where t2.courseid = :course1 and (DATEDIFF(now(), from_unixtime(t4.lastaccess)) >= $daysWithoutConnect) $groupStmt)
         union
         (SELECT (@uniqueId := @uniqueId + 1) uniqueId, t4.id user_id, concat(t4.firstname, ' ', t4.lastname) username,  
         JSON_OBJECT('cmId', t5.id, 'cmName', t3.name, 'nbDaysLate', DATEDIFF(now(), from_unixtime(t3.duedate)), 'url', concat(:assignurl, t5.id)) issue
@@ -346,7 +372,7 @@ class PersistCtrl extends MoodlePersistCtrl
             t2.courseid = :course2 and 
             (t3.duedate > 0 and from_unixtime(t3.duedate) < now() and DATEDIFF(now(), from_unixtime(t3.duedate)) between $daysDueIntervalMin and $daysDueIntervalMax) and 
             not EXISTS((select id from {assign_submission} st1 where st1.assignment = t3.id and st1.userid = t4.id ))
-            and $stmtStudentRole2 $visibleStmt $groupStmt
+            $visibleStmt $groupStmt
         )
         union
         (SELECT (@uniqueId := @uniqueId + 1) uniqueId, t4.id user_id, concat(t4.firstname, ' ', t4.lastname) username,  
@@ -360,10 +386,11 @@ class PersistCtrl extends MoodlePersistCtrl
             t2.courseid = :course3 and 
             (t3.timeclose > 0 and from_unixtime(t3.timeclose) < now() and DATEDIFF(now(), from_unixtime(t3.timeclose)) between $daysDueIntervalMax and $daysDueIntervalMax) and 
             not EXISTS((select id from {quiz_attempts} st1 where st1.quiz = t3.id and st1.userid = t4.id ))
-            and $stmtStudentRole3 $visibleStmt $groupStmt
+            $visibleStmt $groupStmt
         )";
 
         $tmp = $this->getRecordsSQL($query, $vars);
+        $this->filterStudents($tmp, $courseId);
 
         $result = array();
         foreach($tmp as $item){
@@ -389,11 +416,9 @@ class PersistCtrl extends MoodlePersistCtrl
     }
 
     public function reportSectionResults($courseId, $groupId, $cmVisible = 1){
-        $stmtStudentRole = $this->getStmtStudentRole('t3.id', 't1.courseid', ':cap');
 
         $whereStmt = "";
         $vars = array();
-        $vars['cap'] = RECITDASHBOARD_STUDENT_CAPABILITY;
         if($cmVisible != null){
             $whereStmt = " and t4.visible = :visible";
             $vars['visible'] = $cmVisible;
@@ -420,7 +445,7 @@ class PersistCtrl extends MoodlePersistCtrl
         left join {groups_members} t5 on t3.id = t5.userid
         inner join {groups} t5_1 on t5.groupid = t5_1.id and t5_1.courseid = t1.courseid
         inner join {course_sections} t6 on t4.section = t6.id
-        where t1.courseid = :course and $stmtStudentRole $whereStmt
+        where t1.courseid = :course $whereStmt
         group by t1.courseid, t3.id, t4.id, t1.itemname, t1.itemmodule
         order by t6.section, find_in_set(cm_id, t6.`sequence`), concat(first_name, ' ', last_name)";
 
@@ -428,6 +453,7 @@ class PersistCtrl extends MoodlePersistCtrl
 
         $result = array();
         $cmList = array(); // gather all activities to create the columns 
+        $this->filterStudents($tmp, $courseId);
         foreach($tmp as $item){
             // gather the user information
             if(!isset($result[$item->userId])){
@@ -522,6 +548,7 @@ class PersistCtrl extends MoodlePersistCtrl
         $tmp = $this->getRecordsSQL($query, $vars);
         
         $result = array();
+        $this->filterStudents($tmp, $courseId);
         foreach($tmp as $item){
             $item->groupIds = explode(",", $item->groupIds);
 
@@ -556,9 +583,6 @@ class PersistCtrl extends MoodlePersistCtrl
             $vars['group'] = $groupId;
         }
 
-        $stmtStudentRole = $this->getStmtStudentRole('t6.id', 't1.id', ':cap');
-        $vars['cap'] = RECITDASHBOARD_STUDENT_CAPABILITY;
-
         $query = "SELECT (@uniqueId := @uniqueId + 1) uniqueId, if(count(*) > 0, 1, 0) has_random_questions, count(*) nb_questions
         FROM {course_modules} t1 
         inner join {quiz_sections} t2 on t1.instance = t2.quizid
@@ -589,7 +613,7 @@ class PersistCtrl extends MoodlePersistCtrl
         left join {groups_members} t6_1 on t6.id = t6_1.userid 
         left join {groups} t6_2 on t6_1.groupid = t6_2.id ";
 
-        $queryPart3 = " where t2_1.name = 'quiz' and t2.id = :activity and t1.id = :course and $groupStmt and $stmtStudentRole";
+        $queryPart3 = " where t2_1.name = 'quiz' and t2.id = :activity and t1.id = :course and $groupStmt";
         $queryPart4 = "order by t6.id, t5.slot, t4.sumgrades desc";
         $vars['activity'] = $activityId;
         $vars['course'] = $courseId;
@@ -619,6 +643,7 @@ class PersistCtrl extends MoodlePersistCtrl
         $result = new stdClass();
         $result->students = array();
         $result->questions = array();
+        $this->filterStudents($tmp, $courseId);
 
         foreach($tmp as $item){
             // course info

@@ -258,9 +258,10 @@ abstract class MoodleApi extends AWebApi
     }
 
     /**
-     * $level [a = admin | s = student]
+     * @param $level [a = admin | s = student]
+     * @param $courseId course to check permissions
      */
-    abstract public function canUserAccess($level);
+    abstract public function canUserAccess($level, $courseId = null);
 
     public function getCourseList($request){   
         try{
@@ -282,7 +283,7 @@ abstract class MoodleApi extends AWebApi
         try{
             $courseId = clean_param($request['courseId'], PARAM_INT);
             
-            $this->canUserAccess('a');
+            $this->canUserAccess('a', $courseId);
            
             $result = PersistCtrl::getInstance()->getSectionActivityList($courseId);
 			$this->prepareJson($result);            
@@ -296,10 +297,10 @@ abstract class MoodleApi extends AWebApi
 
     public function getEnrolledUserList($request){   
         try{
-            $cmId = intval($request['cmId']);
+            $cmId = clean_param($request['cmId'], PARAM_INT);
             $courseId = (isset($request['courseId']) ? clean_param($request['courseId'], PARAM_INT) : 0);
 
-            $this->canUserAccess('a');
+            $this->canUserAccess('a', $courseId);
 
             $tmp = PersistCtrl::getInstance()->getEnrolledUserList($cmId, 0, $courseId);
             $result = array();
@@ -315,7 +316,5 @@ abstract class MoodleApi extends AWebApi
         }        
     }
 }
-
-date_default_timezone_set("America/New_York");
 
 register_shutdown_function(function(){ return AWebApi::onPhpError(); });
