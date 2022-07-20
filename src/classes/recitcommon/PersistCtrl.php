@@ -65,7 +65,7 @@ abstract class MoodlePersistCtrl extends APersistCtrl{
         $result = array();
         foreach ($courses as $c) {
             $ccontext = \context_course::instance($c->id);
-            if (has_capability(RECITDASHBOARD_ACCESS_CAPABILITY, $ccontext)) {
+            if (has_capability(RECITDASHBOARD_TEACHER_CAPABILITY, $ccontext)) {
                 $result[] = array('courseId' => $c->id, 'courseName' => $c->fullname);
             }
         }

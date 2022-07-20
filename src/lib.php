@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 
-define('RECITDASHBOARD_ACCESS_CAPABILITY', 'local/recitdashboard:access');
+define('RECITDASHBOARD_TEACHER_CAPABILITY', 'local/recitdashboard:teacher');
 define('RECITDASHBOARD_STUDENT_CAPABILITY', 'local/recitdashboard:student');
 
 /**

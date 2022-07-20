@@ -53,7 +53,7 @@ class WebApi extends MoodleApi
 
         if ($courseId){
             $ccontext = \context_course::instance($courseId);
-            $isTeacher = has_capability(RECITDASHBOARD_ACCESS_CAPABILITY, $ccontext);
+            $isTeacher = has_capability(RECITDASHBOARD_TEACHER_CAPABILITY, $ccontext);
         }else{
             $ctrl = PersistCtrl::getInstance();
             $courses = $ctrl->getCourseList();

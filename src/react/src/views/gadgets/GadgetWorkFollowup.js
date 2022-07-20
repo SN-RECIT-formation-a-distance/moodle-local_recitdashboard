@@ -121,7 +121,7 @@ export class GadgetWorkFollowup extends Component{
                             return result;
                         })}
 
-                        {this.state.dataProvider.length === 0 &&  <Alert variant="success">{i18n.get_string('nofollowuptodo')}<FontAwesomeIcon icon={faThumbsUp}/></Alert>}
+                        {this.state.dataProvider.length === 0 &&  <Alert variant="success">{i18n.get_string('nofollowuptodo')}{" "}<FontAwesomeIcon icon={faThumbsUp}/></Alert>}
                     </div>
                 </Card.Body>
             </Card>;

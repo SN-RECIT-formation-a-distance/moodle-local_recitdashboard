@@ -234,22 +234,24 @@ class PersistCtrl extends MoodlePersistCtrl
             $whereStmt = " and exists(select id from {groups_members} tgm where tgm.groupid = $groupId and tuser.userid = tgm.userid)";
         }
 
-
-        $query = "(SELECT (@uniqueId := @uniqueId + 1) uniqueId, t3.id cm_id, t1.name cm_name, FROM_UNIXTIME(t1.duedate) due_date, FROM_UNIXTIME(min(tuser.timemodified)) time_modified, count(*) nb_items, group_concat(tuser.userid) user_ids,
-        concat(:assignurl, t3.id) url, 
-        2 state
+        $query = "
+        -- return the number of submitted assignments by users that need to be corrected
+        (SELECT  (@uniqueid := @uniqueid + 1) uniqueid, t3.id cm_id, t1.name cm_name, FROM_UNIXTIME(t1.duedate) due_date, FROM_UNIXTIME(min(tuser.timemodified)) time_modified, 
+        count(*) nb_items, tuser.userid as user_id, concat(:assignurl, t3.id) url, 2 state
         FROM {assign} t1
         inner join {assign_submission} tuser on t1.id = tuser.assignment
         inner join {course_modules} t3 on t1.id = t3.instance and t3.module = (select id from {modules} where name = 'assign') and t1.course = t3.course
         left join {assign_grades} t4 on t4.assignment = tuser.assignment and t4.userid = tuser.userid
-        -- gather allsignments that need to be (re)graded
+        -- gather all assignments that need to be (re)graded
         where t1.course = :course1 and tuser.status = 'submitted' and (coalesce(t4.grade,0) <= 0 or tuser.timemodified > coalesce(t4.timemodified,0)) $whereStmt
-        group by t3.id, t1.id)       
+        group by t3.id, t1.id, tuser.userid)      
+
         union
-        (select (@uniqueId := @uniqueId + 1) uniqueId, cm_id, cm_name, due_date, time_modified, count(*) nb_items, min(user_ids), url, state from 
-        (SELECT t1.id cm_id, t2.name cm_name, '' due_date, max(t3.timemodified) time_modified,  group_concat(distinct t3.userid) user_ids, t3.attempt quiz_attempt, t4.questionusageid, 
-        concat(:quizurl,t1.id,'&mode=grading') url, group_concat(tuser.state order by tuser.sequencenumber) states,
-        1 state
+
+        -- return the number of quizzes by users that have questions to be corrected manually 
+        (select  (@uniqueid := @uniqueid + 1) uniqueid, cm_id, cm_name, due_date, time_modified, count(*) nb_items, user_id, url, 1 state from 
+        (SELECT t1.id cm_id, t2.name cm_name, '' due_date, max(t3.timemodified) time_modified, t3.attempt quiz_attempt, t4.questionusageid, 
+        concat(:quizurl,t1.id,'&mode=grading') url, group_concat(tuser.state order by tuser.sequencenumber) states, t3.userid as user_id
         FROM 
         {course_modules} t1 
         inner join {quiz} t2 on t2.id = t1.instance and t1.module = (select id from {modules} where name = 'quiz') and t2.course = t1.course
@@ -257,10 +259,9 @@ class PersistCtrl extends MoodlePersistCtrl
         inner join {question_attempts} t4 on  t4.questionusageid = t3.uniqueid
         inner join {question_attempt_steps} tuser on t4.id = tuser.questionattemptid
         where t1.course = :course2 $whereStmt  
-        
         group by t1.id, t2.id, t3.id, t4.id) tab
         where right(states, 12) = 'needsgrading'
-        group by cm_id)";
+        group by cm_id, time_modified, user_id)";
         $vars['assignurl'] = $CFG->wwwroot.'/mod/assign/view.php?id=';
         $vars['quizurl'] = $CFG->wwwroot.'/mod/quiz/report.php?id=';
         $vars['course1'] = $courseId;
@@ -268,25 +269,25 @@ class PersistCtrl extends MoodlePersistCtrl
 
         if(file_exists("{$CFG->dirroot}/mod/recitcahiercanada/")){
             $query .= " union
-            (SELECT (@uniqueId := @uniqueId + 1) uniqueId, t3.id cm_id, CONVERT(t1.name USING utf8) cm_name, '' due_date, FROM_UNIXTIME(t1.timemodified) time_modified, count(*) nb_items, group_concat(tuser.userid) user_ids,
-            concat(:ccurl, t3.id, '&tab=1') url,
-            2 state
+            -- return the number of cahiercanada by users awaiting feedback
+            (SELECT (@uniqueid := @uniqueid + 1) uniqueid, t3.id cm_id, CONVERT(t1.name USING utf8) cm_name, '' due_date, FROM_UNIXTIME(t1.timemodified) time_modified, 
+            count(*) nb_items, tuser.userid as user_id, concat(:ccurl, t3.id, '&tab=1') url, 2 state
             FROM {recitcahiercanada} t1
             inner join {recitcc_cm_notes} t2 on t1.id = t2.ccid
             left join {recitcc_user_notes} tuser on t2.id = tuser.cccmid
             inner join {course_modules} t3 on t1.id = t3.instance and t3.module = (select id from {modules} where name = 'recitcahiercanada') and t1.course = t3.course
             where if(tuser.id > 0 and length(tuser.note) > 0 and (length(REGEXP_REPLACE(trim(coalesce(tuser.feedback, '')), '<[^>]*>+', '')) = 0), 1, 0) = 1 
             and t1.course = :course3 and t2.notifyteacher = 1 $whereStmt
-            group by t3.id, t1.id)";
+            group by t3.id, t1.id, tuser.userid)";
             $vars['ccurl'] = $CFG->wwwroot.'/mod/recitcahiercanada/view.php?id=';
             $vars['course3'] = $courseId;
         }
 
         if(file_exists("{$CFG->dirroot}/mod/recitcahiertraces/")){
             $query .= " union
-            (SELECT (@uniqueId := @uniqueId + 1) uniqueId, t3.id cm_id, CONVERT(t1.name USING utf8) cm_name, '' due_date, FROM_UNIXTIME(t1.timemodified) time_modified, count(*) nb_items, group_concat(tuser.userid) user_ids,
-            concat(:cturl, t3.id, '&tab=1') url,
-            2 state
+            -- return the number of cahiertraces by users awaiting feedback
+            (SELECT (@uniqueid := @uniqueid + 1) uniqueid, t3.id cm_id, CONVERT(t1.name USING utf8) cm_name, '' due_date, FROM_UNIXTIME(t1.timemodified) time_modified, 
+            count(*) nb_items, tuser.userid as user_id, concat(:cturl, t3.id, '&tab=1') url, 2 state
             FROM {recitcahiertraces} t1
             inner join {recitct_groups} t2 on t1.id = t2.ctid
             left join {recitct_notes} t4 on t2.id = t4.gid
@@ -294,44 +295,52 @@ class PersistCtrl extends MoodlePersistCtrl
             inner join {course_modules} t3 on t1.id = t3.instance and t3.module = (select id from {modules} where name = 'recitcahiertraces') and t1.course = t3.course
             where if(tuser.id > 0 and length(tuser.note) > 0 and (length(REGEXP_REPLACE(trim(coalesce(tuser.feedback, '')), '<[^>]*>+', '')) = 0), 1, 0) = 1 
             and t1.course = :course4 and t4.notifyteacher = 1 $whereStmt
-            group by t3.id, t1.id)";
+            group by t3.id, t1.id, tuser.userid)";
             $vars['cturl'] = $CFG->wwwroot.'/mod/recitcahiertraces/view.php?id=';
             $vars['course4'] = $courseId;
         }
 
-        $result = $this->getRecordsSQL($query, $vars);
-        $cache = array();//Keep a cache so we dont check capabilities for the same user multiple times.
-
-        foreach($result as $item){
-            $item->extra = new stdClass();
-            if ($item->state == 1){
-                $item->extra->description = get_string('tobegraded', 'local_recitdashboard');
-            }
-            if ($item->state == 2){
-                $item->extra->description = get_string('toaddfeedback', 'local_recitdashboard');
-            }
-
+        $tmp = $this->getRecordsSQL($query, $vars);
+        
+        $cacheStudents = array(); // Keep a cache so we dont check capabilities for the same user multiple times.
+        $result = array();
+        foreach($tmp as $item){            
             //Capability start
-            $ids = explode(',', $item->userIds);
-            foreach($ids as $i => $userId){
-                if (isset($cache[$userId])){
-                    if (!$cache[$userId]){
-                        unset($ids[$i]);
-                    }
+            if (!isset($cacheStudents[$item->userId])){
+                if ($this->isStudent($item->userId, $courseId)){
+                    $cacheStudents[$item->userId] = true;
+                }
+                else{
+                    $cacheStudents[$item->userId] = false;
                     continue;
                 }
-                if (!$this->isStudent($userId, $courseId)){
-                    $cache[$userId] = false;
-                    unset($ids[$i]);
-                }else{
-                    $cache[$userId] = true;
-                }
             }
-            $item->userIds = implode(',', $ids);
+            else if($cacheStudents[$item->userId] == false){
+                continue;
+            }
             //Capability end
+
+            // index by activity counting the number of occurrences
+            if(isset($result[$item->cmId])){
+                $result[$item->cmId]->nbItems += $item->nbItems;
+            }
+            else{
+                $item->extra = new stdClass();
+                if ($item->state == 1){
+                    $item->extra->description = get_string('tobegraded', 'local_recitdashboard');
+                }
+                else if ($item->state == 2){
+                    $item->extra->description = get_string('toaddfeedback', 'local_recitdashboard');
+                }
+               
+                unset($item->uniqueid);
+                unset($item->state);
+                unset($item->userId);
+                $result[$item->cmId] = $item;
+            }
         } 
 
-        return $result;
+        return array_values($result); 
     }
 
     public function getStudentFollowUp($courseId, $groupId = 0, $cmVisible = 1){
