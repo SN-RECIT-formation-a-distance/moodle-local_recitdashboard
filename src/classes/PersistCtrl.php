@@ -111,6 +111,8 @@ class PersistCtrl extends MoodlePersistCtrl
     
         $result = $this->getRecordsSQL($query, $vars);
         
+        $this->filterStudents($result, $courseId);
+
         foreach($result as $item){
             $item->groups = json_decode($item->groupList);
         }
@@ -130,7 +132,7 @@ class PersistCtrl extends MoodlePersistCtrl
                     $result[$group->id] = new stdClass();
                     $result[$group->id]->nb = 0;
                     $result[$group->id]->g = 0;
-                    $result[$group->id]->gDesc = '% '.get_string('work', 'local_recitdashboard').' > % '.get_string('work', 'local_recitdashboard').'';
+                    $result[$group->id]->gDesc = '% '.get_string('work', 'local_recitdashboard').' > % '.get_string('time', 'local_recitdashboard').'';
                     $result[$group->id]->y = 0;
                     $result[$group->id]->yDesc = '(% '.get_string('work', 'local_recitdashboard').' * 5%) > % '.get_string('time', 'local_recitdashboard').'';
                     $result[$group->id]->r = 0;
@@ -172,20 +174,62 @@ class PersistCtrl extends MoodlePersistCtrl
         }
         $vars['courseid'] = $courseId;
 
-        $query = "select (@uniqueId := @uniqueId + 1) uniqueId, group_id, group_name, (g / (g+y+r) * 100) g, '> 80'  g_desc, (y / (g+y+r) * 100) y, '>= 70'  y_desc, (r / (g+y+r) * 100) r, '< 70' r_desc from
-        (select group_id, group_name, sum(if(final_grade_pct > 80, 1, 0)) g , sum(if(final_grade_pct >= 70, 1, 0)) y, sum(if(final_grade_pct < 70, 1, 0)) r
-        from
-        (SELECT coalesce(t3_2.id, 0) group_id, coalesce(t3_2.name,'') group_name, t3.id user_id, concat(t3.firstname, ' ', t3.lastname) student_name, COALESCE((t2.finalgrade / t1.grademax) * 100, 0) final_grade_pct
+        $query = "SELECT  (@uniqueid := @uniqueid + 1) uniqueid, t3.id user_id, coalesce(t3_2.id, 0) group_id, coalesce(t3_2.name,'') group_name, 
+        t2.finalgrade, t1.grademax, COALESCE((t2.finalgrade / t1.grademax) * 100, 0) final_grade_pct
                     FROM {grade_items} t1                
                         inner join {grade_grades} t2 on t1.id = t2.itemid
                         inner join {user} t3 on t2.userid = t3.id and t3.deleted = 0 and t3.suspended = 0
                         left join {groups_members} t3_1 on t3.id = t3_1.userid
                         left join {groups} t3_2 on t3_1.groupid = t3_2.id and t3_2.courseid = t1.courseid 
-                        WHERE t1.courseid = :courseid and itemtype = 'course' $whereStmt
-                        group by t3_2.id, t3.id, t2.finalgrade, t1.grademax) tab1
-        group by group_name) tab2";
+                        WHERE t1.courseid = :courseid and itemtype = 'course' $whereStmt";
 
-        return $this->getRecordsSQL($query, $vars);
+        $tmp = $this->getRecordsSQL($query, $vars);
+
+        $this->filterStudents($tmp, $courseId);
+
+        $result = array();
+        foreach($tmp as $item){
+            if(!isset($result[$item->groupId])){
+                $result[$item->groupId] = new stdClass();
+                $result[$item->groupId]->group = new stdClass();
+                $result[$item->groupId]->group->id = $item->groupId;
+                $result[$item->groupId]->group->name = $item->groupName;
+
+                $result[$item->groupId]->g = 0;
+                $result[$item->groupId]->gDesc = '>= 80';
+
+                $result[$item->groupId]->y = 0;
+                $result[$item->groupId]->yDesc = '>= 70';
+
+                $result[$item->groupId]->r = 0;
+                $result[$item->groupId]->rDesc = '< 70';
+            }
+            
+            if($item->finalGradePct >= 80){
+                $result[$item->groupId]->g = $result[$item->groupId]->g + 1;    
+            }
+            else if($item->finalGradePct >= 70){
+                $result[$item->groupId]->y = $result[$item->groupId]->y + 1;
+            }
+            else{
+                $result[$item->groupId]->r = $result[$item->groupId]->r + 1;
+            }
+        }
+
+        foreach($result as $i => $item){
+            $total = $item->g + $item->y + $item->r;
+
+            if($total == 0){ 
+                unset($result[$i]);
+                continue;
+            }
+
+            $result[$item->group->id]->g = $item->g / $total * 100;
+            $result[$item->group->id]->y = $item->y / $total * 100;
+            $result[$item->group->id]->r = $item->r / $total * 100;
+        }
+
+        return array_values($result);
     }
     
     public function getGroupsOverview($courseId, $groupId = 0){
@@ -203,16 +247,6 @@ class PersistCtrl extends MoodlePersistCtrl
         }
 
         foreach($grades as $item){
-            if(!isset($result[$item->groupId])){
-                $result[$item->groupId] = new stdClass();                
-            }
-
-            $item->group = new stdClass();
-            $item->group->id = $item->groupId;
-            $item->group->name = $item->groupName;
-            unset($item->groupId);
-            unset($item->groupName);
-
             $result[$item->group->id]->grades = $item;
         }
 
@@ -469,7 +503,9 @@ class PersistCtrl extends MoodlePersistCtrl
 
         $result = array();
         $cmList = array(); // gather all activities to create the columns 
+        
         $this->filterStudents($tmp, $courseId);
+
         foreach($tmp as $item){
             // gather the user information
             if(!isset($result[$item->userId])){
