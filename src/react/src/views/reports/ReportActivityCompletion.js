@@ -165,7 +165,7 @@ export class ReportActivityCompletion  extends Component{
     }
 
     getCellText(item){
-        switch(item.completionState){
+        switch(parseInt(item.completionState, 10)){
             case 1:
                 return <FontAwesomeIcon icon={faCheck}/>;
             case 2:

@@ -54,26 +54,28 @@ class PersistCtrl extends MoodlePersistCtrl
 
     protected function isStudent($userId, $courseId){
         $ccontext = \context_course::instance($courseId);
-        if (has_capability(RECITDASHBOARD_STUDENT_CAPABILITY, $ccontext, $userId)) {
+        if (has_capability(RECITDASHBOARD_STUDENT_CAPABILITY, $ccontext, $userId, false)) {
             return true;
         }
 
         return false;
     }
 
-    protected function filterStudents(array &$tmp, $courseId){
-        $cache = array();//Keep a cache so we dont check capabilities for the same user multiple times.
-        foreach($tmp as $item){
-            if (isset($cache[$item->userId]) && !$cache[$item->userId]){
-                unset($item);
-                continue;
+    protected function filterStudents(array &$dataProvider, $courseId){
+        $cacheStudents = array(); // Keep a cache so we dont check capabilities for the same user multiple times.
+
+        foreach($dataProvider as $i => $item){
+            if (!isset($cacheStudents[$item->userId])){
+                if ($this->isStudent($item->userId, $courseId)){
+                    $cacheStudents[$item->userId] = true;
+                }
+                else{
+                    $cacheStudents[$item->userId] = false;
+                    unset($dataProvider[$i]);
+                }
             }
-            if (!$this->isStudent($item->userId, $courseId)){
-                $cache[$item->userId] = false;
-                unset($item);
-                continue;
-            }else{
-                $cache[$item->userId] = true;
+            else if($cacheStudents[$item->userId] == false){
+                unset($dataProvider[$i]);
             }
         }
     }
@@ -363,12 +365,15 @@ class PersistCtrl extends MoodlePersistCtrl
         }
 
         $query = "
+        -- return if the student is X days without logging in
         (select (@uniqueId := @uniqueId + 1) uniqueId, t4.id user_id, concat(t4.firstname, ' ', t4.lastname) username, 
         JSON_OBJECT('nbDaysLastAccess', DATEDIFF(now(), from_unixtime(t4.lastaccess))) issue
         from {user_enrolments} t1
         inner join {enrol} t2 on t1.enrolid = t2.id
         inner join {user} t4 on t1.userid = t4.id and t4.deleted = 0 and t4.suspended = 0
         where t2.courseid = :course1 and (DATEDIFF(now(), from_unixtime(t4.lastaccess)) >= $daysWithoutConnect) $groupStmt)
+
+        -- return students who have delayed submitting an assignment based on the settings. The assignment must set a due date
         union
         (SELECT (@uniqueId := @uniqueId + 1) uniqueId, t4.id user_id, concat(t4.firstname, ' ', t4.lastname) username,  
         JSON_OBJECT('cmId', t5.id, 'cmName', t3.name, 'nbDaysLate', DATEDIFF(now(), from_unixtime(t3.duedate)), 'url', concat(:assignurl, t5.id)) issue
@@ -383,6 +388,8 @@ class PersistCtrl extends MoodlePersistCtrl
             not EXISTS((select id from {assign_submission} st1 where st1.assignment = t3.id and st1.userid = t4.id ))
             $visibleStmt $groupStmt
         )
+
+        -- return students who have delayed submitting an quiz based on the settings. The quiz must set a time close
         union
         (SELECT (@uniqueId := @uniqueId + 1) uniqueId, t4.id user_id, concat(t4.firstname, ' ', t4.lastname) username,  
         JSON_OBJECT('cmId', t5.id, 'cmName', t3.name, 'nbDaysLate', DATEDIFF(now(), from_unixtime(t3.timeclose)), 'url', concat(:quizurl, t5.id)) issue
@@ -393,7 +400,7 @@ class PersistCtrl extends MoodlePersistCtrl
         inner join {course_modules} t5 on t3.id = t5.instance and t5.module = (select id from {modules} where name = 'quiz') and t5.course = t2.courseid
         where 
             t2.courseid = :course3 and 
-            (t3.timeclose > 0 and from_unixtime(t3.timeclose) < now() and DATEDIFF(now(), from_unixtime(t3.timeclose)) between $daysDueIntervalMax and $daysDueIntervalMax) and 
+            (t3.timeclose > 0 and from_unixtime(t3.timeclose) < now() and DATEDIFF(now(), from_unixtime(t3.timeclose)) between $daysDueIntervalMin and $daysDueIntervalMax) and 
             not EXISTS((select id from {quiz_attempts} st1 where st1.quiz = t3.id and st1.userid = t4.id ))
             $visibleStmt $groupStmt
         )";
