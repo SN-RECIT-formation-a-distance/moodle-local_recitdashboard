@@ -346,8 +346,9 @@ class FilterOptions extends Component{
         let options = this.props.options;
 
         let studentList = this.state.studentList;
+
         if(options.group.id > 0){
-            studentList = studentList.filter( item => item.data.groupId === options.group.id);
+            studentList = studentList.filter( item => item.data.groupId.toString() === options.group.id.toString());
         }
 
         let main = 

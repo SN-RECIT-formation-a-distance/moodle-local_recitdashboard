@@ -100,7 +100,7 @@ abstract class MoodlePersistCtrl extends APersistCtrl{
 
     public function getEnrolledUserList($cmId = 0, $userId = 0, $courseId = 0){
         $cmStmt = " 1 ";
-        $vars = array();
+        
         if($cmId > 0){
             $cmStmt = "(t1.courseid = (select course from {course_modules} where id = $cmId))";
         }
@@ -118,11 +118,8 @@ abstract class MoodlePersistCtrl extends APersistCtrl{
         // This query fetch all students with their groups. The groups belong to the course according to the parameter.
         // In case a student has no group, the left join in the first query add them to the result with groupId = 0.
         // In case there are no groups in the course, the second query adds (by union set) the students without group.
-
-        $vars['str'] = get_string("nogroup", 'local_recitdashboard');
-        $vars['str2'] = get_string("nogroup", 'local_recitdashboard');
-        $query = "(select (@uniqueId := @uniqueId + 1) uniqueId, t1.enrol, t1.courseid course_id, t3.id user_id, concat(t3.firstname, ' ', t3.lastname) user_name, coalesce(t5.id,-1) group_id, 
-            coalesce(t5.name, :str) group_name 
+        $query = "(select (@uniqueid := @uniqueid + 1) uniqueid, t1.courseid course_id, t3.id user_id, concat(t3.firstname, ' ', t3.lastname) user_name, coalesce(t5.id,-1) group_id, 
+            coalesce(t5.name, 'nogroup') group_name 
             from {enrol} t1
         inner join {user_enrolments} t2 on t1.id = t2.enrolid
         inner join {user} t3 on t2.userid = t3.id and t3.suspended = 0 and t3.deleted = 0
@@ -131,21 +128,22 @@ abstract class MoodlePersistCtrl extends APersistCtrl{
         where (t1.courseid = t5.courseid) and $cmStmt and $userStmt and $courseStmt
         order by group_name asc, user_name asc)
         union
-        (select (@uniqueId := @uniqueId + 1) uniqueId, t1.enrol, t1.courseid course_id, t3.id user_id, concat(t3.firstname, ' ', t3.lastname) user_name, -1 group_id, :str2 group_name 
+        (select (@uniqueid := @uniqueid + 1) uniqueid, t1.courseid course_id, t3.id user_id, concat(t3.firstname, ' ', t3.lastname) user_name, -1 group_id, 'nogroup' group_name 
         from {enrol} t1
         inner join {user_enrolments} t2 on t1.id = t2.enrolid
         inner join {user} t3 on t2.userid = t3.id and t3.suspended = 0 and t3.deleted = 0
         where $cmStmt and $userStmt and $courseStmt
         order by user_name asc)";
         
-        $tmp = $this->getRecordsSQL($query, $vars);
+        $tmp = $this->getRecordsSQL($query);
 
         $result = array();
         foreach($tmp as $item){
             $result[$item->groupName][] = $item;
+            unset($item->uniqueid);
         }
 
-        return $result;
+        return array_values($result);
     }
 }
 

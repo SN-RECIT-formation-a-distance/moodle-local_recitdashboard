@@ -52,6 +52,22 @@ class PersistCtrl extends MoodlePersistCtrl
         parent::__construct($mysqlConn, $signedUser);
     }
 
+    public function getEnrolledUserList($cmId = 0, $userId = 0, $courseId = 0){
+        $result = parent::getEnrolledUserList($cmId, $userId, $courseId);
+
+        foreach($result as $i => $group){
+            $this->filterStudents($result[$i], $courseId);
+
+            foreach($group as $student){
+                if($student->groupName == 'nogroup'){
+                    $student->groupName = get_string("nogroup", 'local_recitdashboard');
+                }
+            }
+        }
+
+        return $result;
+    }
+
     protected function isStudent($userId, $courseId){
         $ccontext = \context_course::instance($courseId);
         if (has_capability(RECITDASHBOARD_STUDENT_CAPABILITY, $ccontext, $userId, false)) {
@@ -78,6 +94,8 @@ class PersistCtrl extends MoodlePersistCtrl
                 unset($dataProvider[$i]);
             }
         }
+
+        $dataProvider = array_values($dataProvider); // reindex array
     }
     
     public function getCourseProgressionOverview($courseId, $groupId = 0){
@@ -279,7 +297,7 @@ class PersistCtrl extends MoodlePersistCtrl
         inner join {course_modules} t3 on t1.id = t3.instance and t3.module = (select id from {modules} where name = 'assign') and t1.course = t3.course
         left join {assign_grades} t4 on t4.assignment = tuser.assignment and t4.userid = tuser.userid
         -- gather all assignments that need to be (re)graded
-        where t1.course = :course1 and tuser.status = 'submitted' and (coalesce(t4.grade,0) <= 0 or tuser.timemodified > coalesce(t4.timemodified,0)) $whereStmt
+        where t1.course = :course1 and tuser.status = 'submitted' and (coalesce(t4.grade,0) < 0 or tuser.timemodified > coalesce(t4.timemodified,0)) $whereStmt
         group by t3.id, t1.id, tuser.userid)      
 
         union
@@ -338,24 +356,10 @@ class PersistCtrl extends MoodlePersistCtrl
 
         $tmp = $this->getRecordsSQL($query, $vars);
         
-        $cacheStudents = array(); // Keep a cache so we dont check capabilities for the same user multiple times.
+        $this->filterStudents($tmp, $courseId);
+
         $result = array();
         foreach($tmp as $item){            
-            //Capability start
-            if (!isset($cacheStudents[$item->userId])){
-                if ($this->isStudent($item->userId, $courseId)){
-                    $cacheStudents[$item->userId] = true;
-                }
-                else{
-                    $cacheStudents[$item->userId] = false;
-                    continue;
-                }
-            }
-            else if($cacheStudents[$item->userId] == false){
-                continue;
-            }
-            //Capability end
-
             // index by activity counting the number of occurrences
             if(isset($result[$item->cmId])){
                 $result[$item->cmId]->nbItems += $item->nbItems;
@@ -366,7 +370,7 @@ class PersistCtrl extends MoodlePersistCtrl
                     $item->extra->description = get_string('tobegraded', 'local_recitdashboard');
                 }
                 else if ($item->state == 2){
-                    $item->extra->description = get_string('toaddfeedback', 'local_recitdashboard');
+                    $item->extra->description = get_string('toaddfeedback', 'local_recitdashboard') . $item->userId;
                 }
                
                 unset($item->uniqueid);
@@ -440,6 +444,7 @@ class PersistCtrl extends MoodlePersistCtrl
         )";
 
         $tmp = $this->getRecordsSQL($query, $vars);
+
         $this->filterStudents($tmp, $courseId);
 
         $result = array();
