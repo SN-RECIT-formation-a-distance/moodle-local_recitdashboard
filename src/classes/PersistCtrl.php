@@ -304,17 +304,17 @@ class PersistCtrl extends MoodlePersistCtrl
 
         -- return the number of quizzes by users that have questions to be corrected manually 
         (select  (@uniqueid := @uniqueid + 1) uniqueid, cm_id, cm_name, due_date, time_modified, count(*) nb_items, user_id, url, 1 state from 
-        (SELECT t1.id cm_id, t2.name cm_name, '' due_date, max(t3.timemodified) time_modified, t3.attempt quiz_attempt, t4.questionusageid, 
-        concat(:quizurl,t1.id,'&mode=grading') url, group_concat(tuser.state order by tuser.sequencenumber) states, t3.userid as user_id
+        (SELECT t1.id cm_id, t2.name cm_name, '' due_date, max(tuser.timemodified) time_modified, tuser.attempt quiz_attempt, t4.questionusageid, 
+        concat(:quizurl,t1.id,'&mode=grading') url, group_concat(t5.state order by t5.sequencenumber) states, tuser.userid as user_id
         FROM 
         {course_modules} t1 
         inner join {quiz} t2 on t2.id = t1.instance and t1.module = (select id from {modules} where name = 'quiz') and t2.course = t1.course
-        inner join {quiz_attempts} t3 on t3.quiz = t2.id 
-        inner join {question_attempts} t4 on  t4.questionusageid = t3.uniqueid
-        inner join {question_attempt_steps} tuser on t4.id = tuser.questionattemptid
+        inner join {quiz_attempts} tuser on tuser.quiz = t2.id 
+        inner join {question_attempts} t4 on  t4.questionusageid = tuser.uniqueid
+        inner join {question_attempt_steps} t5 on t4.id = t5.questionattemptid
         where t1.course = :course2 $whereStmt  
-        group by t1.id, t2.id, t3.id, t4.id) tab
-        where right(states, 12) = 'needsgrading'
+        group by t1.id, t2.id, tuser.id, t4.id) tab
+        where right(states, 12) = 'needsgrading' 
         group by cm_id, time_modified, user_id)";
         $vars['assignurl'] = $CFG->wwwroot.'/mod/assign/view.php?id=';
         $vars['quizurl'] = $CFG->wwwroot.'/mod/quiz/report.php?id=';
