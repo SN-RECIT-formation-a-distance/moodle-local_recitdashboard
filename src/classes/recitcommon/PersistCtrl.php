@@ -81,7 +81,7 @@ abstract class MoodlePersistCtrl extends APersistCtrl{
                 when 'quiz' then (select name from {quiz} where id = t3.instance)
                 when 'book' then (select name from {book} where id = t3.instance)
                 when 'lesson' then (select name from {lesson} where id = t3.instance)
-                when 'assignment' then (select name from {assign} where id = t3.instance)
+                when 'assign' then (select name from {assign} where id = t3.instance)
                 when 'scorm' then (select CONVERT(name USING utf8) from {scorm} where id = t3.instance)
                 when 'h5pactivity' then (select CONVERT(name USING utf8) from {h5pactivity} where id = t3.instance)
                 else 'none' end) cm_name
