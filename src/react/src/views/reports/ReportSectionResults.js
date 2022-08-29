@@ -73,13 +73,13 @@ export class ReportSectionResults  extends Component{
         }
 
         if(this.props.options.student.id > 0){
-            dataProvider = dataProvider.filter(item => item.userId === this.props.options.student.id);
+            dataProvider = dataProvider.filter(item => parseInt(item.userId) === this.props.options.student.id);
         }
 
         let grades = JsNx.at(dataProvider, 0, {grades: []}).grades;
 
         let main = 
-                <div >
+                <div>
                     <DataGrid orderBy={true}>
                         <DataGrid.Header>
                             <DataGrid.Header.Row>
@@ -149,11 +149,11 @@ export class ReportSectionResults  extends Component{
     }
 
     filterSectionAndCm(item){
-        if((this.props.options.section.id > 0) && (item.sectionId !== this.props.options.section.id)){
+        if((this.props.options.section.id > 0) && (parseInt(item.sectionId) !== this.props.options.section.id)){
             return false;
         }
 
-        if((this.props.options.cm.id > 0) && (item.cmId !== this.props.options.cm.id)){
+        if((this.props.options.cm.id > 0) && (parseInt(item.cmId) !== this.props.options.cm.id)){
             return false;
         }
 

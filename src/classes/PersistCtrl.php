@@ -98,9 +98,9 @@ class PersistCtrl extends MoodlePersistCtrl
         $dataProvider = array_values($dataProvider); // reindex array
     }
     
-    public function getCourseProgressionOverview($courseId, $groupId = 0){
+    /*public function getCourseProgressionOverview($courseId, $groupId = 0){
         $vars = array();
-        $whereStmt = " and 1 ";
+        $whereStmt = " and true ";
 
         if($groupId > 0){
             $whereStmt = " and t3_2.id = :gid ";
@@ -109,7 +109,7 @@ class PersistCtrl extends MoodlePersistCtrl
         $vars['courseid'] = $courseId;
 
         $query = "select *, round(coalesce(datediff(now(), date_start_user)/datediff(end_date_course,date_start_user)*100,0),2) pct_time from 
-            (select (@uniqueId := @uniqueId + 1) uniqueId, t1.courseid course_id, 
+            (select ". $this->sql_uniqueid() ." uniqueId, t1.courseid course_id, 
             t2.userid user_id, concat(t3.firstname, ' ', t3.lastname) student_name,  
             concat('[', group_concat(distinct JSON_OBJECT('id', coalesce(t3_2.id, 0), 'name', coalesce(t3_2.name, '')) order by t3_2.name), ']') group_list,
             round(sum(if(coalesce(t5.completionstate,0) = 1, 1, 0))/count(*),2) * 100 pct_work, FROM_UNIXTIME(max(t5.timemodified)) last_update,
@@ -128,11 +128,11 @@ class PersistCtrl extends MoodlePersistCtrl
             order by pct_time desc, pct_work desc";
     
         $result = $this->getRecordsSQL($query, $vars);
-        
         $this->filterStudents($result, $courseId);
 
         foreach($result as $item){
-            $item->groups = json_decode($item->groupList);
+            $item->groups = json_decode('['.$item->groupList.']');
+            if (!$item->groups) $item->groups = array();
         }
 
         return $result;
@@ -192,7 +192,7 @@ class PersistCtrl extends MoodlePersistCtrl
         }
         $vars['courseid'] = $courseId;
 
-        $query = "SELECT  (@uniqueid := @uniqueid + 1) uniqueid, t3.id user_id, coalesce(t3_2.id, 0) group_id, coalesce(t3_2.name,'') group_name, 
+        $query = "SELECT ". $this->sql_uniqueid() ." uniqueid, t3.id user_id, coalesce(t3_2.id, 0) group_id, coalesce(t3_2.name,'') group_name, 
         t2.finalgrade, t1.grademax, COALESCE((t2.finalgrade / t1.grademax) * 100, 0) final_grade_pct
                     FROM {grade_items} t1                
                         inner join {grade_grades} t2 on t1.id = t2.itemid
@@ -276,7 +276,7 @@ class PersistCtrl extends MoodlePersistCtrl
         });
 
         return $result;
-    }
+    }*/
 
     public function getWorkFollowup($courseId, $groupId = 0){
         global $CFG;
@@ -290,8 +290,8 @@ class PersistCtrl extends MoodlePersistCtrl
 
         $query = "
         -- return the number of submitted assignments by users that need to be corrected
-        (SELECT  (@uniqueid := @uniqueid + 1) uniqueid, t3.id cm_id, t1.name cm_name, FROM_UNIXTIME(t1.duedate) due_date, FROM_UNIXTIME(min(tuser.timemodified)) time_modified, 
-        count(*) nb_items, tuser.userid as user_id, concat(:assignurl, t3.id) url, 2 state
+        (SELECT ". $this->sql_uniqueid() ." uniqueid, t3.id cm_id, ". $this->sql_castutf8('t1.name')." cm_name, t1.duedate due_date, min(tuser.timemodified) time_modified, count(distinct tuser.id) nb_items, tuser.userid user_id,
+        ". $this->mysqlConn->sql_concat(':assignurl', 't3.id')." url, 2 state
         FROM {assign} t1
         inner join {assign_submission} tuser on t1.id = tuser.assignment
         inner join {course_modules} t3 on t1.id = t3.instance and t3.module = (select id from {modules} where name = 'assign') and t1.course = t3.course
@@ -303,9 +303,9 @@ class PersistCtrl extends MoodlePersistCtrl
         union
 
         -- return the number of quizzes by users that have questions to be corrected manually 
-        (select  (@uniqueid := @uniqueid + 1) uniqueid, cm_id, cm_name, due_date, time_modified, count(*) nb_items, user_id, url, 1 state from 
-        (SELECT t1.id cm_id, t2.name cm_name, '' due_date, max(tuser.timemodified) time_modified, tuser.attempt quiz_attempt, t4.questionusageid, 
-        concat(:quizurl,t1.id,'&mode=grading') url, group_concat(t5.state order by t5.sequencenumber) states, tuser.userid as user_id
+        (select ". $this->sql_uniqueid() ." uniqueid, cm_id, min(cm_name), min(due_date), min(time_modified), count(*) nb_items, user_id, min(url), 1 state from 
+        (SELECT t1.id cm_id, ". $this->sql_castutf8('t2.name')." cm_name, 0 due_date, max(tuser.timemodified) time_modified, tuser.attempt quiz_attempt, t4.questionusageid, 
+        ". $this->mysqlConn->sql_concat(':quizurl', 't1.id', "'&mode=grading'")." url, ". $this->sql_group_concat('t5.state', ',', 't5.sequencenumber') ." states, min(t5.userid) user_id
         FROM 
         {course_modules} t1 
         inner join {quiz} t2 on t2.id = t1.instance and t1.module = (select id from {modules} where name = 'quiz') and t2.course = t1.course
@@ -324,13 +324,13 @@ class PersistCtrl extends MoodlePersistCtrl
         if(file_exists("{$CFG->dirroot}/mod/recitcahiercanada/")){
             $query .= " union
             -- return the number of cahiercanada by users awaiting feedback
-            (SELECT (@uniqueid := @uniqueid + 1) uniqueid, t3.id cm_id, CONVERT(t1.name USING utf8) cm_name, '' due_date, FROM_UNIXTIME(t1.timemodified) time_modified, 
-            count(*) nb_items, tuser.userid as user_id, concat(:ccurl, t3.id, '&tab=1') url, 2 state
+            (SELECT ". $this->sql_uniqueid() ." uniqueid, t3.id cm_id, ". $this->sql_castutf8('t1.name')." cm_name, 0 due_date, t1.timemodified time_modified, 
+            count(*) nb_items, tuser.userid as user_id, ". $this->mysqlConn->sql_concat(':ccurl', 't3.id')." url, 2 state
             FROM {recitcahiercanada} t1
             inner join {recitcc_cm_notes} t2 on t1.id = t2.ccid
             left join {recitcc_user_notes} tuser on t2.id = tuser.cccmid
             inner join {course_modules} t3 on t1.id = t3.instance and t3.module = (select id from {modules} where name = 'recitcahiercanada') and t1.course = t3.course
-            where if(tuser.id > 0 and length(tuser.note) > 0 and (length(REGEXP_REPLACE(trim(coalesce(tuser.feedback, '')), '<[^>]*>+', '')) = 0), 1, 0) = 1 
+            where (case when tuser.id > 0 and length(tuser.note) > 0 and (length(REGEXP_REPLACE(trim(coalesce(tuser.feedback, '')), '<[^>]*>+', '')) = 0) then 1 else 0 end) = 1 
             and t1.course = :course3 and t2.notifyteacher = 1 $whereStmt
             group by t3.id, t1.id, tuser.userid)";
             $vars['ccurl'] = $CFG->wwwroot.'/mod/recitcahiercanada/view.php?id=';
@@ -340,14 +340,14 @@ class PersistCtrl extends MoodlePersistCtrl
         if(file_exists("{$CFG->dirroot}/mod/recitcahiertraces/")){
             $query .= " union
             -- return the number of cahiertraces by users awaiting feedback
-            (SELECT (@uniqueid := @uniqueid + 1) uniqueid, t3.id cm_id, CONVERT(t1.name USING utf8) cm_name, '' due_date, FROM_UNIXTIME(t1.timemodified) time_modified, 
-            count(*) nb_items, tuser.userid as user_id, concat(:cturl, t3.id, '&tab=1') url, 2 state
+            (SELECT ". $this->sql_uniqueid() ." uniqueid, t3.id cm_id, ". $this->sql_castutf8('t1.name')." cm_name, 0 due_date, t1.timemodified time_modified, 
+            count(*) nb_items, tuser.userid as user_id, ". $this->mysqlConn->sql_concat(':cturl', 't3.id')." url, 2 state
             FROM {recitcahiertraces} t1
             inner join {recitct_groups} t2 on t1.id = t2.ctid
             left join {recitct_notes} t4 on t2.id = t4.gid
             left join {recitct_user_notes} tuser on t4.id = tuser.nid
             inner join {course_modules} t3 on t1.id = t3.instance and t3.module = (select id from {modules} where name = 'recitcahiertraces') and t1.course = t3.course
-            where if(tuser.id > 0 and length(tuser.note) > 0 and (length(REGEXP_REPLACE(trim(coalesce(tuser.feedback, '')), '<[^>]*>+', '')) = 0), 1, 0) = 1 
+            where (case when tuser.id > 0 and length(tuser.note) > 0 and (length(REGEXP_REPLACE(trim(coalesce(tuser.feedback, '')), '<[^>]*>+', '')) = 0) then 1 else 0 end) = 1 
             and t1.course = :course4 and t4.notifyteacher = 1 $whereStmt
             group by t3.id, t1.id, tuser.userid)";
             $vars['cturl'] = $CFG->wwwroot.'/mod/recitcahiertraces/view.php?id=';
@@ -370,7 +370,7 @@ class PersistCtrl extends MoodlePersistCtrl
                     $item->extra->description = get_string('tobegraded', 'local_recitdashboard');
                 }
                 else if ($item->state == 2){
-                    $item->extra->description = get_string('toaddfeedback', 'local_recitdashboard') . $item->userId;
+                    $item->extra->description = get_string('toaddfeedback', 'local_recitdashboard');
                 }
                
                 unset($item->uniqueid);
@@ -404,17 +404,17 @@ class PersistCtrl extends MoodlePersistCtrl
 
         $query = "
         -- return if the student is X days without logging in
-        (select (@uniqueId := @uniqueId + 1) uniqueId, t4.id user_id, concat(t4.firstname, ' ', t4.lastname) username, 
-        JSON_OBJECT('nbDaysLastAccess', DATEDIFF(now(), from_unixtime(t4.lastaccess))) issue
+        (select ". $this->sql_uniqueid() ." uniqueId, t4.id user_id, ". $this->mysqlConn->sql_concat('t4.firstname', "' '", 't4.lastname')." username, 
+        ". $this->sql_tojson() ."('nbDaysLastAccess', ".($this->sql_datediff('now()', $this->sql_to_time('t4.lastaccess'))).") issue
         from {user_enrolments} t1
         inner join {enrol} t2 on t1.enrolid = t2.id
         inner join {user} t4 on t1.userid = t4.id and t4.deleted = 0 and t4.suspended = 0
-        where t2.courseid = :course1 and (DATEDIFF(now(), from_unixtime(t4.lastaccess)) >= $daysWithoutConnect) $groupStmt)
+        where t2.courseid = :course1 and ".($this->sql_datediff('now()', $this->sql_to_time('t4.lastaccess')))." >= $daysWithoutConnect $groupStmt)
 
         -- return students who have delayed submitting an assignment based on the settings. The assignment must set a due date
         union
-        (SELECT (@uniqueId := @uniqueId + 1) uniqueId, t4.id user_id, concat(t4.firstname, ' ', t4.lastname) username,  
-        JSON_OBJECT('cmId', t5.id, 'cmName', t3.name, 'nbDaysLate', DATEDIFF(now(), from_unixtime(t3.duedate)), 'url', concat(:assignurl, t5.id)) issue
+        (SELECT ". $this->sql_uniqueid() ." uniqueId, t4.id user_id, ". $this->mysqlConn->sql_concat('t4.firstname', "' '", 't4.lastname')." username,  
+        ". $this->sql_tojson() ."('cmId', t5.id, 'cmName', t3.name, 'nbDaysLate', ".($this->sql_datediff('now()', $this->sql_to_time('t3.duedate'))).", 'url', ". $this->mysqlConn->sql_concat(':assignurl', 't5.id').") issue
         FROM {user_enrolments} t1
         inner join {enrol} t2 on t1.enrolid = t2.id
         inner join {assign} t3 on t2.courseid = t3.course
@@ -422,15 +422,15 @@ class PersistCtrl extends MoodlePersistCtrl
         inner join {course_modules} t5 on t3.id = t5.instance and t5.module = (select id from {modules} where name = 'assign') and t5.course = t2.courseid
         where 
             t2.courseid = :course2 and 
-            (t3.duedate > 0 and from_unixtime(t3.duedate) < now() and DATEDIFF(now(), from_unixtime(t3.duedate)) between $daysDueIntervalMin and $daysDueIntervalMax) and 
+            (t3.duedate > 0 and ".$this->sql_to_time('t3.duedate')." < now() and ".($this->sql_datediff('now()', $this->sql_to_time('t3.duedate')))." between $daysDueIntervalMin and $daysDueIntervalMax) and 
             not EXISTS((select id from {assign_submission} st1 where st1.assignment = t3.id and st1.userid = t4.id ))
             $visibleStmt $groupStmt
         )
 
         -- return students who have delayed submitting an quiz based on the settings. The quiz must set a time close
         union
-        (SELECT (@uniqueId := @uniqueId + 1) uniqueId, t4.id user_id, concat(t4.firstname, ' ', t4.lastname) username,  
-        JSON_OBJECT('cmId', t5.id, 'cmName', t3.name, 'nbDaysLate', DATEDIFF(now(), from_unixtime(t3.timeclose)), 'url', concat(:quizurl, t5.id)) issue
+        (SELECT ". $this->sql_uniqueid() ." uniqueId, t4.id user_id, ". $this->mysqlConn->sql_concat('t4.firstname', "' '", 't4.lastname')." username, 
+        ". $this->sql_tojson() ."('cmId', t5.id, 'cmName', t3.name, 'nbDaysLate', ".($this->sql_datediff('now()', $this->sql_to_time('t3.timeclose'))).", 'url', ". $this->mysqlConn->sql_concat(':quizurl', 't5.id').") issue
         FROM {user_enrolments} t1
         inner join {enrol} t2 on t1.enrolid = t2.id
         inner join {quiz} t3 on t2.courseid = t3.course
@@ -438,11 +438,10 @@ class PersistCtrl extends MoodlePersistCtrl
         inner join {course_modules} t5 on t3.id = t5.instance and t5.module = (select id from {modules} where name = 'quiz') and t5.course = t2.courseid
         where 
             t2.courseid = :course3 and 
-            (t3.timeclose > 0 and from_unixtime(t3.timeclose) < now() and DATEDIFF(now(), from_unixtime(t3.timeclose)) between $daysDueIntervalMin and $daysDueIntervalMax) and 
+            (t3.timeclose > 0 and ".$this->sql_to_time('t3.timeclose')." < now() and ".($this->sql_datediff('now()', $this->sql_to_time('t3.timeclose')))." between $daysDueIntervalMin and $daysDueIntervalMax) and 
             not EXISTS((select id from {quiz_attempts} st1 where st1.quiz = t3.id and st1.userid = t4.id ))
             $visibleStmt $groupStmt
         )";
-
         $tmp = $this->getRecordsSQL($query, $vars);
 
         $this->filterStudents($tmp, $courseId);
@@ -485,12 +484,12 @@ class PersistCtrl extends MoodlePersistCtrl
         }
         $vars['course'] = $courseId;
 
-        $query = "SELECT (@uniqueId := @uniqueId + 1) uniqueId, t1.courseid course_id, t1.itemname item_name, t1.itemmodule item_module, 
+        $query = "SELECT ". $this->sql_uniqueid() ." uniqueId, t1.courseid course_id, t1.itemname item_name, t1.itemmodule item_module, 
         coalesce(max(t2.finalgrade),-1) final_grade, t3.id user_id, t3.firstname first_name, t3.lastname last_name, 
-        t4.id cm_id, t4.section section_id, group_concat(t5.groupid) group_ids, round(max(t2.finalgrade)/max(t1.grademax)*100,1) success_pct,
+        t4.id cm_id, min(t4.section) section_id, ". $this->sql_group_concat('t5.groupid') ." group_ids, round(max(t2.finalgrade)/max(t1.grademax)*100,1) success_pct,
         max(t1.grademax) grade_max,
         (case t1.itemmodule 
-            when 'quiz' then (select JSON_OBJECT('attempt', st1.id)  
+            when 'quiz' then (select ". $this->sql_tojson() ."('attempt', st1.id)  
                                 from {quiz_attempts} st1 where st1.quiz = t4.instance and st1.userid = t3.id and st1.state = 'finished' order by st1.attempt desc limit 1 )           
             else null end) extra
         FROM {grade_items} t1
@@ -502,10 +501,10 @@ class PersistCtrl extends MoodlePersistCtrl
         inner join {course_sections} t6 on t4.section = t6.id
         where t1.courseid = :course $whereStmt
         group by t1.courseid, t3.id, t4.id, t1.itemname, t1.itemmodule
-        order by t6.section, find_in_set(cm_id, t6.`sequence`), concat(first_name, ' ', last_name)";
+        order by min(t6.section), cm_id, min(t6.sequence), ".$this->mysqlConn->sql_concat("t3.firstname", "' '", "t3.lastname");
 
         $tmp = $this->getRecordsSQL($query, $vars);
-
+        
         $result = array();
         $cmList = array(); // gather all activities to create the columns 
         
@@ -590,8 +589,8 @@ class PersistCtrl extends MoodlePersistCtrl
         }
         $vars['course'] = $courseId;
 
-        $query = "SELECT (@uniqueId := @uniqueId + 1) uniqueId, t1.course course_id, t3.id user_id, t3.firstname first_name, t3.lastname last_name, t1.id cm_id, group_concat(t5.groupid) group_ids, 
-        coalesce(t2.completionstate,-1) completion_state, from_unixtime(t2.timemodified) time_modified
+        $query = "SELECT ". $this->sql_uniqueid() ." uniqueId, t1.course course_id, t3.id user_id, t3.firstname first_name, t3.lastname last_name, t1.id cm_id, ". $this->sql_group_concat('t5.groupid') ." group_ids, 
+        coalesce(t2.completionstate,-1) completion_state, t2.timemodified time_modified
         FROM {course_modules} t1 
         inner join {course_sections} t4 on t4.id = t1.section 
         inner join {role_assignments} st2 on st2.contextid in (select id from {context} where instanceid = t1.course and contextlevel = 50)
@@ -600,7 +599,7 @@ class PersistCtrl extends MoodlePersistCtrl
         left join {groups_members} t5 on t3.id = t5.userid 
         left join {course_modules_completion} t2 on t1.id = t2.coursemoduleid and t3.id = t2.userid
         where t1.course = :course and st1.shortname in ('student') $whereStmt
-        group by t1.course, t1.id, t2.id, t3.id order by t4.section, find_in_set(cm_id, t4.`sequence`), concat(first_name, ' ', last_name)";
+        group by t1.course, t1.id, t2.id, t3.id, cm_id, t4.sequence, ".$this->mysqlConn->sql_concat("t3.firstname", "' '", "t3.lastname");
 
         $tmp = $this->getRecordsSQL($query, $vars);
         
@@ -640,7 +639,7 @@ class PersistCtrl extends MoodlePersistCtrl
             $vars['group'] = $groupId;
         }
 
-        $query = "SELECT (@uniqueId := @uniqueId + 1) uniqueId, if(count(*) > 0, 1, 0) has_random_questions, count(*) nb_questions
+        $query = "SELECT ". $this->sql_uniqueid() ." uniqueId, (case when count(*) > 0 then 1 else 0 end) has_random_questions, count(*) nb_questions
         FROM {course_modules} t1 
         inner join {quiz_sections} t2 on t1.instance = t2.quizid
         inner join {quiz_slots} t3 on t3.quizid = t2.quizid
@@ -649,16 +648,16 @@ class PersistCtrl extends MoodlePersistCtrl
         $quiz = $this->getRecordsSQL($query, $vars);
         $quiz = array_pop($quiz);
 
-        $queryPart1 = "SELECT (@uniqueId := @uniqueId + 1) uniqueId, t1.id course_id, t1.shortname course_name, t2.id activity_id, t3.id quiz_id, t3.name quiz_name, 
+        $queryPart1 = "SELECT ". $this->sql_uniqueid() ." uniqueId, t1.id course_id, t1.shortname course_name, t2.id activity_id, t3.id quiz_id, t3.name quiz_name, 
                 t3.sumgrades quiz_sum_grades, t3.grade quiz_max_grade,
-                coalesce((select (case `state` when 'needsgrading' then -1 else fraction end) from mdl_question_attempt_steps t5_1 where t5.id = t5_1.questionattemptid order by sequencenumber desc limit 1),0) grade, 
+                coalesce((select (case state when 'needsgrading' then -1 else fraction end) from {question_attempt_steps} t5_1 where t5.id = t5_1.questionattemptid order by sequencenumber desc limit 1),0) grade, 
                 t5.slot,
-                t4.attempt, t4.id quiz_attempt_id,
-                t4.state attemp_state, if(t4.timestart > 0, from_unixtime(t4.timestart),'') attempt_time_start,
-                if(t4.timefinish > 0, from_unixtime(t4.timefinish), '') attempt_time_finish,
-                greatest(SEC_TO_TIME(t4.timefinish - t4.timestart),0) elapsed_time,
+                min(t4.attempt) attempt, min(t4.id) quiz_attempt_id,
+                min(t4.state) attempt_state, (case when min(t4.timestart) > 0 then min(t4.timestart) else 0 end) attempt_time_start,
+                (case when min(t4.timefinish) > 0 then min(t4.timefinish) else 0 end) attempt_time_finish,
+                greatest(min(t4.timefinish) - min(t4.timestart),0) elapsed_time,
                 t6.id user_id, t6.firstname first_name, t6.lastname last_name, t6.email, 
-                group_concat(distinct coalesce(t6_2.name, 'na') order by t6_2.name) group_name,";
+                ". $this->sql_group_concat('coalesce(t6_2.name, \'na\')', ',', 't6_2.name') ." group_name,";
 
         $queryPart2 = "FROM {course} t1 
         inner join {course_modules} t2 on t1.id= t2.course 
@@ -671,7 +670,7 @@ class PersistCtrl extends MoodlePersistCtrl
         left join {groups} t6_2 on t6_1.groupid = t6_2.id ";
 
         $queryPart3 = " where t2_1.name = 'quiz' and t2.id = :activity and t1.id = :course and $groupStmt";
-        $queryPart4 = "order by t6.id, t5.slot, t4.sumgrades desc";
+        $queryPart4 = "order by t6.id, t5.slot, min(t4.sumgrades) desc";
         $vars['activity'] = $activityId;
         $vars['course'] = $courseId;
 
@@ -687,7 +686,7 @@ class PersistCtrl extends MoodlePersistCtrl
             $query = " $queryPart1
             t5.maxmark default_mark, t7.id question_id, t7.name question_name, 
             t7.questiontext question_text, 
-            (SELECT group_concat(name SEPARATOR ',') FROM {tag} WHERE id IN (SELECT tagid from {tag_instance} where itemid = t7.id and itemtype in ('question') )) tags 
+            (SELECT ". $this->sql_group_concat('name') ." FROM {tag} WHERE id IN (SELECT tagid from {tag_instance} where itemid = t7.id and itemtype in ('question') )) tags 
             $queryPart2
             inner join mdl_question t7 on t5.questionid = t7.id 
             $queryPart3
@@ -745,7 +744,7 @@ class PersistCtrl extends MoodlePersistCtrl
                 $obj = new stdClass();
                 $obj->attempt = $item->attempt;
                 $obj->quizAttemptId = $item->quizAttemptId;
-                $obj->attempState = get_string("state$item->attempState", 'quiz');
+                $obj->attempState = get_string("state$item->attemptState", 'quiz');
                 $obj->attemptTimeStart = $item->attemptTimeStart;
                 $obj->attemptTimeFinish = $item->attemptTimeFinish;
                 $obj->quizSumGrades = $item->quizSumGrades;
