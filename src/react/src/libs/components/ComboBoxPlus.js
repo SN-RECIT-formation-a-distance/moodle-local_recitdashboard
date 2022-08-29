@@ -23,15 +23,17 @@ export class ComboBoxPlus extends Component {
         
         this.onChange = this.onChange.bind(this);
         
-        this.state = {value: this.props.value};
     }
     
     render() {     
         let options = this.props.options;
 
-        let val = JsNx.getItem(options, 'value', this.state.value, null);
+        let val = null;
         for (let o of options){
             o.label = o.text;
+            if (o.value.toString() == this.props.value.toString()){
+                val = o;
+            }
         }
         //  spread attributes <div {...this.props}>    
         let spreadAttr = {required: this.props.required, isDisabled: this.props.disabled, size: this.props.size, style: this.props.style, options: options};
@@ -40,7 +42,7 @@ export class ComboBoxPlus extends Component {
         }
 
         let main = 
-            <Select {...spreadAttr} onChange={this.onChange} defaultValue={val} placeholder={this.props.placeholder}>
+            <Select {...spreadAttr} onChange={this.onChange} value={val} placeholder={this.props.placeholder}>
             </Select>;            
         return (main);
     }   
@@ -48,8 +50,7 @@ export class ComboBoxPlus extends Component {
     onChange(event){
         let value = event.value || "";
         let text = event.label;
-        this.setState({value:value});
-
+        
         this.props.onChange({target:{name: this.props.name, value: value, text: text, data: this.props.data}});
     }   
 }

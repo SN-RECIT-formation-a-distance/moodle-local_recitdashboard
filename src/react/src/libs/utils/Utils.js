@@ -209,7 +209,8 @@ export default class Utils{
     }
 
     static dateFormat(date){
-
+        let d = new Date(parseInt(date)*1000)
+        return d.toLocaleString()
     }
 
     static formatMoney(value){

@@ -191,6 +191,10 @@ export class MainView extends Component{
     }
 
     onGo(){
+        if (this.state.show){//Force a refresh
+            this.setState({show: false}, () => this.setState({show: true}));
+            return;
+        }
         this.setState({show: true});
     }
 }
@@ -222,9 +226,8 @@ class DashboardView extends Component{
                 <br/>
                 <GadgetStudentFollowup options={this.props.options} onClose={() => this.onHide("showstudentfollowupwidget", 0)} show={this.state.options.showstudentfollowupwidget == 1}/> 
                 <br/>
-                <GadgetGroupsOverview options={this.props.options} onClose={() => this.onHide("showgroupsoverviewwidget", 0)} show={this.state.options.showgroupsoverviewwidget == 1}/> 
             </div>
-
+            //<GadgetGroupsOverview options={this.props.options} onClose={() => this.onHide("showgroupsoverviewwidget", 0)} show={this.state.options.showgroupsoverviewwidget == 1}/> 
         return (main);
     }
 
@@ -333,7 +336,8 @@ class FilterOptions extends Component{
     onAfterDataResult(){
         
         if(parseInt(this.props.options.course.id, 10) > 0){
-            let item = JsNx.getItem(this.state.courseList, 'value', this.props.options.course.id, null);
+            let item = JsNx.getItem(this.state.courseList, 'value', parseInt(this.props.options.course.id), null);
+
             if(item){
                 this.onDataChange({target: Object.assign({name: 'course.id'}, item)});
             }
@@ -464,7 +468,7 @@ class FilterOptions extends Component{
 
             for(let group of result.data){
                 let item = JsNx.at(group, 0, null);
-                if(group){
+                if(item){
                     if(item.groupId > 0){
                         groupList.push({text: item.groupName, value: item.groupId, data: item});
                     }

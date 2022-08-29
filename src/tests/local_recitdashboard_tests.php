@@ -34,7 +34,7 @@ require_once(dirname(__FILE__) . '/../classes/WebApi.php'); // Include the code 
 class local_recitdashboard_ctrl_testcase extends advanced_testcase {
 
     protected function setUp(): void {
-        global $DB, $USER;
+        global $DB;
         $this->resetAfterTest(true);
 
         // Create a test course.
@@ -50,6 +50,7 @@ class local_recitdashboard_ctrl_testcase extends advanced_testcase {
         $this->group = $this->getDataGenerator()->create_group(array('courseid' => $course->id));
         groups_add_member($this->group->id, $user->id);
         $editingteacher = $this->getDataGenerator()->create_and_enrol($this->course, 'editingteacher');
+        $this->setUser($editingteacher);
 
         // Create quiz.
         $quizgenerator = $this->getDataGenerator()->get_plugin_generator('mod_quiz');
@@ -91,12 +92,12 @@ class local_recitdashboard_ctrl_testcase extends advanced_testcase {
         $this->ctrl = new recitdashboard\WebApi($DB, $course, $editingteacher);
     }
 
-    public function test_groups_overview() {
+    /*public function test_groups_overview() {
         $ret = $this->ctrl->getGroupsOverview(array('courseId' => $this->course->id, 'groupId' => $this->group->id));
 
         $this->assertTrue($ret->success);
         $this->assertTrue(count($ret->data) >= 1);
-    }
+    }*/
 
     public function test_getWorkFollowup() {
         $ret = $this->ctrl->getWorkFollowup(array('courseId' => $this->course->id, 'groupId' => $this->group->id));

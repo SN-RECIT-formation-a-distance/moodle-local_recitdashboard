@@ -27,6 +27,7 @@ import {$glVars, Options, AppCommon} from '../../common/common';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {faCheck, faTimes, faCheckSquare} from '@fortawesome/free-solid-svg-icons';
 import { i18n } from '../../common/i18n';
+import Utils from '../../libs/utils/Utils';
 
 export class ReportQuiz  extends Component{
     static defaultProps = {        
@@ -151,8 +152,8 @@ export class ReportQuiz  extends Component{
 
                                     items.push(<DataGrid.Body.Cell key={items.length}>{quizAttempt.attempt}</DataGrid.Body.Cell>);
                                     items.push(<DataGrid.Body.Cell key={items.length}>{quizAttempt.attempState}</DataGrid.Body.Cell>);
-                                    items.push(<DataGrid.Body.Cell key={items.length}>{quizAttempt.attemptTimeStart}</DataGrid.Body.Cell>);
-                                    items.push(<DataGrid.Body.Cell key={items.length}>{quizAttempt.attemptTimeFinish}</DataGrid.Body.Cell>);
+                                    items.push(<DataGrid.Body.Cell key={items.length}>{Utils.dateFormat(quizAttempt.attemptTimeStart)}</DataGrid.Body.Cell>);
+                                    items.push(<DataGrid.Body.Cell key={items.length}>{Utils.dateFormat(quizAttempt.attemptTimeFinish)}</DataGrid.Body.Cell>);
                                     items.push(<DataGrid.Body.Cell key={items.length} style={{textAlign: "center"}} >{this.formatElapsedTime(quizAttempt.elapsedTime)}</DataGrid.Body.Cell>);
 
                                     let finalGrade = 0;
@@ -264,7 +265,7 @@ export class ReportQuiz  extends Component{
     }   
 
     formatElapsedTime(value){
-        /*let dateObj = new Date(nbSecs * 1000);
+        let dateObj = new Date(parseInt(value) * 1000);
         let hours = dateObj.getUTCHours();
         let minutes = dateObj.getUTCMinutes();
         let seconds = dateObj.getSeconds();
@@ -273,7 +274,7 @@ export class ReportQuiz  extends Component{
         minutes.toString().padStart(2, '0') + ':' + 
         seconds.toString().padStart(2, '0');
 
-        return result;*/
-        return value;
+        return result;
+        //return value;
     }
 }

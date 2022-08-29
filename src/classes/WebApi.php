@@ -70,7 +70,7 @@ class WebApi extends MoodleApi
             return true;
         }*/
         else{
-            throw new Exception(get_string('accessdenied'));
+            throw new Exception(get_string('accessdenied', 'admin'));
         }
     }
     
@@ -130,7 +130,7 @@ class WebApi extends MoodleApi
             $this->canUserAccess('a', $courseId);
             
             $result = new stdClass();
-            $result->details = PersistCtrl::getInstance()->getGroupsOverview($courseId, $groupId);
+            $result->details = array();// PersistCtrl::getInstance()->getGroupsOverview($courseId, $groupId);
             $this->prepareJson($result);
             
             return new WebApiResult(true, $result->details);

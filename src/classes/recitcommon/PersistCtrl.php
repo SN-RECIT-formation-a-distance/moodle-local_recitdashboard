@@ -27,23 +27,16 @@ namespace recitdashboard;
 
 abstract class APersistCtrl
 {
-   /**
-     * mysqli_native_moodle_database 
-     */
     protected $mysqlConn;    
     protected $signedUser;
     protected $prefix = "";
    
     protected function __construct($mysqlConn, $signedUser){
-        global $CFG;
-
         $this->mysqlConn = $mysqlConn;
         $this->signedUser = $signedUser;
     }
 
     public function getRecordsSQL($sql, $params = array()){
-
-        $this->mysqlConn->execute("set @uniqueId = 0");
         $result = $this->mysqlConn->get_records_sql($sql, $params);
         
         foreach($result as $item){
@@ -56,6 +49,97 @@ abstract class APersistCtrl
             }
         }
         return array_values($result);
+    }
+
+    /**
+     * Return SQL for performing group concatenation on given field/expression
+     *
+     * @param string $field
+     * @param string $separator
+     * @param string $sort
+     * @return string
+     */
+    public function sql_group_concat(string $field, string $separator = ',', string $sort = ''): string {
+        global $CFG;
+        if ($CFG->dbtype == 'pgsql'){
+            $fieldsort = $sort ? "ORDER BY {$sort}" : '';
+            return "STRING_AGG(CAST({$field} AS VARCHAR), '{$separator}' {$fieldsort})";
+        }else{
+            $fieldsort = $sort ? "ORDER BY {$sort}" : '';
+            return "GROUP_CONCAT({$field} {$fieldsort} SEPARATOR '{$separator}')";
+        }
+    }
+    
+    public function sql_uniqueid(): string {
+        global $CFG;
+        if ($CFG->dbtype == 'pgsql'){
+            return "gen_random_uuid()";
+        }else{
+            return "uuid()";
+        }
+    }
+    
+    public function sql_from_unixtime($field): string {
+        global $CFG;
+        if ($CFG->dbtype == 'pgsql'){
+            return "to_char(to_timestamp($field), 'yyyy-mm-dd HH24:MI:SS')";
+        }else{
+            return "FROM_UNIXTIME($field)";
+        }
+    }
+    
+    public function sql_to_time($field): string {
+        global $CFG;
+        if ($CFG->dbtype == 'pgsql'){
+            return "to_timestamp($field)";
+        }else{
+            return "FROM_UNIXTIME($field)";
+        }
+    }
+    
+    public function sql_datediff($field, $field2): string {
+        global $CFG;
+        if ($CFG->dbtype == 'pgsql'){
+            return "EXTRACT(DAY FROM $field - $field2)";
+        }else{
+            return "DATEDIFF($field, $field2)";
+        }
+    }
+    
+    public function sql_caststring($field): string {
+        global $CFG;
+        if ($CFG->dbtype == 'pgsql'){
+            return "CAST($field AS STRING)";
+        }else{
+            return "$field";
+        }
+    }
+    
+    public function sql_castutf8($field): string {
+        global $CFG;
+        if ($CFG->dbtype == 'pgsql'){
+            return "CAST($field AS STRING)";
+        }else{
+            return "CONVERT($field USING utf8)";
+        }
+    }
+    
+    public function sql_tojson(): string {
+        global $CFG;
+        if ($CFG->dbtype == 'pgsql'){
+            return "jsonb_build_object";
+        }else{
+            return "JSON_OBJECT";
+        }
+    }
+    
+    public function sql_sectotime($field): string {
+        global $CFG;
+        if ($CFG->dbtype == 'pgsql'){
+            return "to_char( ($field ||' seconds')::interval, 'HH24:MM:SS' )";
+        }else{
+            return "SEC_TO_TIME($field)";
+        }
     }
 }
 
@@ -75,22 +159,22 @@ abstract class MoodlePersistCtrl extends APersistCtrl{
 
     public function getSectionActivityList($courseId){
         $query = "select * from
-        (select (@uniqueId := @uniqueId + 1) uniqueId, t2.id section_id, if(length(coalesce(t2.name, '')) = 0, concat('Section ', t2.section), t2.name) section_name, t3.id cm_id, t4.name module_name, 
+        (select ". $this->sql_uniqueid() ." uniqueId, t2.section section, t2.id section_id, (case when length(coalesce(t2.name, '')) = 0 then concat('Section ', t2.section) else t2.name end) section_name, t3.id cm_id, t4.name module_name, 
             (case t4.name 	 
                 when 'page' then (select name from {page} where id = t3.instance)
                 when 'quiz' then (select name from {quiz} where id = t3.instance)
                 when 'book' then (select name from {book} where id = t3.instance)
                 when 'lesson' then (select name from {lesson} where id = t3.instance)
                 when 'assign' then (select name from {assign} where id = t3.instance)
-                when 'scorm' then (select CONVERT(name USING utf8) from {scorm} where id = t3.instance)
-                when 'h5pactivity' then (select CONVERT(name USING utf8) from {h5pactivity} where id = t3.instance)
+                when 'scorm' then (select ". $this->sql_castutf8('name')." from {scorm} where id = t3.instance)
+                when 'h5pactivity' then (select ". $this->sql_castutf8('name')." from {h5pactivity} where id = t3.instance)
                 else 'none' end) cm_name
         from {course_sections} t2 
         left join {course_modules} t3 on t2.id = t3.section
         left join {modules} t4 on t4.id = t3.module
         where t2.course = :course) tab
         where cm_name != 'none'
-        order by section_name asc, module_name asc";
+        order by section asc, module_name asc";
 
         $result = $this->getRecordsSQL($query, ['course' => $courseId]);
 
@@ -99,18 +183,18 @@ abstract class MoodlePersistCtrl extends APersistCtrl{
     }
 
     public function getEnrolledUserList($cmId = 0, $userId = 0, $courseId = 0){
-        $cmStmt = " 1 ";
-        
+        $cmStmt = " true ";
+        $vars = array();
         if($cmId > 0){
             $cmStmt = "(t1.courseid = (select course from {course_modules} where id = $cmId))";
         }
 
-        $userStmt =  " 1 ";
+        $userStmt =  " true ";
         if($userId > 0){
             $userStmt = " (t3.id = $userId)";
         }
 
-        $courseStmt = " 1 ";
+        $courseStmt = " true ";
         if($courseId > 0){
             $courseStmt = "(t1.courseid = $courseId)";
         }
@@ -118,8 +202,11 @@ abstract class MoodlePersistCtrl extends APersistCtrl{
         // This query fetch all students with their groups. The groups belong to the course according to the parameter.
         // In case a student has no group, the left join in the first query add them to the result with groupId = 0.
         // In case there are no groups in the course, the second query adds (by union set) the students without group.
-        $query = "(select (@uniqueid := @uniqueid + 1) uniqueid, t1.courseid course_id, t3.id user_id, concat(t3.firstname, ' ', t3.lastname) user_name, coalesce(t5.id,-1) group_id, 
-            coalesce(t5.name, 'nogroup') group_name 
+
+        $vars['str'] = get_string("nogroup", 'local_recitdashboard');
+        $vars['str2'] = get_string("nogroup", 'local_recitdashboard');
+        $query = "(select ". $this->sql_uniqueid() ." uniqueId, t1.id, t1.enrol, t1.courseid course_id, t3.id user_id, concat(t3.firstname, ' ', t3.lastname) user_name, coalesce(t5.id,-1) group_id, 
+            coalesce(t5.name, :str) group_name 
             from {enrol} t1
         inner join {user_enrolments} t2 on t1.id = t2.enrolid
         inner join {user} t3 on t2.userid = t3.id and t3.suspended = 0 and t3.deleted = 0
@@ -128,22 +215,21 @@ abstract class MoodlePersistCtrl extends APersistCtrl{
         where (t1.courseid = t5.courseid) and $cmStmt and $userStmt and $courseStmt
         order by group_name asc, user_name asc)
         union
-        (select (@uniqueid := @uniqueid + 1) uniqueid, t1.courseid course_id, t3.id user_id, concat(t3.firstname, ' ', t3.lastname) user_name, -1 group_id, 'nogroup' group_name 
+        (select ". $this->sql_uniqueid() ." uniqueId, t1.id, t1.enrol, t1.courseid course_id, t3.id user_id, concat(t3.firstname, ' ', t3.lastname) user_name, -1 group_id, :str2 group_name 
         from {enrol} t1
         inner join {user_enrolments} t2 on t1.id = t2.enrolid
         inner join {user} t3 on t2.userid = t3.id and t3.suspended = 0 and t3.deleted = 0
         where $cmStmt and $userStmt and $courseStmt
         order by user_name asc)";
         
-        $tmp = $this->getRecordsSQL($query);
+        $tmp = $this->getRecordsSQL($query, $vars);
 
         $result = array();
         foreach($tmp as $item){
             $result[$item->groupName][] = $item;
-            unset($item->uniqueid);
         }
 
-        return array_values($result);
+        return $result;
     }
 }
 
@@ -175,41 +261,41 @@ class DiagTagPersistCtrl extends MoodlePersistCtrl
     }
 
     public function getReportDiagTagQuestion($activityId = 0, $userId = 0, $tagId = 0, $courseId = 0, $groupId = 0, $sectionId = 0){
-        $userStmt = "1";
+        $userStmt = "true";
         if($userId > 0){
             $userStmt = " t6.id = $userId";
         }
 
-        $groupStmt = "1";
+        $groupStmt = "true";
         if($groupId > 0){
             $groupStmt = " t6_2.id = $groupId";
         }
 
-        $activityStmt = "1";
+        $activityStmt = "true";
         if($activityId > 0){
             $activityStmt = " t2.id = $activityId";
         }
 
-        $tagStmt = "1";
+        $tagStmt = "true";
         if($tagId > 0){
             $tagStmt = " t9.id = $tagId";
         }
 		
-		$courseStmt = "1";
+		$courseStmt = "true";
         if($courseId > 0){
             $courseStmt = " t1.id = $courseId";
         }
 
-        $sectionStmt = "1";
+        $sectionStmt = "true";
         if($sectionId > 0){
             $sectionStmt = " t2.section = $sectionId";
         }
 
-        $query = "SELECT (@uniqueId := @uniqueId + 1) uniqueId, t1.id course_id, t1.shortname course, t2.id activity_id, t3.id quiz_id, t3.name quiz, 
-        t4.lastattempt last_attempt, 
+        $query = "SELECT ". $this->sql_uniqueid() ." uniqueId, t1.id course_id, t1.shortname course, t2.id activity_id, t3.id quiz_id, t3.name quiz, 
+        min(t4.lastattempt) last_attempt, 
         coalesce((select fraction from {question_attempt_steps} t5_1 where t5.id = t5_1.questionattemptid order by sequencenumber desc limit 1),0) grade,
         t6.id user_id, t6.firstname first_name, t6.lastname last_name, t6.email, 
-        group_concat(distinct coalesce(t6_2.name, 'na') order by t6_2.name) group_name,
+        ". $this->sql_group_concat('coalesce(t6_2.name, \'na\')', ',', 't6_2.name') ." group_name,
         t7.defaultmark grade_weight, t7.id question_id, 
         t9.id tag_id, t9.name tag_name
         FROM {course} t1 
@@ -232,20 +318,20 @@ class DiagTagPersistCtrl extends MoodlePersistCtrl
     }
     
     public function getReportDiagTagQuiz($courseId, $userId = 0, $groupId = 0){
-        $userStmt = "1";
+        $userStmt = "true";
         if($userId > 0){
             $userStmt = " t4.id = $userId";
         }
 
-        $groupStmt = "1";
+        $groupStmt = "true";
         if($groupId > 0){
             $groupStmt = "  t4_2.id = $groupId";
         }
 
-        $query = "SELECT (@uniqueId := @uniqueId + 1) uniqueId, t1.course course_id, t1.id activity_id, t1.name activity_name, t5.id cm_id, max(t2.attempt) last_quiz_attempt, 
+        $query = "SELECT ". $this->sql_uniqueid() ." uniqueId, t1.course course_id, t1.id activity_id, t1.name activity_name, t5.id cm_id, max(t2.attempt) last_quiz_attempt, 
         t2.timestart time_start, t2.timefinish time_end, t4.id user_id, t4.firstname first_name, t4.lastname last_name,
         t4.email, coalesce(max(t3.grade),0) / 10 grade, 1 grade_weight, t7.id tag_id, t7.name tag_name,
-        group_concat(distinct coalesce(t4_2.name, 'na') order by t4_2.name) group_name
+        ". $this->sql_group_concat('coalesce(t4_2.name, \'na\')', ',', 't4_2.name') ." group_name
         from {quiz} t1 
         inner join {quiz_attempts} t2 on t1.id = t2.quiz
         inner join {quiz_grades} t3 on t1.id = t3.quiz and t2.userid = t3.userid
@@ -263,21 +349,21 @@ class DiagTagPersistCtrl extends MoodlePersistCtrl
     }   
 
     public function getReportDiagTagAssignment($courseId, $userId = 0, $groupId = 0){
-        $userStmt = "1";
+        $userStmt = "true";
         if($userId > 0){
             $userStmt = " t4.id = $userId";
         }
 
-        $groupStmt = "1";
+        $groupStmt = "true";
         if($groupId > 0){
-            $groupStmt = "  t4_2.id = $groupId";
+            $groupStmt = " t4_2.id = $groupId";
         }
 
-        $query = "SELECT (@uniqueId := @uniqueId + 1) uniqueId, t1.course course_id, t1.id activity_id, t1.name activity_name, t5.id cm_id,
+        $query = "SELECT ". $this->sql_uniqueid() ." uniqueId, t1.course course_id, t1.id activity_id, t1.name activity_name, t5.id cm_id,
         t2.timecreated time_start, t2.timemodified time_end, 
         t4.id user_id, t4.firstname first_name, t4.lastname last_name, t4.email, 
         coalesce(max(t3.grade),0) / 100 grade, 1 gradeWeight, t7.id tag_id, t7.name tag_name,
-        group_concat(distinct coalesce(t4_2.name, 'na') order by t4_2.name) group_name
+        ". $this->sql_group_concat('coalesce(t4_2.name, \'na\')', ',', 't4_2.name') ." group_name
         from {assign} t1 
         inner join {assign_submission} t2 on t1.id = t2.assignment
         inner join {assign_grades} t3 on t1.id = t3.assignment and t2.userid = t3.userid
@@ -295,21 +381,21 @@ class DiagTagPersistCtrl extends MoodlePersistCtrl
     }  
     
     public function getReportDiagTagLesson($courseId,  $userId = 0, $groupId = 0){
-        $userStmt = "1";
+        $userStmt = "true";
         if($userId > 0){
             $userStmt = " t4.id = $userId";
         }
 
-        $groupStmt = "1";
+        $groupStmt = "true";
         if($groupId > 0){
-            $groupStmt = "  t4_2.id = $groupId";
+            $groupStmt = " t4_2.id = $groupId";
         }
 
-        $query = "SELECT (@uniqueId := @uniqueId + 1) uniqueId, t1.course course_id, t1.id activity_id, t1.name activity_name, t5.id cm_id, 
-        t2.timeseen time_start, coalesce(t3.completed, unix_timestamp()) time_end, 
+        $query = "SELECT ". $this->sql_uniqueid() ." uniqueId, t1.course course_id, t1.id activity_id, t1.name activity_name, t5.id cm_id, 
+        t2.timeseen time_start, coalesce(t3.completed, 0) time_end, 
         t4.id user_id, t4.firstname first_name, t4.lastname last_name,
         t4.email, coalesce(max(t3.grade),0) / 100 grade, 1 grade_weight, 
-        group_concat(distinct coalesce(t4_2.name, 'na') order by t4_2.name) group_name,
+        ". $this->sql_group_concat('coalesce(t4_2.name, \'na\')', ',', 't4_2.name') ." group_name,
         t7.id tag_id, t7.name tag_name
         from {lesson} t1 
         inner join {lesson_attempts} t2 on t1.id = t2.lessonid
