@@ -5,6 +5,7 @@ $string['privacy:metadata:local_recitdashboard_options'] = 'Stores user settings
 $string['privacy:metadata:local_recitdashboard_options:name'] = 'Setting name';
 $string['privacy:metadata:local_recitdashboard_options:value'] = 'Setting value';
 $string['privacy:metadata:local_recitdashboard_options:userid'] = 'The user ID the setting belongs to';
+$string['recitdashboard:teacher'] = 'Teacher';
 
 $string['recitdashboard:access'] = 'Whether or not the user can access RÉCIT Dashboard';
 $string['recitdashboard:student'] = 'Whether or not the user is a student';
