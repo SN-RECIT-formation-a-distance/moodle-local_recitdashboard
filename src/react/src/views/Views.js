@@ -22,7 +22,7 @@
  */
 import React, { Component } from 'react';
 import {NavDropdown, Nav, Button, Collapse, Jumbotron, Form} from 'react-bootstrap';
-import {faTachometerAlt, faPlus, faMinus, faFileAlt, faSearchPlus} from '@fortawesome/free-solid-svg-icons';
+import {faChartLine, faPlus, faMinus, faFileAlt, faSearchPlus} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {JsNx} from '../libs/utils/Utils';
 import {$glVars} from '../common/common';
@@ -90,7 +90,7 @@ export class MainView extends Component{
                     <p>{i18n.get_string('dashboarddesc')}</p>
                     <Nav variant="pills" activeKey={this.state.selectedView} onSelect={this.onSelect}>
                         <Nav.Item>
-                            <Nav.Link href="#" eventKey={0}><FontAwesomeIcon icon={faTachometerAlt}/> {i18n.get_string('dashboard')}</Nav.Link>
+                            <Nav.Link href="#" eventKey={0}><FontAwesomeIcon icon={faChartLine}/> {i18n.get_string('dashboard')}</Nav.Link>
                         </Nav.Item>
                         <NavDropdown variant="outline-primary" title={<span><FontAwesomeIcon icon={faFileAlt}/> {this.state.options.report.name.length === 0 ? i18n.get_string('report') : this.state.options.report.name}</span>} id="btnReports" >
                             {this.state.reportList.map((item, index) => {
