@@ -493,7 +493,7 @@ class PersistCtrl extends MoodlePersistCtrl
                                 from {quiz_attempts} st1 where st1.quiz = t4.instance and st1.userid = t3.id and st1.state = 'finished' order by st1.attempt desc limit 1 )           
             else null end) extra
         FROM {grade_items} t1
-        inner join {grade_grades} t2 on t1.id = t2.itemid and t2.timecreated is not null
+        inner join {grade_grades} t2 on t1.id = t2.itemid and (t2.timecreated is not null or t2.timemodified is not null)
         inner join {user} t3 on t3.id = t2.userid and t3.deleted = 0 and t3.suspended = 0
         inner join {course_modules} t4 on t4.course = t1.courseid and t4.module = (select id from {modules} where name = t1.itemmodule order by name asc limit 1) and t4.instance = t1.iteminstance
         left join {groups_members} t5 on t3.id = t5.userid
