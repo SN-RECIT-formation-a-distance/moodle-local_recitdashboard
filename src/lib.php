@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * RÉCIT Dashboard
@@ -21,8 +21,6 @@
  * @copyright 2019 RÉCIT 
  * @license   {@link http://www.gnu.org/licenses/gpl-3.0.html} GNU GPL v3 or later
  */
-
-defined('MOODLE_INTERNAL') || die();
 
 
 define('RECITDASHBOARD_TEACHER_CAPABILITY', 'local/recitdashboard:teacher');

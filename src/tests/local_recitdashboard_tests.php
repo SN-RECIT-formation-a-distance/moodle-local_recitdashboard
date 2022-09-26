@@ -40,7 +40,7 @@ class local_recitdashboard_ctrl_testcase extends advanced_testcase {
         // Create a test course.
         $this->course = $this->getDataGenerator()->create_course(array('enablecompletion' => 1));
         $this->context = context_course::instance($this->course->id);
-        $this->section1 = $this->getDataGenerator()->create_course_section(array('course'=> $this->course->id, 'section' => 1));
+        $this->section1 = $this->getDataGenerator()->create_course_section(array('course' => $this->course->id, 'section' => 1));
         $DB->set_field('course_sections', 'name', 'Section 0', array('id' => $this->section1->id));
 
         // Create a course.

@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * RÉCIT Dashboard
@@ -109,7 +109,7 @@ abstract class APersistCtrl
     public function sql_caststring($field): string {
         global $CFG;
         if ($CFG->dbtype == 'pgsql'){
-            return "CAST($field AS STRING)";
+            return "CAST($field AS TEXT)";
         }else{
             return "$field";
         }
@@ -118,7 +118,7 @@ abstract class APersistCtrl
     public function sql_castutf8($field): string {
         global $CFG;
         if ($CFG->dbtype == 'pgsql'){
-            return "CAST($field AS STRING)";
+            return "CAST($field AS TEXT)";
         }else{
             return "CONVERT($field USING utf8)";
         }
