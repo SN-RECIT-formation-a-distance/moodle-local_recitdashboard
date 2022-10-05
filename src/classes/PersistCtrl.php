@@ -32,7 +32,7 @@ use DateTime;
 /**
  * Singleton class
  */
-class PersistCtrl extends MoodlePersistCtrl
+abstract class PersistCtrl extends MoodlePersistCtrl
 {
     protected static $instance = null;
     
@@ -42,8 +42,13 @@ class PersistCtrl extends MoodlePersistCtrl
      */
     public static function getInstance($mysqlConn = null, $signedUser = null)
     {
+        global $CFG;
         if(!isset(self::$instance)) {
-            self::$instance = new self($mysqlConn, $signedUser);
+            if ($CFG->version >= 2022041900){//Moodle 4.0
+                self::$instance = new PersistCtrlMoodle4($mysqlConn, $signedUser);
+            }else{
+                self::$instance = new PersistCtrlMoodle3($mysqlConn, $signedUser);
+            }
         }
         return self::$instance;
     }
@@ -629,8 +634,11 @@ class PersistCtrl extends MoodlePersistCtrl
 
         return array_values($result);
     }
+
+    abstract public function reportQuiz_QueryNbQuestions();
     
     public function reportQuiz($courseId, $activityId, $groupId = 0){
+        global $CFG;
         $groupStmt = "1";
         $vars = array();
         $vars['activity'] = $activityId;
@@ -639,12 +647,7 @@ class PersistCtrl extends MoodlePersistCtrl
             $vars['group'] = $groupId;
         }
 
-        $query = "SELECT ". $this->sql_uniqueid() ." uniqueId, (case when count(*) > 0 then 1 else 0 end) has_random_questions, count(*) nb_questions
-        FROM {course_modules} t1 
-        inner join {quiz_sections} t2 on t1.instance = t2.quizid
-        inner join {quiz_slots} t3 on t3.quizid = t2.quizid
-        inner join {question} t4 on t4.id = t3.questionid
-        where t1.id = :activity and (t2.shufflequestions = 1 or t4.qtype= 'random')";
+        $query = $this->reportQuiz_QueryNbQuestions();
         $quiz = $this->getRecordsSQL($query, $vars);
         $quiz = array_pop($quiz);
 
@@ -851,5 +854,31 @@ class PersistCtrl extends MoodlePersistCtrl
         $DB->execute("insert into {local_recitdashboard_options} (userid, name, value)
         values(?, ?, ?)
         ON DUPLICATE KEY UPDATE value = ?", [$userId, $key, $value, $value]);
+    }
+}
+
+class PersistCtrlMoodle3 extends PersistCtrl {
+    public function reportQuiz_QueryNbQuestions(){
+        
+        $query = "SELECT ". $this->sql_uniqueid() ." uniqueId, (case when count(*) > 0 then 1 else 0 end) has_random_questions, count(*) nb_questions
+        FROM {course_modules} t1 
+        inner join {quiz_sections} t2 on t1.instance = t2.quizid
+        inner join {quiz_slots} t3 on t3.quizid = t2.quizid
+        inner join {question} t4 on t4.id = t3.questionid
+        where t1.id = :activity and (t2.shufflequestions = 1 or t4.qtype= 'random')";
+        return $query;
+    }
+}
+
+class PersistCtrlMoodle4 extends PersistCtrl {
+    public function reportQuiz_QueryNbQuestions() {
+        $query = "SELECT ". $this->sql_uniqueid() ." uniqueId, (case when count(*) > 0 then 1 else 0 end) has_random_questions, count(*) nb_questions
+        FROM {course_modules} t1 
+        inner join {quiz_sections} t2 on t1.instance = t2.quizid
+        inner join {quiz_slots} t3 on t3.quizid = t2.quizid
+        inner join {question_references} t3_1 on t3.id = t3_1.itemid
+        inner join {question} t4 on t4.id = t3_1.questionbankentryid
+        where t1.id = :activity and (t2.shufflequestions = 1 or t4.qtype= 'random')";
+        return $query;
     }
 }
