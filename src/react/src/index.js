@@ -21,7 +21,7 @@
  * @license   {@link http://www.gnu.org/licenses/gpl-3.0.html} GNU GPL v3 or later
  */
 import React, { Component } from 'react';
-import ReactDOM from "react-dom";
+import { createRoot } from 'react-dom/client';
 
 import {faSync} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -73,9 +73,10 @@ class App extends Component {
 
 document.addEventListener('DOMContentLoaded', function(){ 
     const domContainer = document.getElementById('recit_dashboard');
+    const root = createRoot(domContainer);
     let signedUser = {userId: domContainer.getAttribute('data-student-id')};
 
-    ReactDOM.render(<App signedUser={signedUser} courseId={parseInt(domContainer.getAttribute('data-course-id'))}/>, domContainer);
+    root.render(<App signedUser={signedUser} courseId={parseInt(domContainer.getAttribute('data-course-id'))}/>);
 }, false);
 
 
