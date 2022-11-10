@@ -23,9 +23,9 @@
  */
 namespace recitdashboard;
 
-require(__DIR__ . '/../../config.php');
-require(__DIR__ . '/lib.php');
-require(dirname(__FILE__) . '/classes/PersistCtrl.php');
+require_once(__DIR__ . '/../../config.php');
+require_once(__DIR__ . '/lib.php');
+require_once(dirname(__FILE__) . '/classes/PersistCtrl.php');
 
 defined('MOODLE_INTERNAL') || die();
 
