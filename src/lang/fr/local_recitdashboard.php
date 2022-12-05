@@ -7,7 +7,8 @@ $string['privacy:metadata:local_recitdashboard_options:value'] = 'Valeur du para
 $string['privacy:metadata:local_recitdashboard_options:userid'] = 'ID de l\'utilisateur du paramètre';
 $string['recitdashboard:teacher'] = 'Enseignant';
 
-$string['recitdashboard:teacher'] = 'L\'utilisateur a accès à l\'apprendimètre';
+$string['recitdashboard:accessdashboard'] = 'L\'utilisateur a accès à l\'apprendimètre';
+$string['recitdashboard:accessallgroups'] = 'L\'utilisateur a accès à tous les données des groupes même s\'ils ne sont pas dans le groupe';
 $string['recitdashboard:student'] = 'L\'utilisateur est un étudiant';
 $string['work'] = 'Travail';
 $string['time'] = 'Temps';

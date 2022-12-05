@@ -57,8 +57,8 @@ abstract class PersistCtrl extends MoodlePersistCtrl
         parent::__construct($mysqlConn, $signedUser);
     }
 
-    public function getEnrolledUserList($cmId = 0, $userId = 0, $courseId = 0){
-        $result = parent::getEnrolledUserList($cmId, $userId, $courseId);
+    public function getEnrolledUserList($cmId = 0, $userId = 0, $courseId = 0, $ownGroup = false){
+        $result = parent::getEnrolledUserList($cmId, $userId, $courseId, $ownGroup);
 
         foreach($result as $i => $group){
             $this->filterStudents($result[$i], $courseId);

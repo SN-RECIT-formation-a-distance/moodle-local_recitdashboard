@@ -149,7 +149,7 @@ abstract class MoodlePersistCtrl extends APersistCtrl{
         $result = array();
         foreach ($courses as $c) {
             $ccontext = \context_course::instance($c->id);
-            if (has_capability(RECITDASHBOARD_TEACHER_CAPABILITY, $ccontext)) {
+            if (has_capability(RECITDASHBOARD_ACCESSDASHBOARD_CAPABILITY, $ccontext)) {
                 $result[] = array('courseId' => $c->id, 'courseName' => $c->fullname);
             }
         }
@@ -182,7 +182,7 @@ abstract class MoodlePersistCtrl extends APersistCtrl{
         return $result;
     }
 
-    public function getEnrolledUserList($cmId = 0, $userId = 0, $courseId = 0){
+    public function getEnrolledUserList($cmId = 0, $userId = 0, $courseId = 0, $ownGroup = false){
         $cmStmt = " true ";
         $vars = array();
         if($cmId > 0){
@@ -191,12 +191,17 @@ abstract class MoodlePersistCtrl extends APersistCtrl{
 
         $userStmt =  " true ";
         if($userId > 0){
-            $userStmt = " (t3.id = $userId)";
+            // $userStmt = " (t3.id = $userId)";
         }
 
         $courseStmt = " true ";
         if($courseId > 0){
             $courseStmt = "(t1.courseid = $courseId)";
+        }
+
+        $groupStmt = " true ";
+        if($ownGroup){
+            $groupStmt = "t4.groupid in (select groupid from {groups_members} where userid = $userId)";
         }
 
         // This query fetch all students with their groups. The groups belong to the course according to the parameter.
@@ -210,7 +215,7 @@ abstract class MoodlePersistCtrl extends APersistCtrl{
             from {enrol} t1
         inner join {user_enrolments} t2 on t1.id = t2.enrolid
         inner join {user} t3 on t2.userid = t3.id and t3.suspended = 0 and t3.deleted = 0
-        left join {groups_members} t4 on t3.id = t4.userid
+        left join {groups_members} t4 on t3.id = t4.userid and $groupStmt
         left join {groups} t5 on t4.groupid = t5.id
         where (t1.courseid = t5.courseid) and $cmStmt and $userStmt and $courseStmt
         order by group_name asc, user_name asc)

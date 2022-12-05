@@ -23,8 +23,9 @@
  */
 
 
-define('RECITDASHBOARD_TEACHER_CAPABILITY', 'local/recitdashboard:teacher');
+define('RECITDASHBOARD_ACCESSDASHBOARD_CAPABILITY', 'local/recitdashboard:accessdashboard');
 define('RECITDASHBOARD_STUDENT_CAPABILITY', 'local/recitdashboard:student');
+define('RECITDASHBOARD_ACCESSALLGROUPS_CAPABILITY', 'local/recitdashboard:accessallgroups');
 
 /**
  * Initialise the js strings required for this module.

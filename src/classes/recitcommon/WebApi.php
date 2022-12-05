@@ -296,13 +296,21 @@ abstract class MoodleApi extends AWebApi
     }
 
     public function getEnrolledUserList($request){   
+        global $USER;
         try{
             $cmId = clean_param($request['cmId'], PARAM_INT);
             $courseId = (isset($request['courseId']) ? clean_param($request['courseId'], PARAM_INT) : 0);
+            $userId = $USER->id;
+            $ownGroup = true;
+            $ccontext = \context_course::instance($courseId);
+            if (has_capability(RECITDASHBOARD_ACCESSALLGROUPS_CAPABILITY, $ccontext, $userId, false)) {
+                $ownGroup = false;
+                $userId = 0;
+            }
 
             $this->canUserAccess('a', $courseId);
 
-            $tmp = PersistCtrl::getInstance()->getEnrolledUserList($cmId, 0, $courseId);
+            $tmp = PersistCtrl::getInstance()->getEnrolledUserList($cmId, $userId, $courseId, $ownGroup);
             $result = array();
             foreach($tmp as $item){
                 $this->prepareJson($item);

@@ -27,7 +27,17 @@ defined('MOODLE_INTERNAL') || die();
 require_once(__DIR__ . '/../lib.php');
 
 $capabilities = [
-    RECITDASHBOARD_TEACHER_CAPABILITY => [
+    RECITDASHBOARD_ACCESSALLGROUPS_CAPABILITY => [
+        'riskbitmask' => RISK_PERSONAL,
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes' => [
+            'teacher' => CAP_PREVENT,
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW,
+        ]
+    ],
+    RECITDASHBOARD_ACCESSDASHBOARD_CAPABILITY => [
         'riskbitmask' => RISK_PERSONAL,
         'captype' => 'write',
         'contextlevel' => CONTEXT_COURSE,
