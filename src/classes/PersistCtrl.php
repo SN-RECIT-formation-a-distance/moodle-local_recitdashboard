@@ -343,12 +343,15 @@ abstract class PersistCtrl extends MoodlePersistCtrl
         }
 
         if(file_exists("{$CFG->dirroot}/mod/recitcahiertraces/")){
+            $version = get_config('mod_recitcahiertraces')->version;
+            $ctid_field = "ctid";
+            if ($version > 2022100102) $ctid_field = "ct_id";
             $query .= " union
             -- return the number of cahiertraces by users awaiting feedback
             (SELECT ". $this->sql_uniqueid() ." uniqueid, t3.id cm_id, ". $this->sql_castutf8('t1.name')." cm_name, 0 due_date, t1.timemodified time_modified, 
             count(*) nb_items, tuser.userid as user_id, ". $this->mysqlConn->sql_concat(':cturl', 't3.id')." url, 2 state
             FROM {recitcahiertraces} t1
-            inner join {recitct_groups} t2 on t1.id = t2.ctid
+            inner join {recitct_groups} t2 on t1.id = t2.$ctid_field
             left join {recitct_notes} t4 on t2.id = t4.gid
             left join {recitct_user_notes} tuser on t4.id = tuser.nid
             inner join {course_modules} t3 on t1.id = t3.instance and t3.module = (select id from {modules} where name = 'recitcahiertraces') and t1.course = t3.course
