@@ -81,7 +81,7 @@ $PAGE->set_title(get_string('pluginname', 'local_recitdashboard'));
 $PAGE->set_heading(get_string('pluginname', 'local_recitdashboard'));
 
 echo $OUTPUT->header();
-$courseId = (isset($_GET['courseId']) ? $_GET['courseId'] : 0);
+$courseId = optional_param('courseId', 0, PARAM_INT);
 $recitDashboard = new MainView($USER, $courseId);
 $recitDashboard->display();
 

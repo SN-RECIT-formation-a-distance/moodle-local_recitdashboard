@@ -1,3 +1,4 @@
 .cache
 node_modules
 local_recitdashboard.zip
+*.zip

@@ -184,9 +184,13 @@ abstract class MoodlePersistCtrl extends APersistCtrl{
 
     public function getEnrolledUserList($cmId = 0, $userId = 0, $courseId = 0, $ownGroup = false){
         $cmStmt = " true ";
+        $cmStmt2 = " true ";
         $vars = array();
         if($cmId > 0){
-            $cmStmt = "(t1.courseid = (select course from {course_modules} where id = $cmId))";
+            $cmStmt = "(t1.courseid = (select course from {course_modules} where id = :cmid))";
+            $vars['cmid'] = $cmId;
+            $cmStmt2 = "(t1.courseid = (select course from {course_modules} where id = :cmid2))";
+            $vars['cmid2'] = $cmId;
         }
 
         $userStmt =  " true ";
@@ -195,13 +199,18 @@ abstract class MoodlePersistCtrl extends APersistCtrl{
         }
 
         $courseStmt = " true ";
+        $courseStmt2 = " true ";
         if($courseId > 0){
-            $courseStmt = "(t1.courseid = $courseId)";
+            $courseStmt = "(t1.courseid = :courseid)";
+            $vars['courseid'] = $courseId;
+            $courseStmt2 = "(t1.courseid = :courseid2)";
+            $vars['courseid2'] = $courseId;
         }
 
         $groupStmt = " true ";
         if($ownGroup){
-            $groupStmt = "t4.groupid in (select groupid from {groups_members} where userid = $userId)";
+            $groupStmt = "t4.groupid in (select groupid from {groups_members} where userid = :userid)";
+            $vars['userid'] = $userId;
         }
 
         // This query fetch all students with their groups. The groups belong to the course according to the parameter.
@@ -210,7 +219,7 @@ abstract class MoodlePersistCtrl extends APersistCtrl{
 
         $vars['str'] = get_string("nogroup", 'local_recitdashboard');
         $vars['str2'] = get_string("nogroup", 'local_recitdashboard');
-        $query = "(select ". $this->sql_uniqueid() ." uniqueId, t1.id, t1.enrol, t1.courseid course_id, t3.id user_id, concat(t3.firstname, ' ', t3.lastname) user_name, coalesce(t5.id,-1) group_id, 
+        $query = "(select ". $this->sql_uniqueid() ." uniqueId, t1.id, t1.enrol, t1.courseid course_id, t3.id user_id, ".$this->mysqlConn->sql_concat("t3.firstname", "' '", "t3.lastname")." user_name, coalesce(t5.id,-1) group_id, 
             coalesce(t5.name, :str) group_name 
             from {enrol} t1
         inner join {user_enrolments} t2 on t1.id = t2.enrolid
@@ -220,11 +229,11 @@ abstract class MoodlePersistCtrl extends APersistCtrl{
         where (t1.courseid = t5.courseid) and $cmStmt and $userStmt and $courseStmt
         order by group_name asc, user_name asc)
         union
-        (select ". $this->sql_uniqueid() ." uniqueId, t1.id, t1.enrol, t1.courseid course_id, t3.id user_id, concat(t3.firstname, ' ', t3.lastname) user_name, -1 group_id, :str2 group_name 
+        (select ". $this->sql_uniqueid() ." uniqueId, t1.id, t1.enrol, t1.courseid course_id, t3.id user_id, ".$this->mysqlConn->sql_concat("t3.firstname", "' '", "t3.lastname")." user_name, -1 group_id, :str2 group_name 
         from {enrol} t1
         inner join {user_enrolments} t2 on t1.id = t2.enrolid
         inner join {user} t3 on t2.userid = t3.id and t3.suspended = 0 and t3.deleted = 0
-        where $cmStmt and $userStmt and $courseStmt
+        where $cmStmt2 and $userStmt and $courseStmt2
         order by user_name asc)";
         
         $tmp = $this->getRecordsSQL($query, $vars);
@@ -267,33 +276,40 @@ class DiagTagPersistCtrl extends MoodlePersistCtrl
 
     public function getReportDiagTagQuestion($activityId = 0, $userId = 0, $tagId = 0, $courseId = 0, $groupId = 0, $sectionId = 0){
         $userStmt = "true";
+        $args = array();
         if($userId > 0){
-            $userStmt = " t6.id = $userId";
+            $userStmt = " t6.id = :userid";
+            $args['userid'] = $userId;
         }
 
         $groupStmt = "true";
         if($groupId > 0){
-            $groupStmt = " t6_2.id = $groupId";
+            $groupStmt = " t6_2.id = :groupid";
+            $args['groupid'] = $groupId;
         }
 
         $activityStmt = "true";
         if($activityId > 0){
-            $activityStmt = " t2.id = $activityId";
+            $activityStmt = " t2.id = :activityid";
+            $args['activityid'] = $activityId;
         }
 
         $tagStmt = "true";
         if($tagId > 0){
-            $tagStmt = " t9.id = $tagId";
+            $tagStmt = " t9.id = :tagid";
+            $args['tagid'] = $tagId;
         }
 		
 		$courseStmt = "true";
         if($courseId > 0){
-            $courseStmt = " t1.id = $courseId";
+            $courseStmt = " t1.id = :courseid";
+            $args['courseid'] = $courseId;
         }
 
         $sectionStmt = "true";
         if($sectionId > 0){
-            $sectionStmt = " t2.section = $sectionId";
+            $sectionStmt = " t2.section = :sectionid";
+            $args['sectionid'] = $sectionId;
         }
 
         $query = "SELECT ". $this->sql_uniqueid() ." uniqueId, t1.id course_id, t1.shortname course, t2.id activity_id, t3.id quiz_id, t3.name quiz, 
@@ -318,11 +334,11 @@ class DiagTagPersistCtrl extends MoodlePersistCtrl
         where t2_1.name = 'quiz' and $activityStmt and $userStmt and $tagStmt and $courseStmt and $groupStmt and $sectionStmt
         group by t1.id, t2.id, t3.id, t5.id, t6.id, t7.id, t8.tagid, t9.id";
 
-        $tmp = $this->getRecordsSQL($query);
+        $tmp = $this->getRecordsSQL($query, $args);
         return (empty($tmp) ? array() : $tmp);
     }
     
-    public function getReportDiagTagQuiz($courseId, $userId = 0, $groupId = 0){
+   /* public function getReportDiagTagQuiz($courseId, $userId = 0, $groupId = 0){
         $userStmt = "true";
         if($userId > 0){
             $userStmt = " t4.id = $userId";
@@ -416,5 +432,5 @@ class DiagTagPersistCtrl extends MoodlePersistCtrl
 
         $tmp = $this->getRecordsSQL($query);
         return (empty($tmp) ? array() : $tmp);
-    }
+    }*/
 }

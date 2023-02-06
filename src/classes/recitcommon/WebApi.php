@@ -83,6 +83,9 @@ abstract class AWebApi
         return $result;
     }
 
+    /**
+     * WARNING: Clean param is called everytime we have to read a $_REQUEST or input variable
+     */
     public function getRequest(){
         if(empty($_REQUEST)){
             $this->request = json_decode(file_get_contents('php://input'), true);
@@ -96,7 +99,7 @@ abstract class AWebApi
     }
 
     public function preProcessRequest(){
-        $sesskey = (isset($this->request['sesskey']) ? strval($this->request['sesskey']) : 'nosesskey'); 
+        $sesskey = (isset($this->request['sesskey']) ? clean_param($this->request['sesskey'], PARAM_TEXT) : 'nosesskey'); 
 
         if(!confirm_sesskey($sesskey)){
             $this->lastResult = new WebApiResult(false, null, get_string('invalidsesskey', 'local_recitdashboard'));
@@ -124,7 +127,7 @@ abstract class AWebApi
             return;
         }
 
-        $serviceWanted = $this->request['service'];
+        $serviceWanted = clean_param($this->request['service'], PARAM_TEXT);
 		$result = $this->$serviceWanted($this->request);	
 
         $this->lastResult = $result;

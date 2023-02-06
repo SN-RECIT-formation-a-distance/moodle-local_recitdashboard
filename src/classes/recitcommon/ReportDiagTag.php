@@ -63,12 +63,12 @@ class ReportDiagTagContent
         $tmp = array();
         $this->rawData = array();
 
-        if(in_array('quiz', $options)){
-            $tmp = DiagTagPersistCtrl::getInstance($this->DB)->getReportDiagTagQuiz($courseId, $userId, $groupId);
-        }
-
         if(in_array('question', $options)){
             $tmp = array_merge($tmp, DiagTagPersistCtrl::getInstance($this->DB)->getReportDiagTagQuestion($cmId, $userId, 0, $courseId, $groupId, $sectionId));
+        }
+
+        /*if(in_array('quiz', $options)){
+            $tmp = DiagTagPersistCtrl::getInstance($this->DB)->getReportDiagTagQuiz($courseId, $userId, $groupId);
         }
 
         if(in_array('assignment', $options)){
@@ -77,7 +77,7 @@ class ReportDiagTagContent
 
         if(in_array('lesson', $options)){
             $tmp = array_merge($tmp, DiagTagPersistCtrl::getInstance($this->DB)->getReportDiagTagLesson($courseId, $userId, $groupId));
-        }
+        }*/
 
         foreach($tmp as $item){
             $item->groupName = explode(",", $item->groupName);

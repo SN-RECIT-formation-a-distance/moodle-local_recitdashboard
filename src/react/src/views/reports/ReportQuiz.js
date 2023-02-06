@@ -73,7 +73,7 @@ export class ReportQuiz  extends Component{
         if (dataProvider.students.length === 0){ return null};
         
         if(this.props.options.student.id > 0){
-            dataProvider.students = dataProvider.students.filter(item => item.userId === this.props.options.student.id);
+            dataProvider.students = dataProvider.students.filter(item => parseInt(item.userId) === parseInt(this.props.options.student.id));
         }
 
         let main = 

@@ -396,18 +396,31 @@ abstract class PersistCtrl extends MoodlePersistCtrl
 
         $vars = array('quizurl' => $CFG->wwwroot.'/mod/quiz/view.php?id=', 'assignurl' => $CFG->wwwroot.'/mod/assign/view.php?id=', 'course1' => $courseId, 'course2' => $courseId, 'course3' => $courseId);
         $options = $this->getUserOptions($USER->id);
-        $daysWithoutConnect = intval($options['dayswithoutconnect']);
-        $daysDueIntervalMin = intval($options['daysdueintervalmin']);
-        $daysDueIntervalMax = intval($options['daysdueintervalmax']);
+        $vars['dayswithoutconnect'] = intval($options['dayswithoutconnect']);
+        $vars['daysdueintervalmin'] = intval($options['daysdueintervalmin']);
+        $vars['daysdueintervalmax'] = intval($options['daysdueintervalmax']);
+        $vars['daysdueintervalmin2'] = intval($options['daysdueintervalmin']);
+        $vars['daysdueintervalmax2'] = intval($options['daysdueintervalmax']);
 
         $visibleStmt = "";
+        $visibleStmt2 = "";
         if($cmVisible != null){
-            $visibleStmt = " and t5.visible = $cmVisible ";
+            $visibleStmt = " and t5.visible = :visible ";
+            $vars['visible'] = $cmVisible;
+            $visibleStmt2 = " and t5.visible = :visible2 ";
+            $vars['visible2'] = $cmVisible;
         }
 
         $groupStmt = "";
+        $groupStmt2 = "";
+        $groupStmt3 = "";
         if($groupId > 0){
-            $groupStmt = " and exists(select id from {groups_members} tgm where tgm.groupid = $groupId and t4.id = tgm.userid) ";
+            $groupStmt = " and exists(select id from {groups_members} tgm where tgm.groupid = :gid and t4.id = tgm.userid) ";
+            $vars['gid'] = $groupId;
+            $groupStmt2 = " and exists(select id from {groups_members} tgm where tgm.groupid = :gid2 and t4.id = tgm.userid) ";
+            $vars['gid2'] = $groupId;
+            $groupStmt3 = " and exists(select id from {groups_members} tgm where tgm.groupid = :gid3 and t4.id = tgm.userid) ";
+            $vars['gid3'] = $groupId;
         }
 
         $query = "
@@ -417,7 +430,7 @@ abstract class PersistCtrl extends MoodlePersistCtrl
         from {user_enrolments} t1
         inner join {enrol} t2 on t1.enrolid = t2.id
         inner join {user} t4 on t1.userid = t4.id and t4.deleted = 0 and t4.suspended = 0
-        where t2.courseid = :course1 and ".($this->sql_datediff('now()', $this->sql_to_time('t4.lastaccess')))." >= $daysWithoutConnect $groupStmt)
+        where t2.courseid = :course1 and ".($this->sql_datediff('now()', $this->sql_to_time('t4.lastaccess')))." >= :dayswithoutconnect $groupStmt)
 
         -- return students who have delayed submitting an assignment based on the settings. The assignment must set a due date
         union
@@ -430,9 +443,9 @@ abstract class PersistCtrl extends MoodlePersistCtrl
         inner join {course_modules} t5 on t3.id = t5.instance and t5.module = (select id from {modules} where name = 'assign') and t5.course = t2.courseid
         where 
             t2.courseid = :course2 and 
-            (t3.duedate > 0 and ".$this->sql_to_time('t3.duedate')." < now() and ".($this->sql_datediff('now()', $this->sql_to_time('t3.duedate')))." between $daysDueIntervalMin and $daysDueIntervalMax) and 
+            (t3.duedate > 0 and ".$this->sql_to_time('t3.duedate')." < now() and ".($this->sql_datediff('now()', $this->sql_to_time('t3.duedate')))." between :daysdueintervalmin and :daysdueintervalmax) and 
             not EXISTS((select id from {assign_submission} st1 where st1.assignment = t3.id and st1.userid = t4.id ))
-            $visibleStmt $groupStmt
+            $visibleStmt $groupStmt2
         )
 
         -- return students who have delayed submitting an quiz based on the settings. The quiz must set a time close
@@ -446,9 +459,9 @@ abstract class PersistCtrl extends MoodlePersistCtrl
         inner join {course_modules} t5 on t3.id = t5.instance and t5.module = (select id from {modules} where name = 'quiz') and t5.course = t2.courseid
         where 
             t2.courseid = :course3 and 
-            (t3.timeclose > 0 and ".$this->sql_to_time('t3.timeclose')." < now() and ".($this->sql_datediff('now()', $this->sql_to_time('t3.timeclose')))." between $daysDueIntervalMin and $daysDueIntervalMax) and 
+            (t3.timeclose > 0 and ".$this->sql_to_time('t3.timeclose')." < now() and ".($this->sql_datediff('now()', $this->sql_to_time('t3.timeclose')))." between :daysdueintervalmin2 and :daysdueintervalmax2) and 
             not EXISTS((select id from {quiz_attempts} st1 where st1.quiz = t3.id and st1.userid = t4.id ))
-            $visibleStmt $groupStmt
+            $visibleStmt2 $groupStmt3
         )";
         $tmp = $this->getRecordsSQL($query, $vars);
 

@@ -47,8 +47,6 @@ class WebApi extends MoodleApi
      * @param string $level [a = admin | s = student]
      */
     public function canUserAccess($level, $courseId = null){
-        global $DB;
-        $userId = $this->signedUser->id;
         $isTeacher = false;
 
         if ($courseId){
@@ -65,10 +63,6 @@ class WebApi extends MoodleApi
         if(($level == 'a') && $isTeacher){
             return true;
         }
-        // if the user is student then it has access only if it is accessing its own stuff
-        /*else if(($level == 's') && $isStudent){
-            return true;
-        }*/
         else{
             throw new Exception(get_string('accessdenied', 'admin'));
         }
@@ -333,7 +327,7 @@ class WebApi extends MoodleApi
             $courseId = clean_param($request['courseId'], PARAM_INT);
             $groupId = clean_param($request['groupId'], PARAM_INT);
             $cmId = clean_param($request['cmId'], PARAM_INT);
-            $output = (isset($request['output']) ? $request['output'] : 'json');
+            $output = (isset($request['output']) ? clean_param($request['output'], PARAM_RAW) : 'json');
 
             $this->canUserAccess('a', $courseId);
             
