@@ -28,6 +28,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {VisualFeedback, Loading} from "./libs/components/Components";
 import {MainView} from "./views/Views";
 import {$glVars} from "./common/common";
+import { Options } from './common/Options';
 import "./common/style.scss";
 
 class App extends Component {
@@ -45,7 +46,7 @@ class App extends Component {
     }
 
     componentDidMount(){
-
+        window.document.title += Options.appTitle(); 
         $glVars.feedback.addObserver("App", this.onFeedback); 
     }
 

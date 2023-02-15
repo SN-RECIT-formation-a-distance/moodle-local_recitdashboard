@@ -211,6 +211,9 @@ class DashboardView extends Component{
 
     render() {
         if (!this.state.options) return null;
+
+        // <NavDropdown.Item onClick={(e) => this.onHide('showgroupsoverviewwidget', 1)}>{i18n.get_string('overviewofmygroups')}</NavDropdown.Item>
+
         let main =
             <div>
                 <Header options={this.props.options} title={i18n.get_string('dashboard')}/>
@@ -218,7 +221,7 @@ class DashboardView extends Component{
                     <NavDropdown variant="outline-primary" style={{textAlign:'right'}} title={i18n.get_string('gadget')}>
                         <NavDropdown.Item onClick={(e) => this.onHide('showworkfollowupwidget', 1)}>{i18n.get_string('worktracking')}</NavDropdown.Item>
                         <NavDropdown.Item onClick={(e) => this.onHide('showstudentfollowupwidget', 1)}>{i18n.get_string('studenttracking')}</NavDropdown.Item>
-                        <NavDropdown.Item onClick={(e) => this.onHide('showgroupsoverviewwidget', 1)}>{i18n.get_string('overviewofmygroups')}</NavDropdown.Item>
+                        
                     </NavDropdown>
                 </div>
                 <br/>

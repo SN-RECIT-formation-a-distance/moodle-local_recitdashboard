@@ -38,6 +38,10 @@ export class Options
 
         return result;
     }
+
+    static appTitle(){
+        return " | v" + this.appVersion();
+    }
 }
 
 export class OptionManager

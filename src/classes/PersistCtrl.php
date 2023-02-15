@@ -535,7 +535,7 @@ abstract class PersistCtrl extends MoodlePersistCtrl
             // gather the user information
             if(!isset($result[$item->userId])){
                 $result[$item->userId] = new stdClass();
-                $result[$item->userId]->userId = $item->userId;
+                $result[$item->userId]->userId = (int) $item->userId;
                 $result[$item->userId]->firstName = $item->firstName;
                 $result[$item->userId]->lastName = $item->lastName;
                 $result[$item->userId]->groupIds = explode(",", $item->groupIds);
@@ -631,8 +631,8 @@ abstract class PersistCtrl extends MoodlePersistCtrl
 
             if(!isset($result[$item->userId])){
                 $result[$item->userId] = new stdClass();
-                $result[$item->userId]->courseId = $item->courseId;
-                $result[$item->userId]->userId = $item->userId;
+                $result[$item->userId]->courseId = (int) $item->courseId;
+                $result[$item->userId]->userId = (int) $item->userId;
                 $result[$item->userId]->firstName = $item->firstName;
                 $result[$item->userId]->lastName = $item->lastName;
                 $result[$item->userId]->groupIds = $item->groupIds;
@@ -749,7 +749,7 @@ abstract class PersistCtrl extends MoodlePersistCtrl
             // students info
             if(!isset($result->students[$item->userId])){
                 $obj = new stdClass();
-                $obj->userId = $item->userId;
+                $obj->userId = (int) $item->userId;
                 $obj->firstName = $item->firstName;
                 $obj->lastName = $item->lastName;
                 $obj->email = $item->email;
