@@ -820,7 +820,10 @@ abstract class PersistCtrl extends MoodlePersistCtrl
         }
 
         function cmp2($a, $b) {
-            return ($a->slot > $b->slot) ? -1 : 1;
+            if($a->slot == $b->slot){
+                return 0;
+            }
+            return ($a->slot < $b->slot) ? -1 : 1;
         }
 
         // sort by student name and question slot
