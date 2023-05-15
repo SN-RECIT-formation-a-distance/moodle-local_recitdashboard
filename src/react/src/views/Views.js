@@ -355,7 +355,7 @@ class FilterOptions extends Component{
         let studentList = this.state.studentList;
 
         if(options.group.id > 0){
-            studentList = studentList.filter( item => item.data.groupId.toString() === options.group.id.toString());
+            studentList = studentList.filter( item => item.data?.groupId.toString() === options.group.id.toString() || item.value === 0); //If value is 0, it's the all option
         }
 
         let main = 
@@ -439,6 +439,7 @@ class FilterOptions extends Component{
         
         if(event.target.name === "section.id"){
             activityList = [];
+            activityList.push({text: i18n.get_string('all'), value: 0});
 
             for(let item of this.state.sectionProvider){
                 if((item.sectionId.toString() === event.target.value.toString()) && (JsNx.getItem(activityList, 'value', item.cmId, null) === null)){
@@ -454,6 +455,7 @@ class FilterOptions extends Component{
         if (result.success){
             let sectionList = [];
 
+            sectionList.push({text: i18n.get_string('all'), value: 0});
             for(let item of result.data){
                 if(JsNx.getItem(sectionList, 'value', item.sectionId, null) === null){
                     sectionList.push({text: item.sectionName, value: item.sectionId});
@@ -468,6 +470,8 @@ class FilterOptions extends Component{
         if(result.success){
             let groupList = [];
             let studentList = [];
+            groupList.push({text: i18n.get_string('all'), value: 0});
+            studentList.push({text: i18n.get_string('all'), value: 0});
 
             for(let group of result.data){
                 let item = JsNx.at(group, 0, null);
