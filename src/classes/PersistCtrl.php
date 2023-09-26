@@ -742,7 +742,11 @@ abstract class PersistCtrl extends MoodlePersistCtrl
                 $obj->questionText = $item->questionText;
                 $obj->gradeWeight = $item->defaultMark * ($item->quizSumGrades > 0 ? $item->quizMaxGrade/$item->quizSumGrades : 0);
                 
-                $obj->tags = explode(",", $item->tags);
+                $obj->tags = array();
+                if($item->tags){
+                    $obj->tags = explode(",", $item->tags);
+                }
+                
                 $result->questions[$item->slot] = $obj;
             }
 
