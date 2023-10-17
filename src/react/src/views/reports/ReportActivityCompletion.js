@@ -86,10 +86,11 @@ export class ReportActivityCompletion  extends Component{
                     <DataGrid orderBy={true}>
                         <DataGrid.Header>
                             <DataGrid.Header.Row>
+                                <DataGrid.Header.Cell style={{minWidth: "120px"}}>{i18n.get_string('lastname')}</DataGrid.Header.Cell>
                                 <DataGrid.Header.Cell style={{minWidth: "120px"}}>{i18n.get_string('firstname')}</DataGrid.Header.Cell>
-                                <DataGrid.Header.Cell style={{minWidth: "100px"}}>{i18n.get_string('lastname')}</DataGrid.Header.Cell>
+                                
                                 {activityList.map((item, index) => {
-                                    if(!this.filterSectionAndCm(item)){ return null;}
+                                    if(!this.filterSectionAndCm(item)){ return null;} 
 
                                     let result = 
                                         <DataGrid.Header.Cell key={index} style={{textAlign: "center", minWidth: "100px", position: 'sticky', top: '0' }} >
@@ -108,15 +109,15 @@ export class ReportActivityCompletion  extends Component{
                                     let items =  [];
 
                                     let cell = 
-                                        <DataGrid.Header.Cell sortValue={item.firstName}  key={items.length} freezing={true}>
-                                            <a href={`${M.cfg.wwwroot}/user/profile.php?id=${item.userId}&course=${item.courseId}`} target={"_blank"}>{item.firstName}</a>
+                                        <DataGrid.Header.Cell sortValue={item.lastName}  key={items.length} freezing={true}>
+                                            <a href={`${M.cfg.wwwroot}/user/profile.php?id=${item.userId}&course=${item.courseId}`} target={"_blank"}>{item.lastName}</a>
                                         </DataGrid.Header.Cell>;
 
                                     items.push(cell);
 
                                     cell = 
-                                        <DataGrid.Header.Cell sortValue={item.lastName}  key={items.length} freezing={true}>
-                                            <a href={`${M.cfg.wwwroot}/user/profile.php?id=${item.userId}&course=${item.courseId}`} target={"_blank"}>{item.lastName}</a>
+                                        <DataGrid.Header.Cell sortValue={item.firstName}  key={items.length} freezing={true}>
+                                            <a href={`${M.cfg.wwwroot}/user/profile.php?id=${item.userId}&course=${item.courseId}`} target={"_blank"}>{item.firstName}</a>
                                         </DataGrid.Header.Cell>;
 
                                     items.push(cell);

@@ -103,186 +103,6 @@ abstract class PersistCtrl extends MoodlePersistCtrl
         $dataProvider = array_values($dataProvider); // reindex array
     }
     
-    /*public function getCourseProgressionOverview($courseId, $groupId = 0){
-        $vars = array();
-        $whereStmt = " and true ";
-
-        if($groupId > 0){
-            $whereStmt = " and t3_2.id = :gid ";
-            $vars['gid'] = $groupId;
-        }
-        $vars['courseid'] = $courseId;
-
-        $query = "select *, round(coalesce(datediff(now(), date_start_user)/datediff(end_date_course,date_start_user)*100,0),2) pct_time from 
-            (select ". $this->sql_uniqueid() ." uniqueId, t1.courseid course_id, 
-            t2.userid user_id, concat(t3.firstname, ' ', t3.lastname) student_name,  
-            concat('[', group_concat(distinct JSON_OBJECT('id', coalesce(t3_2.id, 0), 'name', coalesce(t3_2.name, '')) order by t3_2.name), ']') group_list,
-            round(sum(if(coalesce(t5.completionstate,0) = 1, 1, 0))/count(*),2) * 100 pct_work, FROM_UNIXTIME(max(t5.timemodified)) last_update,
-            from_unixtime(t6.startdate) date_start_user,
-            from_unixtime(t6.enddate) end_date_course
-            from {enrol} t1
-            inner join {user_enrolments} t2 on t1.id = t2.enrolid
-            inner join {user} t3 on t2.userid = t3.id and t3.deleted = 0 and t3.suspended = 0
-            left join {groups_members} t3_1 on t3.id = t3_1.userid
-            left join {groups} t3_2 on t3_1.groupid = t3_2.id and t3_2.courseid = t1.courseid
-            inner join {course} t6 on t1.courseid = t6.id and t6.visible = 1
-            inner join {course_modules} t4 on t1.courseid = t4.course
-            left join {course_modules_completion} t5 on t4.id = t5.coursemoduleid and t5.userid = t2.userid
-            where t1.courseid = :courseid and t4.completion = 1 $whereStmt
-            group by user_id) tab
-            order by pct_time desc, pct_work desc";
-    
-        $result = $this->getRecordsSQL($query, $vars);
-        $this->filterStudents($result, $courseId);
-
-        foreach($result as $item){
-            $item->groups = json_decode('['.$item->groupList.']');
-            if (!$item->groups) $item->groups = array();
-        }
-
-        return $result;
-    }
-    
-    public function getCourseProgressionOverviewByGroups($courseId, $groupId = 0){
-        $data = $this->getCourseProgressionOverview($courseId, $groupId);
-
-        $result = array();
-
-        $threshold = 0.05; 
-        foreach($data as $item){
-            foreach($item->groups as $group){
-                if(!isset($result[$group->id])){
-                    $result[$group->id] = new stdClass();
-                    $result[$group->id]->nb = 0;
-                    $result[$group->id]->g = 0;
-                    $result[$group->id]->gDesc = '% '.get_string('work', 'local_recitdashboard').' > % '.get_string('time', 'local_recitdashboard').'';
-                    $result[$group->id]->y = 0;
-                    $result[$group->id]->yDesc = '(% '.get_string('work', 'local_recitdashboard').' * 5%) > % '.get_string('time', 'local_recitdashboard').'';
-                    $result[$group->id]->r = 0;
-                    $result[$group->id]->rDesc = '% '.get_string('work', 'local_recitdashboard').' < % '.get_string('time', 'local_recitdashboard').'';
-                    $result[$group->id]->group = $group;
-                }
-
-                if($item->pctTime < $item->pctWork){
-                    $result[$group->id]->g++;
-                }
-                else if($item->pctTime < $item->pctWork + ($item->pctWork * $threshold)){
-                    $result[$group->id]->y++;
-                }
-                else{
-                    $result[$group->id]->r++;
-                }
-
-                $result[$group->id]->nb++;
-            }
-        }
-
-        foreach($result as $group){
-            $group->g = $group->g / $group->nb * 100;
-            $group->y = $group->y / $group->nb * 100;
-            $group->r = $group->r / $group->nb * 100;
-            unset($group->nb);
-        }
-
-        return array_values($result);
-    }
-
-    public function getCourseGradesOverviewByGroups($courseId, $groupId = 0){
-        $whereStmt = "";
-        $vars = array();
-
-        if($groupId > 0){
-            $whereStmt = " and t3_1.groupid = :gid ";
-            $vars['gid'] = $groupId;
-        }
-        $vars['courseid'] = $courseId;
-
-        $query = "SELECT ". $this->sql_uniqueid() ." uniqueid, t3.id user_id, coalesce(t3_2.id, 0) group_id, coalesce(t3_2.name,'') group_name, 
-        t2.finalgrade, t1.grademax, COALESCE((t2.finalgrade / t1.grademax) * 100, 0) final_grade_pct
-                    FROM {grade_items} t1                
-                        inner join {grade_grades} t2 on t1.id = t2.itemid
-                        inner join {user} t3 on t2.userid = t3.id and t3.deleted = 0 and t3.suspended = 0
-                        left join {groups_members} t3_1 on t3.id = t3_1.userid
-                        left join {groups} t3_2 on t3_1.groupid = t3_2.id and t3_2.courseid = t1.courseid 
-                        WHERE t1.courseid = :courseid and itemtype = 'course' $whereStmt";
-
-        $tmp = $this->getRecordsSQL($query, $vars);
-
-        $this->filterStudents($tmp, $courseId);
-
-        $result = array();
-        foreach($tmp as $item){
-            if(!isset($result[$item->groupId])){
-                $result[$item->groupId] = new stdClass();
-                $result[$item->groupId]->group = new stdClass();
-                $result[$item->groupId]->group->id = $item->groupId;
-                $result[$item->groupId]->group->name = $item->groupName;
-
-                $result[$item->groupId]->g = 0;
-                $result[$item->groupId]->gDesc = '>= 80';
-
-                $result[$item->groupId]->y = 0;
-                $result[$item->groupId]->yDesc = '>= 70';
-
-                $result[$item->groupId]->r = 0;
-                $result[$item->groupId]->rDesc = '< 70';
-            }
-            
-            if($item->finalGradePct >= 80){
-                $result[$item->groupId]->g = $result[$item->groupId]->g + 1;    
-            }
-            else if($item->finalGradePct >= 70){
-                $result[$item->groupId]->y = $result[$item->groupId]->y + 1;
-            }
-            else{
-                $result[$item->groupId]->r = $result[$item->groupId]->r + 1;
-            }
-        }
-
-        foreach($result as $i => $item){
-            $total = $item->g + $item->y + $item->r;
-
-            if($total == 0){ 
-                unset($result[$i]);
-                continue;
-            }
-
-            $result[$item->group->id]->g = $item->g / $total * 100;
-            $result[$item->group->id]->y = $item->y / $total * 100;
-            $result[$item->group->id]->r = $item->r / $total * 100;
-        }
-
-        return array_values($result);
-    }
-    
-    public function getGroupsOverview($courseId, $groupId = 0){
-        $progress = $this->getCourseProgressionOverviewByGroups($courseId, $groupId);
-        $grades = $this->getCourseGradesOverviewByGroups($courseId, $groupId);
-
-        $result = array();
-
-        foreach($progress as $item){
-            if(!isset($result[$item->group->id])){
-                $result[$item->group->id] = new stdClass();                
-            }
-
-            $result[$item->group->id]->progress = $item;
-        }
-
-        foreach($grades as $item){
-            $result[$item->group->id]->grades = $item;
-        }
-
-        $result = array_values($result);
-
-        // sort by student name and question slot
-        usort($result, function($a, $b) {
-            return strcmp($a->progress->group->name, $b->progress->group->name);
-        });
-
-        return $result;
-    }*/
-
     public function getWorkFollowup($courseId, $groupId = 0){
         global $CFG;
 
@@ -426,6 +246,7 @@ abstract class PersistCtrl extends MoodlePersistCtrl
         $query = "
         -- return if the student is X days without logging in
         (select ". $this->sql_uniqueid() ." uniqueId, t4.id user_id, ". $this->mysqlConn->sql_concat('t4.firstname', "' '", 't4.lastname')." username, 
+        ". $this->mysqlConn->sql_concat('t4.firstname', "' '", 't4.lastname')." orderby,
         ". $this->sql_tojson() ."('nbDaysLastAccess', ".($this->sql_datediff('now()', $this->sql_to_time('t4.lastaccess'))).") issue
         from {user_enrolments} t1
         inner join {enrol} t2 on t1.enrolid = t2.id
@@ -435,6 +256,7 @@ abstract class PersistCtrl extends MoodlePersistCtrl
         -- return students who have delayed submitting an assignment based on the settings. The assignment must set a due date
         union
         (SELECT ". $this->sql_uniqueid() ." uniqueId, t4.id user_id, ". $this->mysqlConn->sql_concat('t4.firstname', "' '", 't4.lastname')." username,  
+        ". $this->mysqlConn->sql_concat('t4.firstname', "' '", 't4.lastname')." orderby,
         ". $this->sql_tojson() ."('cmId', t5.id, 'cmName', t3.name, 'nbDaysLate', ".($this->sql_datediff('now()', $this->sql_to_time('t3.duedate'))).", 'url', ". $this->mysqlConn->sql_concat(':assignurl', 't5.id').") issue
         FROM {user_enrolments} t1
         inner join {enrol} t2 on t1.enrolid = t2.id
@@ -451,6 +273,7 @@ abstract class PersistCtrl extends MoodlePersistCtrl
         -- return students who have delayed submitting an quiz based on the settings. The quiz must set a time close
         union
         (SELECT ". $this->sql_uniqueid() ." uniqueId, t4.id user_id, ". $this->mysqlConn->sql_concat('t4.firstname', "' '", 't4.lastname')." username, 
+        ". $this->mysqlConn->sql_concat('t4.firstname', "' '", 't4.lastname')." orderby,
         ". $this->sql_tojson() ."('cmId', t5.id, 'cmName', t3.name, 'nbDaysLate', ".($this->sql_datediff('now()', $this->sql_to_time('t3.timeclose'))).", 'url', ". $this->mysqlConn->sql_concat(':quizurl', 't5.id').") issue
         FROM {user_enrolments} t1
         inner join {enrol} t2 on t1.enrolid = t2.id
@@ -473,6 +296,7 @@ abstract class PersistCtrl extends MoodlePersistCtrl
                 $result[$item->userId] = new stdClass();
                 $result[$item->userId]->userId = $item->userId;
                 $result[$item->userId]->username = $item->username;
+                $result[$item->userId]->orderby = $item->orderby;
                 $result[$item->userId]->issues = array();
             }
 
@@ -482,7 +306,7 @@ abstract class PersistCtrl extends MoodlePersistCtrl
         $result = array_values($result);
 
         function cmp($a, $b) {
-            return strcmp($a->username, $b->username);
+            return strnatcasecmp($a->orderby, $b->orderby);
         }
 
         usort($result, "recitdashboard\cmp");
@@ -522,7 +346,7 @@ abstract class PersistCtrl extends MoodlePersistCtrl
         inner join {course_sections} t6 on t4.section = t6.id
         where t1.courseid = :course $whereStmt
         group by t1.courseid, t3.id, t4.id, t1.itemname, t1.itemmodule
-        order by min(t6.section), cm_id, min(t6.sequence), ".$this->mysqlConn->sql_concat("t3.firstname", "' '", "t3.lastname");
+        order by min(t6.section), cm_id, min(t6.sequence)";
 
         $tmp = $this->getRecordsSQL($query, $vars);
         
@@ -571,7 +395,16 @@ abstract class PersistCtrl extends MoodlePersistCtrl
             $user->grades = array_values(array_merge($cmList, $user->grades));
         }
 
-        return array_values($result);
+        function cmp1($a, $b) { 
+            //  Case insensitive string comparisons using a "natural order" algorithm
+            return strnatcasecmp("{$a->lastName} {$a->firstName}", "{$b->lastName} {$b->firstName}");
+        }
+
+        $result = array_values($result);
+
+        usort($result, "recitdashboard\cmp1");
+
+        return $result;
     }
 
     public function reportActivityCompletion($courseId, $groupId, $cmVisible = 1){        
@@ -620,7 +453,8 @@ abstract class PersistCtrl extends MoodlePersistCtrl
         left join {groups_members} t5 on t3.id = t5.userid 
         left join {course_modules_completion} t2 on t1.id = t2.coursemoduleid and t3.id = t2.userid
         where t1.course = :course and st1.shortname in ('student') $whereStmt
-        group by t1.course, t1.id, t2.id, t3.id, cm_id, t4.sequence, ".$this->mysqlConn->sql_concat("t3.firstname", "' '", "t3.lastname");
+        group by t1.course, t1.id, t2.id, t3.id, cm_id, t4.sequence 
+        order by ".$this->mysqlConn->sql_concat("t3.lastname", "' '", "t3.firstname") . " asc ";
 
         $tmp = $this->getRecordsSQL($query, $vars);
         
@@ -819,24 +653,29 @@ abstract class PersistCtrl extends MoodlePersistCtrl
         $result->students = array_values($result->students);
 
 
-        function cmp1($a, $b) {
-            return strcmp("{$a->firstName} {$a->lastName}", "{$b->firstName} {$b->lastName}");
+        function cmp2($a, $b) {
+            return strnatcasecmp("{$a->lastName} {$a->firstName}", "{$b->lastName} {$b->firstName}");
         }
 
-        function cmp2($a, $b) {
-            if($a->slot == $b->slot){
-                return 0;
-            }
+        function cmp3($a, $b) {
+            if($a->slot == $b->slot){ return 0; }
             return ($a->slot < $b->slot) ? -1 : 1;
         }
 
+        function cmp4($a, $b) {
+            if($a->attempt == $b->attempt){ return 0; }
+            return ($a->attempt < $b->attempt) ? -1 : 1;
+        }
+
         // sort by student name and question slot
-        usort($result->students, "recitdashboard\cmp1");
-        usort($result->questions, "recitdashboard\cmp2");
+        usort($result->students, "recitdashboard\cmp2");
+        usort($result->questions, "recitdashboard\cmp3");
 
         foreach($result->students as $student){
+            usort($student->quizAttempts, "recitdashboard\cmp4");
+
             foreach($student->quizAttempts as $attempt){
-                usort($attempt->questions, "recitdashboard\cmp2");
+                usort($attempt->questions, "recitdashboard\cmp3");
             }
         }
 

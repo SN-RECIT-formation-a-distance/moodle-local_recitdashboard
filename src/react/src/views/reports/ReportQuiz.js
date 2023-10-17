@@ -81,8 +81,8 @@ export class ReportQuiz  extends Component{
                     <DataGrid orderBy={true}>
                         <DataGrid.Header>
                             <DataGrid.Header.Row>
+                                <DataGrid.Header.Cell style={{minWidth: "120px"}}>{i18n.get_string('lastname')}</DataGrid.Header.Cell>
                                 <DataGrid.Header.Cell style={{minWidth: "120px"}}>{i18n.get_string('firstname')}</DataGrid.Header.Cell>
-                                <DataGrid.Header.Cell style={{minWidth: "100px"}}>{i18n.get_string('lastname')}</DataGrid.Header.Cell>
                                 <DataGrid.Header.Cell style={{minWidth: "70px"}} title={i18n.get_string('attempts')}>{"#"}</DataGrid.Header.Cell>
                                 <DataGrid.Header.Cell style={{minWidth: "100px"}}>{i18n.get_string('state')}</DataGrid.Header.Cell>
                                 <DataGrid.Header.Cell style={{minWidth: "110px"}}>{i18n.get_string('beganat')}</DataGrid.Header.Cell>
@@ -139,15 +139,16 @@ export class ReportQuiz  extends Component{
                                     let cell = null;
 
                                     cell = 
-                                    <DataGrid.Header.Cell sortValue={student.firstName}  key={items.length} freezing={true}>
-                                        <a href={`${M.cfg.wwwroot}/user/profile.php?id=${student.userId}`} target={"_blank"}>{student.firstName}</a>
+                                    <DataGrid.Header.Cell sortValue={student.lastName}  key={items.length} freezing={true}>
+                                        <a href={`${M.cfg.wwwroot}/user/profile.php?id=${student.userId}`} target={"_blank"}>{student.lastName}</a>
                                     </DataGrid.Header.Cell>;
                                     items.push(cell);
 
                                     cell = 
-                                    <DataGrid.Header.Cell sortValue={student.lastName}  key={items.length} freezing={true}>
-                                        <a href={`${M.cfg.wwwroot}/user/profile.php?id=${student.userId}`} target={"_blank"}>{student.lastName}</a>
+                                    <DataGrid.Header.Cell sortValue={student.firstName}  key={items.length} freezing={true}>
+                                        <a href={`${M.cfg.wwwroot}/user/profile.php?id=${student.userId}`} target={"_blank"}>{student.firstName}</a>
                                     </DataGrid.Header.Cell>;
+                                    
                                     items.push(cell);
 
                                     items.push(<DataGrid.Body.Cell key={items.length}>{quizAttempt.attempt}</DataGrid.Body.Cell>);

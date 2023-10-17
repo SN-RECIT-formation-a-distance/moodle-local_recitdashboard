@@ -21,12 +21,11 @@
  * @license   {@link http://www.gnu.org/licenses/gpl-3.0.html} GNU GPL v3 or later
  */
 import React, { Component } from 'react';
-import {NavDropdown, Nav, Button, Collapse, Jumbotron, Form} from 'react-bootstrap';
+import {NavDropdown, Nav, Button, Collapse, Jumbotron} from 'react-bootstrap';
 import {faChartLine, faPlus, faMinus, faFileAlt, faSearchPlus} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {JsNx} from '../libs/utils/Utils';
 import {$glVars} from '../common/common';
-import {GadgetGroupsOverview} from './gadgets/GadgetGroupsOverview';
 import {GadgetWorkFollowup} from './gadgets/GadgetWorkFollowup';
 import {GadgetStudentFollowup} from './gadgets/GadgetStudentFollowup';
 import {ReportDiagnosticTags} from './reports/ReportDiagnosticTags';

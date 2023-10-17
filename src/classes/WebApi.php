@@ -219,7 +219,7 @@ class WebApi extends MoodleApi
     protected function reportSectionResultsAsCSV($data){
         try{                
             // header
-            $arr = array(get_string('firstname'), get_string('lastname'));
+            $arr = array(get_string('lastname'), get_string('firstname'));
 
             $student = current($data);
             foreach($student->grades as $grade){ 
@@ -229,7 +229,7 @@ class WebApi extends MoodleApi
             $fileContent[] = $arr;
 
             foreach($data as $student){
-                $arr = array($student->firstName, $student->lastName);
+                $arr = array($student->lastName, $student->firstName);
 
                 foreach($student->grades as $grade){ 
                     $arr[] = sprintf("%s/%s", number_format($grade->finalGrade, 1, ",", ""), number_format($grade->gradeMax, 1, ",", ""));
@@ -286,7 +286,7 @@ class WebApi extends MoodleApi
     protected function reportActivityCompletionAsCSV($data){
         try{                
             // header
-            $arr = array(get_string('firstname'), get_string('lastname'));
+            $arr = array(get_string('lastname'), get_string('firstname'));
 
             $student = current($data);
             foreach($student->activityList as $item){ 
@@ -300,7 +300,7 @@ class WebApi extends MoodleApi
             $fileContent[] = $arr;
 
             foreach($data as $student){
-                $arr = array($student->firstName, $student->lastName);
+                $arr = array($student->lastName, $student->firstName);
 
                 foreach($student->activityList as $item){ 
                     $arr[] = $item->completionState;
@@ -357,7 +357,7 @@ class WebApi extends MoodleApi
     protected function reportQuizAsCSV($data){
         try{                
             // header
-            $arr = array(get_string('firstname'), get_string('lastname'));
+            $arr = array(get_string('lastname'), get_string('firstname'));
             $arr[] = get_string('attempts', 'local_recitdashboard');
             $arr[] = get_string('state', 'local_recitdashboard');
             $arr[] = get_string('beganat', 'local_recitdashboard');
@@ -381,7 +381,7 @@ class WebApi extends MoodleApi
 
             foreach($data->students as $student){
                 foreach($student->quizAttempts as $quizAttempt){
-                    $row = array($student->firstName, $student->lastName);
+                    $row = array($student->lastName, $student->firstName);
                     $row[] = $quizAttempt->attempt;
                     $row[] = $quizAttempt->attempState;
                     $row[] = ($quizAttempt->attemptTimeStart instanceof DateTime ? $quizAttempt->attemptTimeStart->format("Y-m-d H:i:s") : $quizAttempt->attemptTimeStart);

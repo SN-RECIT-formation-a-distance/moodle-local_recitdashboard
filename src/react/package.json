@@ -1,6 +1,6 @@
 {
   "name": "recit_dashboard",
-  "version": "1.17.6-stable",
+  "version": "1.17.7-stable",
   "description": "RÉCIT Dashboard",
   "main": "index.js",
   "scripts": {
@@ -15,7 +15,6 @@
     "@fortawesome/fontawesome-svg-core": "1.2.35",
     "@fortawesome/free-solid-svg-icons": "5.15.3",
     "@fortawesome/react-fontawesome": "0.2.0",
-    "@nivo/pie": "0.61.1",
     "bootstrap": "4.6.2",
     "prop-types": "15.7.2",
     "react": "18.2.0",

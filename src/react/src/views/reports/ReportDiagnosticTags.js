@@ -131,8 +131,9 @@ export class ReportDiagnosticTags extends Component{
             <DataGrid orderBy={true}>
                 <DataGrid.Header>
                     <DataGrid.Header.Row>
+                        <DataGrid.Header.Cell style={{minWidth: "120px"}}>{i18n.get_string('lastname')}</DataGrid.Header.Cell>
                         <DataGrid.Header.Cell style={{minWidth: "120px"}}>{i18n.get_string('firstname')}</DataGrid.Header.Cell>
-                        <DataGrid.Header.Cell style={{minWidth: "100px"}}>{i18n.get_string('lastname')}</DataGrid.Header.Cell>
+                        
                         {tagList.map((item, index) => {
                             return <DataGrid.Header.Cell key={index}>{item}</DataGrid.Header.Cell>
                         })}
@@ -141,8 +142,8 @@ export class ReportDiagnosticTags extends Component{
                 <DataGrid.Body>
                 {data.students.map((student, index) => {
                             let cols = [];
-                            cols.push(<DataGrid.Header.Cell key={cols.length} freezing={true}>{student.firstName}</DataGrid.Header.Cell>);
                             cols.push(<DataGrid.Header.Cell key={cols.length} freezing={true}>{student.lastName}</DataGrid.Header.Cell>);
+                            cols.push(<DataGrid.Header.Cell key={cols.length} freezing={true}>{student.firstName}</DataGrid.Header.Cell>);
 
                             {tagList.map((tagName, index2) => {
                                 let tag = JsNx.getItem(student.tags, 'tagName', tagName, null);

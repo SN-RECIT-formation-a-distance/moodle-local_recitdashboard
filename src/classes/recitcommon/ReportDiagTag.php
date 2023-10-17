@@ -137,7 +137,7 @@ class ReportDiagTagContent
     protected function sortStudents($a, $b){
         $str1 = $a->firstName . " " . $a->lastName;
         $str2 = $b->firstName . " " . $b->lastName;
-        return strcmp($str1, $str2);
+        return strnatcasecmp($str1, $str2); 
     }
 
     protected function loadGroupsResult(){
@@ -241,7 +241,7 @@ abstract class ReportDiagTagItem
     }
 
     protected function sortTags($a, $b){
-        return strcmp($a->tagName, $b->tagName);
+        return strnatcasecmp($a->tagName, $b->tagName);
     }
 
     
@@ -404,7 +404,7 @@ class ReportDiagTagCSVWriter extends ReportDiagTagWriter
             $fileContent[] = array();
 
             // header
-            $arr = array(get_string("firstname"), get_string("lastname"), get_string("email"));
+            $arr = array(get_string("lastname"), get_string("firstname"), get_string("email"));
 
             $student = current($this->content->students);
             foreach($student->tags as $tag){ 
@@ -414,7 +414,7 @@ class ReportDiagTagCSVWriter extends ReportDiagTagWriter
             $fileContent[] = $arr;
 
             foreach($this->content->students as $student){
-                $arr = array($student->firstName, $student->lastName, $student->email);
+                $arr = array($student->lastName, $student->firstName, $student->email);
 
                 foreach($student->tags as $tag){ 
                     $arr[] = number_format($tag->value, 1, ",", "");

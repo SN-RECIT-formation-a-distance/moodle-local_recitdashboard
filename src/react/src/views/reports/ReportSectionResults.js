@@ -83,8 +83,9 @@ export class ReportSectionResults  extends Component{
                     <DataGrid orderBy={true}>
                         <DataGrid.Header>
                             <DataGrid.Header.Row>
+                                <DataGrid.Header.Cell style={{minWidth: "120px"}}>{i18n.get_string('lastname')}</DataGrid.Header.Cell>
                                 <DataGrid.Header.Cell style={{minWidth: "120px"}}>{i18n.get_string('firstname')}</DataGrid.Header.Cell>
-                                <DataGrid.Header.Cell style={{minWidth: "100px"}}>{i18n.get_string('lastname')}</DataGrid.Header.Cell>
+                                
                                 {grades.map((item, index) => {
                                     if(!this.filterSectionAndCm(item)){ return null;}
 
@@ -104,15 +105,15 @@ export class ReportSectionResults  extends Component{
                                     let items =  [];
 
                                     let cell = 
-                                        <DataGrid.Header.Cell sortValue={item.firstName}  key={items.length} freezing={true}>
-                                            <a href={`${M.cfg.wwwroot}/user/profile.php?id=${item.userId}`} target={"_blank"}>{item.firstName}</a>
+                                        <DataGrid.Header.Cell sortValue={item.lastName}  key={items.length} freezing={true}>
+                                            <a href={`${M.cfg.wwwroot}/user/profile.php?id=${item.userId}`} target={"_blank"}>{item.lastName}</a>
                                         </DataGrid.Header.Cell>;
 
                                     items.push(cell);
 
                                     cell = 
-                                        <DataGrid.Header.Cell sortValue={item.lastName}  key={items.length} freezing={true}>
-                                            <a href={`${M.cfg.wwwroot}/user/profile.php?id=${item.userId}`} target={"_blank"}>{item.lastName}</a>
+                                        <DataGrid.Header.Cell sortValue={item.firstName}  key={items.length} freezing={true}>
+                                            <a href={`${M.cfg.wwwroot}/user/profile.php?id=${item.userId}`} target={"_blank"}>{item.firstName}</a>
                                         </DataGrid.Header.Cell>;
 
                                     items.push(cell);
