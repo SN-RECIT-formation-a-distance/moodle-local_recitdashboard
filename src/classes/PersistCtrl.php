@@ -382,7 +382,10 @@ abstract class PersistCtrl extends MoodlePersistCtrl
 
             // gather the user information about the activity
             $grade = clone($grade);
-            $grade->extra = json_decode($item->extra);
+            if($item->extra != null){
+                $grade->extra = json_decode($item->extra);
+            }
+            
             $grade->finalGrade = $item->finalGrade;
             $grade->gradeMax = $item->gradeMax;
             $grade->successPct = $item->successPct;
