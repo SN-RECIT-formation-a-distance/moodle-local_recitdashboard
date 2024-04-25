@@ -491,7 +491,6 @@ abstract class PersistCtrl extends MoodlePersistCtrl
     abstract public function reportQuiz_QueryNbQuestions();
     
     public function reportQuiz($courseId, $activityId, $groupId = 0){
-        global $CFG;
         $groupStmt = "1";
         $vars = array();
         $vars['activity'] = $activityId;
@@ -544,7 +543,7 @@ abstract class PersistCtrl extends MoodlePersistCtrl
             t7.questiontext question_text, 
             (SELECT ". $this->sql_group_concat('name') ." FROM {tag} WHERE id IN (SELECT tagid from {tag_instance} where itemid = t7.id and itemtype in ('question') )) tags 
             $queryPart2
-            inner join mdl_question t7 on t5.questionid = t7.id 
+            inner join {question} t7 on t5.questionid = t7.id 
             $queryPart3
             group by t1.id, t2.id, t3.id, t5.id, t6.id, t7.id
             $queryPart4";
@@ -680,6 +679,52 @@ abstract class PersistCtrl extends MoodlePersistCtrl
             foreach($student->quizAttempts as $attempt){
                 usort($attempt->questions, "recitdashboard\cmp3");
             }
+        }
+
+        return $result;
+    }
+
+    public function reportQuizEssayAnswers($courseId, $cmId, $groupId, $studentId){
+        $vars = array();
+        $vars['cmid'] = $cmId;
+        $vars['courseid'] = $courseId;
+
+        $groupStmt = "1";
+        if($groupId > 0){
+            $groupStmt = " t6_2.id = :groupid";
+            $vars['groupid'] = $groupId;
+        }
+
+        $studentStmt = "1";
+        if($studentId > 0){
+            $studentStmt = " t6.id = :studentid";
+            $vars['studentid'] = $studentId;
+        }
+
+        $query = "select ". $this->sql_uniqueid() ." uniqueId, t1.id course_id, t1.shortname course_name, t2.id cmid, t3.id quiz_id, 
+                t3.name quiz_name, t6.id user_id, t6.firstname first_name, t6.lastname last_name, ". $this->mysqlConn->sql_concat('t6.firstname', "' '", 't6.lastname')." fullname,
+                t6.email, t5_2.value as answer, t5_1.timecreated as answer_timestamp
+                from {course} t1 
+                inner join {course_modules} t2 on t1.id= t2.course 
+                inner join {modules} t2_1 on t2.module = t2_1.id 
+                inner join {quiz} t3 on t2.instance = t3.id 
+                inner join {quiz_attempts} t4 on t4.quiz = t3.id 
+                inner join {question_attempts} t5 on t4.uniqueid = t5.questionusageid 
+                inner join {question_attempt_steps} t5_1 on t5.id = t5_1.questionattemptid
+                inner join {question_attempt_step_data} t5_2 on t5_1.id = t5_2.attemptstepid and t5_2.name = 'answer'
+                inner join {qtype_essay_options} as t5_3 on t5.questionid = t5_3.questionid
+                inner join {user} t6 on t4.userid = t6.id  and t6.deleted = 0 and t6.suspended = 0
+                left join {groups_members} t6_1 on t6.id = t6_1.userid 
+                left join {groups} t6_2 on t6_1.groupid = t6_2.id 
+                where t2_1.name = 'quiz' and t2.id = :cmid  and t1.id = :courseid  and $groupStmt and $studentStmt";
+
+        $result = $this->getRecordsSQL($query, $vars);
+
+        foreach($result as $item){
+            //$output = preg_replace('/\s\s+/',' ',$input);
+            $answer = html_entity_decode($item->answer);
+            $answer = strip_tags($item->answer);
+            $item->nbWords = str_word_count($answer);
         }
 
         return $result;

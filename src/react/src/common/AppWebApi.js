@@ -137,4 +137,15 @@ export class AppWebApi extends WebApi
         let data = {sesskey: M.cfg.sesskey, groupId: groupId, courseId: courseId, service: "reportActivityCompletion"};
         this.post(this.gateway, data, onSuccess);
     }
+
+    reportQuizEssayAnswers(data){
+        data = data || {};
+
+        data.sesskey = M.cfg.sesskey;
+        data.service = "reportQuizEssayAnswers";
+
+        let params = new URLSearchParams(data).toString();
+
+        window.open(`${this.gateway}?${params}`, '_blank');
+    }
 };

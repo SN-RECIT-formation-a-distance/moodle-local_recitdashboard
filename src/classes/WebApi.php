@@ -27,6 +27,7 @@ require_once(dirname(__FILE__).'../../../../config.php');
 require_once(dirname(__FILE__)."/recitcommon/WebApi.php");
 require_once dirname(__FILE__).'/recitcommon/ReportDiagTag.php';
 require_once(dirname(__FILE__).'/PersistCtrl.php');
+require_once(dirname(__FILE__).'/ReportPDF.php');
 require_once(dirname(__FILE__).'/../lib.php');
 
 use Exception;
@@ -405,6 +406,31 @@ class WebApi extends MoodleApi
         }     
     }   
 
+    public function reportQuizEssayAnswers($request){
+        try{
+            $courseId = clean_param($request['courseId'], PARAM_INT);
+            $groupId = clean_param($request['groupId'], PARAM_INT);
+            $cmId = clean_param($request['cmId'], PARAM_INT);
+            $studentId = clean_param($request['studentId'], PARAM_INT);
+
+            $extraData = new stdClass();
+            $extraData->supervisorName = (isset($request['supervisorName']) ? clean_param($request['supervisorName'], PARAM_RAW) : '');
+
+            $this->canUserAccess('a', $courseId);
+            
+            $data = PersistCtrl::getInstance()->reportQuizEssayAnswers($courseId, $cmId, $groupId, $studentId);
+            
+            
+            $pdfWritter = new ReportQuizEssayAnswersPdf();
+            $pdfWritter->SetDataset($data, $extraData);
+            $pdfWritter->PrintOut('I');
+          
+            return new WebApiResult(true);
+        }
+        catch(Exception $ex){
+            return new WebApiResult(false, false, $ex->GetMessage());
+        } 
+    }
     /**
      * This function generates a report of used tags
      * 

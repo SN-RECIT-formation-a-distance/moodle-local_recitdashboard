@@ -84,3 +84,5 @@ $string['taganalysis'] = 'Tag Overview';
 $string['servicenotfound'] = 'Unspecified web service.';
 $string['invalidsesskey'] = 'Invalid session key.';
 $string['downloadcsv'] = 'Download CSV';
+$string['printessayquestions'] = 'Print Essay Questions';
+$string['viewreport'] = 'View Report';

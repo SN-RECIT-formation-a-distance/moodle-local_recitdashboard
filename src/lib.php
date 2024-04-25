@@ -104,6 +104,8 @@ function local_recitdashboard_strings_for_js() {
         "resultsbysection",
         "quizresults",
         "taganalysis",
-        "downloadcsv"
+        "downloadcsv",
+        "printessayquestions",
+        "viewreport"
     ), 'local_recitdashboard');
 }

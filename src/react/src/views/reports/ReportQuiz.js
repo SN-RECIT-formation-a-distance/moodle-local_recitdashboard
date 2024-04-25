@@ -22,7 +22,7 @@
  */
 import React, { Component } from 'react';
 import {DataGrid} from '../../libs/components/Components';
-import {OverlayTrigger, Popover, Button, Badge} from 'react-bootstrap';
+import {OverlayTrigger, Popover, Button, Badge, Modal, Form} from 'react-bootstrap';
 import {$glVars, Options, AppCommon} from '../../common/common';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {faCheck, faTimes, faCheckSquare} from '@fortawesome/free-solid-svg-icons';
@@ -37,10 +37,11 @@ export class ReportQuiz  extends Component{
     constructor(props) {
         super(props);
 
+        this.onShowModal = this.onShowModal.bind(this);
         this.getData = this.getData.bind(this);
         this.getDataResult = this.getDataResult.bind(this);
 
-        this.state = {dataProvider: null};
+        this.state = {dataProvider: null, printEssayQuestionModal: false};
     }
 
     componentDidMount(){
@@ -182,10 +183,12 @@ export class ReportQuiz  extends Component{
                     </DataGrid>
                     <br/>
                     <hr/>
-                    <div>
+                    <div className='d-flex align-items-center'>
                         <a href={`${Options.getGateway(true)}&service=reportQuiz&courseId=${this.props.options.course.id}&groupId=${this.props.options.group.id}&cmId=${this.props.options.cm.id}&output=csv`} target='_blank'>{i18n.get_string('downloadcsv')}</a>
+                        <span className='ml-3 mr-3'>|</span>
+                        <Button className='p-0' variant='link' onClick={() => this.onShowModal(true)}>{i18n.get_string('printessayquestions')}</Button>
                     </div>                           
-                    <br/>
+                    <PrintEssayQuestionModal show={this.state.printEssayQuestionModal} options={this.props.options} onClose={() => this.onShowModal(false)}/>
                 </div>;
 
         return (main);
@@ -277,5 +280,83 @@ export class ReportQuiz  extends Component{
 
         return result;
         //return value;
+    }
+
+    onShowModal(value){
+        this.setState({printEssayQuestionModal: value});
+    }
+}
+
+class PrintEssayQuestionModal extends Component{
+    static defaultProps = {        
+        options: null,
+        show: false,
+        onClose: null
+    };
+
+    constructor(props){
+        super(props);
+
+        this.onDataChange = this.onDataChange.bind(this);
+        this.viewReport = this.viewReport.bind(this);
+
+        this.state = {
+            data: {
+                documentTitle: '',
+                supervisorName: '',
+                permanentCode: '',
+                testNumber: ''
+            }
+        }
+    }
+
+    render(){
+        let main = 
+            <Modal onHide={this.props.onClose} show={this.props.show}>
+                <Modal.Header closeButton>
+                    <Modal.Title>{i18n.get_string('printessayquestions')}</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Form.Group>
+                        <Form.Label>Titre du document</Form.Label>
+                        <Form.Control name='documentTitle' value={this.state.documentTitle} onChange={this.onDataChange} maxLength={100} />
+                    </Form.Group>
+                    <Form.Group>
+                        <Form.Label>Nom du surveillant</Form.Label>
+                        <Form.Control name='supervisorName' value={this.state.supervisorName} onChange={this.onDataChange} maxLength={75} />
+                    </Form.Group>
+                    <Form.Group>
+                        <Form.Label>Code permanent</Form.Label>
+                        <Form.Control name='permanentCode' value={this.state.permanentCode} onChange={this.onDataChange} maxLength={25} />
+                    </Form.Group>
+                    <Form.Group>
+                        <Form.Label>Numéro de l'épreuve</Form.Label>
+                        <Form.Control name='testNumber' value={this.state.testNumber} onChange={this.onDataChange} maxLength={25} />
+                    </Form.Group>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={this.props.onClose}>{i18n.get_string('cancel')}</Button>
+                    <Button variant="primary" onClick={this.viewReport}>{i18n.get_string('viewreport')}</Button>
+                </Modal.Footer>
+            </Modal>
+
+        return (main);
+    }
+
+    viewReport(){
+        let data = {
+            courseId: this.props.options.course.id,
+            cmId: this.props.options.cm.id,
+            groupId: this.props.options.group.id,
+            studentId: this.props.options.student.id
+        }
+
+        $glVars.webApi.reportQuizEssayAnswers(data);
+    }
+
+    onDataChange(event){
+        let data = this.state.data;
+        data[event.target.name] = event.target.value;
+        this.setState({data: data});
     }
 }

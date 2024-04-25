@@ -85,3 +85,5 @@ $string['taganalysis'] = 'Analyse par tag';
 $string['servicenotfound'] = 'Service web non spécifié.';
 $string['invalidsesskey'] = 'Clé de session invalide.';
 $string['downloadcsv'] = 'Télécharger en CSV';
+$string['printessayquestions'] = 'Imprimer les questions composition';
+$string['viewreport'] = 'Voir le rapport';

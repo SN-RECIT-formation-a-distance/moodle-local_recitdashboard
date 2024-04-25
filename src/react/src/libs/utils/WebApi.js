@@ -163,8 +163,10 @@ export class WebApi
         console.log(jqXHR);
     };
     
-    post(url, data, callbackSuccess, callbackError, showFeedback){
+    post(url, data, callbackSuccess, callbackError, showFeedback, contentType, responseType){
         showFeedback = (typeof showFeedback === 'undefined' ? true : showFeedback);
+        contentType = (typeof contentType === 'undefined' ?  HttpRequest.contentType.json : contentType);
+        responseType = (typeof responseType === 'undefined' ?  HttpRequest.responseType.json : responseType);
         
         if(showFeedback){
             this.showLoadingFeedback();
@@ -173,7 +175,7 @@ export class WebApi
         callbackError = callbackError || this.onError;
         data = JSON.stringify(data);
 
-        this.http.send("post", url, data, callbackSuccess, callbackError, this.onComplete, HttpRequest.contentType.json, HttpRequest.responseType.json);
+        this.http.send("post", url, data, callbackSuccess, callbackError, this.onComplete, contentType, responseType);
     }
 
     onComplete(){
