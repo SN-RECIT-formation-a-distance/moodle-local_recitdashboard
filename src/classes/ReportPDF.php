@@ -61,7 +61,7 @@ class CustomPdf extends \TCPDF
 
         $this->setCellPaddings(1, 1, 1, 1);
 
-        $this->setCellmargins(0,4,0,0);
+        $this->setCellmargins(0,7,0,0);
         $this->SetFont('times', 'b', 10);
         $this->Cell($this->pctToMm(37), 0, "Nom de l'élève:", 'LT', 0, 'L');
         $this->Cell($this->pctToMm(37), 0, "Signature", 'T', 0, 'L');
@@ -82,8 +82,8 @@ class CustomPdf extends \TCPDF
 
         $this->SetFont('times', '', 10);
         $this->Cell($this->pctToMm(25), 0, $this->extraData->supervisorName, 'LB', 0, 'L');
-        $this->Cell($this->pctToMm(25), 0, "______________________", 'B', 0, 'L');
-        $this->Cell($this->pctToMm(25), 0, "_________________", 'B', 0, 'L');
+        $this->Cell($this->pctToMm(25), 0, $this->extraData->permanentCode, 'B', 0, 'L');
+        $this->Cell($this->pctToMm(25), 0, $this->extraData->testNumber, 'B', 0, 'L');
         $this->Cell($this->pctToMm(25), 0, $this->data->nbWords, 'BR', 1, 'L');
 
         // Page number
@@ -206,12 +206,11 @@ class ReportQuizEssayAnswersPdf extends PdfWritter
 
         $this->pdf->SetXY($this->marginLeft, $this->marginTop);
         $this->pdf->SetFont('times', 'b', 16);
-        $this->pdf->MultiCell(0, 0, 'VERSION DÉFINITIVE', 0, 'C');
+        $this->pdf->MultiCell(0, 0, $this->extraData->documentTitle, 0, 'C');
 
         $this->pdf->SetFont('times', '', 12);
-        $answer = "<div style='line-height: 50px;'>$data->answer</div>";
-        $this->pdf->MultiCell(0, 0, $answer, 0, 'L', false, 1, null, null, true, 0, true);
-
-
+        //$this->pdf->MultiCell(0, 0, $answer, 0, 'L', false, 1, null, null, true, 0, true);
+        $this->pdf->setCellHeightRatio(2);
+        $this->pdf->writeHTMLCell(0, 0, null, null, $data->answer, 0, 1, false, true, 'L');
     }
 }

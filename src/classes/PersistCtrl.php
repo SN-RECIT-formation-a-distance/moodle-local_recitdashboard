@@ -684,7 +684,7 @@ abstract class PersistCtrl extends MoodlePersistCtrl
         return $result;
     }
 
-    public function reportQuizEssayAnswers($courseId, $cmId, $groupId, $studentId){
+    public function reportQuizEssayAnswers($courseId, $cmId, $groupId, $studentId, $onlyLastTry = false){
         $vars = array();
         $vars['cmid'] = $cmId;
         $vars['courseid'] = $courseId;
@@ -703,7 +703,7 @@ abstract class PersistCtrl extends MoodlePersistCtrl
 
         $query = "select ". $this->sql_uniqueid() ." uniqueId, t1.id course_id, t1.shortname course_name, t2.id cmid, t3.id quiz_id, 
                 t3.name quiz_name, t6.id user_id, t6.firstname first_name, t6.lastname last_name, ". $this->mysqlConn->sql_concat('t6.firstname', "' '", 't6.lastname')." fullname,
-                t6.email, t5_2.value as answer, t5_1.timecreated as answer_timestamp
+                t6.email, t5_2.value as answer, t5_1.timecreated as answer_timestamp, t4.attempt
                 from {course} t1 
                 inner join {course_modules} t2 on t1.id= t2.course 
                 inner join {modules} t2_1 on t2.module = t2_1.id 
@@ -716,18 +716,29 @@ abstract class PersistCtrl extends MoodlePersistCtrl
                 inner join {user} t6 on t4.userid = t6.id  and t6.deleted = 0 and t6.suspended = 0
                 left join {groups_members} t6_1 on t6.id = t6_1.userid 
                 left join {groups} t6_2 on t6_1.groupid = t6_2.id 
-                where t2_1.name = 'quiz' and t2.id = :cmid  and t1.id = :courseid  and $groupStmt and $studentStmt";
+                where t2_1.name = 'quiz' and t2.id = :cmid  and t1.id = :courseid  and $groupStmt and $studentStmt
+                order by last_name asc, first_name asc, attempt desc";
 
-        $result = $this->getRecordsSQL($query, $vars);
+        $tmp = $this->getRecordsSQL($query, $vars);
 
-        foreach($result as $item){
+        $result = array();
+        foreach($tmp as $item){
             //$output = preg_replace('/\s\s+/',' ',$input);
             $answer = html_entity_decode($item->answer);
             $answer = strip_tags($item->answer);
             $item->nbWords = str_word_count($answer);
+
+            if($onlyLastTry){
+                if(!isset($result[$item->userId])){
+                    $result[$item->userId] = $item;
+                }
+            }
+            else{
+                $result[] = $item;
+            }
         }
 
-        return $result;
+        return array_values($result);
     }
 
     public function getUserOptions($userId){

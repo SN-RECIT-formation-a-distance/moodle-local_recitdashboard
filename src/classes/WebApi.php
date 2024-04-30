@@ -412,15 +412,18 @@ class WebApi extends MoodleApi
             $groupId = clean_param($request['groupId'], PARAM_INT);
             $cmId = clean_param($request['cmId'], PARAM_INT);
             $studentId = clean_param($request['studentId'], PARAM_INT);
+            $onlyLastTry = (clean_param($request['onlyLastTry'], PARAM_INT) == 1 ? true : false);
 
             $extraData = new stdClass();
-            $extraData->supervisorName = (isset($request['supervisorName']) ? clean_param($request['supervisorName'], PARAM_RAW) : '');
-
+            $extraData->documentTitle = clean_param($request['documentTitle'], PARAM_RAW);
+            $extraData->supervisorName = clean_param($request['supervisorName'], PARAM_RAW);
+            $extraData->permanentCode = clean_param($request['permanentCode'], PARAM_RAW);
+            $extraData->testNumber = clean_param($request['testNumber'], PARAM_RAW);
+                        
             $this->canUserAccess('a', $courseId);
             
-            $data = PersistCtrl::getInstance()->reportQuizEssayAnswers($courseId, $cmId, $groupId, $studentId);
-            
-            
+            $data = PersistCtrl::getInstance()->reportQuizEssayAnswers($courseId, $cmId, $groupId, $studentId, $onlyLastTry);                   
+
             $pdfWritter = new ReportQuizEssayAnswersPdf();
             $pdfWritter->SetDataset($data, $extraData);
             $pdfWritter->PrintOut('I');

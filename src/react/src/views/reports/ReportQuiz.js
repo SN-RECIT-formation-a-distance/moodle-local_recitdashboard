@@ -40,8 +40,15 @@ export class ReportQuiz  extends Component{
         this.onShowModal = this.onShowModal.bind(this);
         this.getData = this.getData.bind(this);
         this.getDataResult = this.getDataResult.bind(this);
+        this.onDataChange = this.onDataChange.bind(this);
 
-        this.state = {dataProvider: null, printEssayQuestionModal: false};
+        this.state = {
+            dataProvider: null, 
+            printEssayQuestionModal: false, 
+            data: {
+                onlyLastTry: false
+            }
+        };
     }
 
     componentDidMount(){
@@ -69,16 +76,26 @@ export class ReportQuiz  extends Component{
     }
 
     render() {    
-        let dataProvider = this.state.dataProvider;
-        if (dataProvider === null){ return null};
-        if (dataProvider.students.length === 0){ return null};
-        
+        if (this.state.dataProvider === null){ return null};
+        if (this.state.dataProvider.students.length === 0){ return null};
+
+        let dataProvider = structuredClone(this.state.dataProvider);
+
         if(this.props.options.student.id > 0){
             dataProvider.students = dataProvider.students.filter(item => parseInt(item.userId) === parseInt(this.props.options.student.id));
         }
 
+        if(this.state.data.onlyLastTry){
+            for(let student of dataProvider.students){
+                student.quizAttempts = [student.quizAttempts.pop()];
+            }
+        }
+
         let main = 
                 <div>
+                    <div className='mb-2 p-2 border rounded'>
+                        <Form.Check id="checkboxOnlyLastTry" name='onlyLastTry' checked={this.state.data.onlyLastTry} onChange={this.onDataChange} type="checkbox" label="Check me out" />
+                    </div>
                     <DataGrid orderBy={true}>
                         <DataGrid.Header>
                             <DataGrid.Header.Row>
@@ -188,10 +205,16 @@ export class ReportQuiz  extends Component{
                         <span className='ml-3 mr-3'>|</span>
                         <Button className='p-0' variant='link' onClick={() => this.onShowModal(true)}>{i18n.get_string('printessayquestions')}</Button>
                     </div>                           
-                    <PrintEssayQuestionModal show={this.state.printEssayQuestionModal} options={this.props.options} onClose={() => this.onShowModal(false)}/>
+                    <PrintEssayQuestionModal show={this.state.printEssayQuestionModal} options={this.props.options} extraOptions={this.state.data} onClose={() => this.onShowModal(false)}/>
                 </div>;
 
         return (main);
+    }
+
+    onDataChange(event){
+        let data = this.state.data;
+        data[event.target.name] = event.target.checked;
+        this.setState({data: data});
     }
 
     getCell(quizAttempt, question, index){
@@ -290,6 +313,7 @@ export class ReportQuiz  extends Component{
 class PrintEssayQuestionModal extends Component{
     static defaultProps = {        
         options: null,
+        extraOptions: null,
         show: false,
         onClose: null
     };
@@ -302,10 +326,10 @@ class PrintEssayQuestionModal extends Component{
 
         this.state = {
             data: {
-                documentTitle: '',
+                documentTitle: 'VERSION DÉFINITIVE',
                 supervisorName: '',
                 permanentCode: '',
-                testNumber: ''
+                testNumber: ''   
             }
         }
     }
@@ -319,19 +343,19 @@ class PrintEssayQuestionModal extends Component{
                 <Modal.Body>
                     <Form.Group>
                         <Form.Label>Titre du document</Form.Label>
-                        <Form.Control name='documentTitle' value={this.state.documentTitle} onChange={this.onDataChange} maxLength={100} />
+                        <Form.Control name='documentTitle' value={this.state.data.documentTitle} onChange={this.onDataChange} maxLength={100} />
                     </Form.Group>
                     <Form.Group>
                         <Form.Label>Nom du surveillant</Form.Label>
-                        <Form.Control name='supervisorName' value={this.state.supervisorName} onChange={this.onDataChange} maxLength={75} />
+                        <Form.Control name='supervisorName' value={this.state.data.supervisorName} onChange={this.onDataChange} maxLength={75} />
                     </Form.Group>
                     <Form.Group>
                         <Form.Label>Code permanent</Form.Label>
-                        <Form.Control name='permanentCode' value={this.state.permanentCode} onChange={this.onDataChange} maxLength={25} />
+                        <Form.Control name='permanentCode' value={this.state.data.permanentCode} onChange={this.onDataChange} maxLength={25} />
                     </Form.Group>
                     <Form.Group>
                         <Form.Label>Numéro de l'épreuve</Form.Label>
-                        <Form.Control name='testNumber' value={this.state.testNumber} onChange={this.onDataChange} maxLength={25} />
+                        <Form.Control name='testNumber' value={this.state.data.testNumber} onChange={this.onDataChange} maxLength={25} />
                     </Form.Group>
                 </Modal.Body>
                 <Modal.Footer>
@@ -348,7 +372,12 @@ class PrintEssayQuestionModal extends Component{
             courseId: this.props.options.course.id,
             cmId: this.props.options.cm.id,
             groupId: this.props.options.group.id,
-            studentId: this.props.options.student.id
+            studentId: this.props.options.student.id,
+            documentTitle: this.state.data.documentTitle,
+            supervisorName: this.state.data.supervisorName,
+            permanentCode: this.state.data.permanentCode,
+            testNumber: this.state.data.testNumber,
+            onlyLastTry: (this.props.extraOptions.onlyLastTry ? '1' : '0'),
         }
 
         $glVars.webApi.reportQuizEssayAnswers(data);
