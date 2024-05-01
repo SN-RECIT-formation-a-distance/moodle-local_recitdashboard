@@ -29,16 +29,16 @@ require_once(dirname(__FILE__)."/recitcommon/tcpdf/tcpdf.php");
 
 class CustomPdf extends \TCPDF
 {
-    protected $data;
-    protected $extraData;
+    protected $data = null;
+    protected $extraData = null;
 
     public function __construct($orientation = 'P', $unit = 'mm', $format = 'A4', $unicode = true, $encoding = 'UTF-8', $diskcache = false) {
         parent::__construct($orientation, $unit, $format, $unicode, $encoding, $diskcache);
         
         // set document information
         $this->SetCreator(PDF_CREATOR);
-        $this->SetAuthor(get_string('pluginname', 'local_recitdashboard'));
-        //$this->SetTitle('Rapport Test');
+        $this->SetAuthor(get_string('pluginname', 'local_recitdashboard'));        
+        //$this->pdf->SetTitle("{$this->extraData->documentTitle} - {$this->dataset->fullname}");
         //$this->SetSubject('TCPDF Tutorial');
         //$this->SetKeywords('TCPDF, PDF, example, test, guide');
     }
@@ -56,8 +56,12 @@ class CustomPdf extends \TCPDF
 
     // Page footer
     public function Footer() {
+        if(($this->data == null) || ($this->extraData == null)){
+            return;
+        } 
+
         // Position at X mm from bottom
-        $this->SetY(-37);
+        $this->SetY(-40);
 
         $this->setCellPaddings(1, 1, 1, 1);
 
@@ -67,22 +71,26 @@ class CustomPdf extends \TCPDF
         $this->Cell($this->pctToMm(37), 0, "Signature", 'T', 0, 'L');
         $this->Cell($this->pctToMm(26), 0, "Date:", 'TR', 1, 'L');
 
-        $this->setCellmargins(0,0,0,2);
-        $this->SetFont('times', '', 10);
-        $this->Cell($this->pctToMm(37), 0, $this->data->fullname, 'LB', 0, 'L');
-        $this->Cell($this->pctToMm(37), 0, "___________________________", 'B', 0, 'L');
-        $this->Cell($this->pctToMm(26), 0, date('Y-m-d H:i:s', $this->data->answerTimestamp), 'BR', 1, 'L');
-
         $this->setCellmargins(0,0,0,0);
+        $this->SetFont('times', '', 10);
+        $this->Cell($this->pctToMm(37), 0, $this->data->fullname, 'L', 0, 'L');
+        $this->Cell($this->pctToMm(37), 0, "___________________________", '', 0, 'L');
+        $this->Cell($this->pctToMm(26), 0, date('Y-m-d H:i:s', $this->data->answerTimestamp), 'R', 1, 'L');
+
+        $this->setCellPaddings(0, 0, 0, 0);
+        $this->Cell(0, 0, '', 'LR', 1, 'L');
+
+        //$this->setCellmargins(0,0,0,0);
+        $this->setCellPaddings(1, 1, 1, 1);
         $this->SetFont('times', 'b', 10);
-        $this->Cell($this->pctToMm(25), 0, "Nom du surveillant:", 'LT', 0, 'L');
-        $this->Cell($this->pctToMm(25), 0, "Code permanent", 'T', 0, 'L');
-        $this->Cell($this->pctToMm(25), 0, "# de l'épreuve:", 'T', 0, 'L');
-        $this->Cell($this->pctToMm(25), 0, "Nombre de mots calculés:", 'TR', 1, 'L');
+        $this->Cell($this->pctToMm(25), 0, "Nom du surveillant:", 'L', 0, 'L');
+        $this->Cell($this->pctToMm(25), 0, "Code permanent", '', 0, 'L');
+        $this->Cell($this->pctToMm(25), 0, "# de l'épreuve:", '', 0, 'L');
+        $this->Cell($this->pctToMm(25), 0, "Nombre de mots calculés:", 'R', 1, 'L');
 
         $this->SetFont('times', '', 10);
         $this->Cell($this->pctToMm(25), 0, $this->extraData->supervisorName, 'LB', 0, 'L');
-        $this->Cell($this->pctToMm(25), 0, $this->extraData->permanentCode, 'B', 0, 'L');
+        $this->Cell($this->pctToMm(25), 0, "_____________________", 'B', 0, 'L');
         $this->Cell($this->pctToMm(25), 0, $this->extraData->testNumber, 'B', 0, 'L');
         $this->Cell($this->pctToMm(25), 0, $this->data->nbWords, 'BR', 1, 'L');
 
@@ -147,9 +155,10 @@ abstract class PdfWritter
     public function PrintOut($destination = 'I')
     {		
 		error_reporting(E_ALL);
-        $this->WritePdf();        
-		//ob_end_clean();
-        return $this->pdf->output($this->pdfName, $destination);
+
+        $this->WritePdf();
+        //ob_end_clean();
+        $this->pdf->output($this->pdfName, $destination);
     }
 }
 
@@ -161,7 +170,7 @@ class ReportQuizEssayAnswersPdf extends PdfWritter
     private $marginTop = 25.4; 
     private $marginLeft = 25.4;
     private $marginRight  = 25.4;
-    private $marginBottom = 25.4;
+    private $marginBottom = 35;//25.4;
 
     public function __construct()
     {
@@ -187,6 +196,14 @@ class ReportQuizEssayAnswersPdf extends PdfWritter
         // set font
         //$this->pdf->SetFont('times', 'BI', 20);
         $this->pdf->setCustomData(null, $this->extraData);
+
+        if(count($this->dataset) == 0){    
+            $this->pdf->AddPage('p', 'LETTER');     
+            $this->pdf->SetXY($this->marginLeft, $this->marginTop);
+            $this->pdf->SetFont('times', '', 16);
+            $this->pdf->MultiCell(0, 0, get_string('noresult', 'local_recitdashboard'), 0, 'l');   
+            return;
+        }
 
         foreach($this->dataset as $item){
             $this->pdf->AddPage('p', 'LETTER');

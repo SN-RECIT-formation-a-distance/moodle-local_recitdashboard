@@ -106,6 +106,12 @@ function local_recitdashboard_strings_for_js() {
         "taganalysis",
         "downloadcsv",
         "printessayquestions",
-        "viewreport"
+        "viewreport",
+        "onlylasttry",
+        "definitiveversion",
+        "documentTitle",
+        "supervisorName",
+        "permanentCode",
+        "testNumber"
     ), 'local_recitdashboard');
 }

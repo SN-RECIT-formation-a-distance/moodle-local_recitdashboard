@@ -712,7 +712,7 @@ abstract class PersistCtrl extends MoodlePersistCtrl
                 inner join {question_attempts} t5 on t4.uniqueid = t5.questionusageid 
                 inner join {question_attempt_steps} t5_1 on t5.id = t5_1.questionattemptid
                 inner join {question_attempt_step_data} t5_2 on t5_1.id = t5_2.attemptstepid and t5_2.name = 'answer'
-                inner join {qtype_essay_options} as t5_3 on t5.questionid = t5_3.questionid
+                inner join {question} t5_3 on t5.questionid = t5_3.id and t5_3.qtype in ('essay', 'essayautograde')
                 inner join {user} t6 on t4.userid = t6.id  and t6.deleted = 0 and t6.suspended = 0
                 left join {groups_members} t6_1 on t6.id = t6_1.userid 
                 left join {groups} t6_2 on t6_1.groupid = t6_2.id 
@@ -722,6 +722,11 @@ abstract class PersistCtrl extends MoodlePersistCtrl
         $tmp = $this->getRecordsSQL($query, $vars);
 
         $result = array();
+
+        if(count($tmp) == 0){
+            return $result;
+        }
+
         foreach($tmp as $item){
             //$output = preg_replace('/\s\s+/',' ',$input);
             $answer = html_entity_decode($item->answer);
