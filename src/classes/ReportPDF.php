@@ -31,14 +31,14 @@ class CustomPdf extends \TCPDF
 {
     protected $data = null;
     protected $extraData = null;
-
+    
     public function __construct($orientation = 'P', $unit = 'mm', $format = 'A4', $unicode = true, $encoding = 'UTF-8', $diskcache = false) {
         parent::__construct($orientation, $unit, $format, $unicode, $encoding, $diskcache);
         
         // set document information
         $this->SetCreator(PDF_CREATOR);
         $this->SetAuthor(get_string('pluginname', 'local_recitdashboard'));        
-        //$this->pdf->SetTitle("{$this->extraData->documentTitle} - {$this->dataset->fullname}");
+        $this->SetTitle(get_string('printessayquestions', 'local_recitdashboard'));
         //$this->SetSubject('TCPDF Tutorial');
         //$this->SetKeywords('TCPDF, PDF, example, test, guide');
     }
@@ -67,9 +67,9 @@ class CustomPdf extends \TCPDF
 
         $this->setCellmargins(0,7,0,0);
         $this->SetFont('times', 'b', 10);
-        $this->Cell($this->pctToMm(37), 0, "Nom de l'élève:", 'LT', 0, 'L');
-        $this->Cell($this->pctToMm(37), 0, "Signature", 'T', 0, 'L');
-        $this->Cell($this->pctToMm(26), 0, "Date:", 'TR', 1, 'L');
+        $this->Cell($this->pctToMm(37), 0, get_string('studentname', 'local_recitdashboard') . ":", 'LT', 0, 'L');
+        $this->Cell($this->pctToMm(37), 0, get_string('signature', 'local_recitdashboard') . ":", 'T', 0, 'L');
+        $this->Cell($this->pctToMm(26), 0, get_string('date', 'local_recitdashboard') . ":", 'TR', 1, 'L');
 
         $this->setCellmargins(0,0,0,0);
         $this->SetFont('times', '', 10);
@@ -83,27 +83,24 @@ class CustomPdf extends \TCPDF
         //$this->setCellmargins(0,0,0,0);
         $this->setCellPaddings(1, 1, 1, 1);
         $this->SetFont('times', 'b', 10);
-        $this->Cell($this->pctToMm(25), 0, "Nom du surveillant:", 'L', 0, 'L');
-        $this->Cell($this->pctToMm(25), 0, "Code permanent", '', 0, 'L');
-        $this->Cell($this->pctToMm(25), 0, "# de l'épreuve:", '', 0, 'L');
-        $this->Cell($this->pctToMm(25), 0, "Nombre de mots calculés:", 'R', 1, 'L');
+        $this->Cell($this->pctToMm(30), 0, get_string('supervisorname', 'local_recitdashboard') . ":", 'L', 0, 'L');
+        $this->Cell($this->pctToMm(30), 0, get_string('permanentcode', 'local_recitdashboard') . ":", '', 0, 'L');
+        $this->Cell($this->pctToMm(30), 0, get_string('numberwordscalculated', 'local_recitdashboard') . ":", '', 0, 'L');
+        $this->Cell($this->pctToMm(10), 0, get_string('page', 'local_recitdashboard') . ":", 'R', 1, 'L');
 
         $this->SetFont('times', '', 10);
-        $this->Cell($this->pctToMm(25), 0, $this->extraData->supervisorName, 'LB', 0, 'L');
-        $this->Cell($this->pctToMm(25), 0, "_____________________", 'B', 0, 'L');
-        $this->Cell($this->pctToMm(25), 0, $this->extraData->testNumber, 'B', 0, 'L');
-        $this->Cell($this->pctToMm(25), 0, $this->data->nbWords, 'BR', 1, 'L');
+        $this->Cell($this->pctToMm(30), 0, $this->extraData->supervisorName, 'LB', 0, 'L');
+        $this->Cell($this->pctToMm(30), 0, "_____________________", 'B', 0, 'L');
+        $this->Cell($this->pctToMm(30), 0, $this->data->nbWords, 'B', 0, 'L');
+        $this->Cell($this->pctToMm(10), 0, $this->getPageNumGroupAlias().' / '.$this->getPageGroupAlias(), 'BR', 1, 'L');
 
         // Page number
         //$this->Cell(0, 10, 'Page '.$this->getAliasNumPage().'/'.$this->getAliasNbPages(), 0, false, 'R', 0, '', 0, false, 'T', 'M');
     }
 
-    public function setCustomData($data, $extraData = null){
+    public function setCustomData($data, $extraData){
         $this->data = $data;
-
-        if($extraData != null){
-            $this->extraData = $extraData;
-        }
+        $this->extraData = $extraData;
     }
 
     public function pctToMm($value){
@@ -166,6 +163,7 @@ class ReportQuizEssayAnswersPdf extends PdfWritter
 {
     protected $dataset;
     protected $extraData;
+    protected $studentPageCount = 0;
     
     private $marginTop = 25.4; 
     private $marginLeft = 25.4;
@@ -195,19 +193,22 @@ class ReportQuizEssayAnswersPdf extends PdfWritter
 
         // set font
         //$this->pdf->SetFont('times', 'BI', 20);
-        $this->pdf->setCustomData(null, $this->extraData);
 
         if(count($this->dataset) == 0){    
             $this->pdf->AddPage('p', 'LETTER');     
             $this->pdf->SetXY($this->marginLeft, $this->marginTop);
             $this->pdf->SetFont('times', '', 16);
-            $this->pdf->MultiCell(0, 0, get_string('noresult', 'local_recitdashboard'), 0, 'l');   
+            $this->pdf->MultiCell(0, 0, get_string('noresult', 'local_recitdashboard') . ".", 0, 'l');   
             return;
         }
 
-        foreach($this->dataset as $item){
+        foreach($this->dataset as $item){         
+            // Start First Page Group (each student is a page group)
+            $this->pdf->startPageGroup();
+            
             $this->pdf->AddPage('p', 'LETTER');
-            $this->pdf->setCustomData($item);
+
+            $this->pdf->setCustomData($item, $this->extraData);
             $this->printContent($item);
         }
     }

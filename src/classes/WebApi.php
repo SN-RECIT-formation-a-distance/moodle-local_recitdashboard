@@ -417,7 +417,6 @@ class WebApi extends MoodleApi
             $extraData = new stdClass();
             $extraData->documentTitle = clean_param($request['documentTitle'], PARAM_RAW);
             $extraData->supervisorName = clean_param($request['supervisorName'], PARAM_RAW);
-            $extraData->testNumber = clean_param($request['testNumber'], PARAM_RAW);
                         
             $this->canUserAccess('a', $courseId);
             

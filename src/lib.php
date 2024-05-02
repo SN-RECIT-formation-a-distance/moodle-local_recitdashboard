@@ -109,9 +109,8 @@ function local_recitdashboard_strings_for_js() {
         "viewreport",
         "onlylasttry",
         "definitiveversion",
-        "documentTitle",
-        "supervisorName",
-        "permanentCode",
-        "testNumber"
+        "documenttitle",
+        "supervisorname",
+        "permanentcode",
     ), 'local_recitdashboard');
 }

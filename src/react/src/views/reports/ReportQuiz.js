@@ -328,7 +328,6 @@ class PrintEssayQuestionModal extends Component{
             data: {
                 documentTitle: i18n.get_string('definitiveversion'),
                 supervisorName: '',
-                testNumber: ''   
             }
         }
     }
@@ -341,17 +340,12 @@ class PrintEssayQuestionModal extends Component{
                 </Modal.Header>
                 <Modal.Body>
                     <Form.Group>
-                        <Form.Label>{i18n.get_string('documentTitle')}</Form.Label>
+                        <Form.Label>{i18n.get_string('documenttitle')}</Form.Label>
                         <Form.Control name='documentTitle' value={this.state.data.documentTitle} onChange={this.onDataChange} maxLength={100} />
                     </Form.Group>
                     <Form.Group>
-                        <Form.Label>{i18n.get_string('supervisorName')}</Form.Label>
+                        <Form.Label>{i18n.get_string('supervisorname')}</Form.Label>
                         <Form.Control name='supervisorName' value={this.state.data.supervisorName} onChange={this.onDataChange} maxLength={75} />
-                    </Form.Group>
-                   
-                    <Form.Group>
-                        <Form.Label>{i18n.get_string('testNumber')}</Form.Label>
-                        <Form.Control name='testNumber' value={this.state.data.testNumber} onChange={this.onDataChange} maxLength={25} />
                     </Form.Group>
                 </Modal.Body>
                 <Modal.Footer>
@@ -371,7 +365,6 @@ class PrintEssayQuestionModal extends Component{
             studentId: this.props.options.student.id,
             documentTitle: this.state.data.documentTitle,
             supervisorName: this.state.data.supervisorName,
-            testNumber: this.state.data.testNumber,
             onlyLastTry: (this.props.extraOptions.onlyLastTry ? '1' : '0'),
         }
 
