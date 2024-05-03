@@ -51,7 +51,7 @@ class MainView{
         if ($this->hasAccess()){
             echo sprintf("<div id='recit_dashboard' data-student-id='%ld' data-course-id='%ld'></div>", $studentId, $selectedCourseId);
         }else{
-            print_error('accessdenied', 'admin');
+            throw new \moodle_exception('accessdenied', 'admin');
         }
     }
 

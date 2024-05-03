@@ -703,16 +703,20 @@ abstract class PersistCtrl extends MoodlePersistCtrl
 
         $query = "select ". $this->sql_uniqueid() ." uniqueId, t1.id course_id, t1.shortname course_name, t2.id cmid, t3.id quiz_id, 
                 t3.name quiz_name, t6.id user_id, t6.firstname first_name, t6.lastname last_name, ". $this->mysqlConn->sql_concat('t6.firstname', "' '", 't6.lastname')." fullname,
-                t6.email, t5_2.value as answer, t5_1.timecreated as answer_timestamp, t4.attempt
+                t6.email, t4.attempt,
+                (select concat(t5_2.value,'#SEP#', t5_1.timecreated)  from
+mdl_question_attempts t5 
+inner join mdl_question_attempt_steps t5_1 on t5.id = t5_1.questionattemptid
+inner join mdl_question_attempt_step_data t5_2 on t5_1.id = t5_2.attemptstepid and t5_2.name = 'answer'
+inner join mdl_qtype_essay_options as t5_3 on t5.questionid = t5_3.questionid
+where t5.questionusageid = t4.uniqueid
+order by t5_1.sequencenumber desc limit 1
+) serialanswer                
                 from {course} t1 
                 inner join {course_modules} t2 on t1.id= t2.course 
                 inner join {modules} t2_1 on t2.module = t2_1.id 
                 inner join {quiz} t3 on t2.instance = t3.id 
                 inner join {quiz_attempts} t4 on t4.quiz = t3.id 
-                inner join {question_attempts} t5 on t4.uniqueid = t5.questionusageid 
-                inner join {question_attempt_steps} t5_1 on t5.id = t5_1.questionattemptid
-                inner join {question_attempt_step_data} t5_2 on t5_1.id = t5_2.attemptstepid and t5_2.name = 'answer'
-                inner join {question} t5_3 on t5.questionid = t5_3.id and t5_3.qtype in ('essay', 'essayautograde')
                 inner join {user} t6 on t4.userid = t6.id  and t6.deleted = 0 and t6.suspended = 0
                 left join {groups_members} t6_1 on t6.id = t6_1.userid 
                 left join {groups} t6_2 on t6_1.groupid = t6_2.id 
@@ -729,6 +733,16 @@ abstract class PersistCtrl extends MoodlePersistCtrl
 
         foreach($tmp as $item){
             //$output = preg_replace('/\s\s+/',' ',$input);
+            $item->answer = '';
+            $item->answerTimestamp = '';
+
+            $answer = explode('#SEP#', $item->serialanswer);
+            if(count($answer) == 2){
+                $item->answer = $answer[0];
+                $item->answerTimestamp = $answer[1];
+            }
+            unset($item->serialanswer);
+
             $answer = html_entity_decode($item->answer);
             $answer = strip_tags($item->answer);
             $item->nbWords = str_word_count($answer);
