@@ -739,7 +739,7 @@ order by t5_1.sequencenumber desc limit 1
             $answer = explode('#SEP#', $item->serialanswer);
             if(count($answer) == 2){
                 $item->answer = $answer[0];
-                $item->answerTimestamp = $answer[1];
+                $item->answerTimestamp = intval($answer[1]);
             }
             unset($item->serialanswer);
 

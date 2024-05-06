@@ -67,15 +67,15 @@ class CustomPdf extends \TCPDF
 
         $this->setCellmargins(0,7,0,0);
         $this->SetFont('times', 'b', 10);
-        $this->Cell($this->pctToMm(37), 0, get_string('studentname', 'local_recitdashboard') . ":", 'LT', 0, 'L');
-        $this->Cell($this->pctToMm(37), 0, get_string('signature', 'local_recitdashboard') . ":", 'T', 0, 'L');
-        $this->Cell($this->pctToMm(26), 0, get_string('date', 'local_recitdashboard') . ":", 'TR', 1, 'L');
+        $this->Cell($this->pctToMm(50), 0, get_string('studentname', 'local_recitdashboard') . ":", 'LT', 0, 'L');
+        $this->Cell($this->pctToMm(50), 0, get_string('signature', 'local_recitdashboard') . ":", 'TR', 1, 'L');
+        //$this->Cell($this->pctToMm(26), 0, get_string('date', 'local_recitdashboard') . ":", 'TR', 1, 'L');
 
         $this->setCellmargins(0,0,0,0);
         $this->SetFont('times', '', 10);
-        $this->Cell($this->pctToMm(37), 0, $this->data->fullname, 'L', 0, 'L');
-        $this->Cell($this->pctToMm(37), 0, "___________________________", '', 0, 'L');
-        $this->Cell($this->pctToMm(26), 0, date('Y-m-d H:i:s', $this->data->answerTimestamp), 'R', 1, 'L');
+        $this->Cell($this->pctToMm(50), 0, $this->data->fullname, 'L', 0, 'L');
+        $this->Cell($this->pctToMm(50), 0, "___________________________", 'R', 1, 'L');
+        //$this->Cell($this->pctToMm(26), 0, date('Y-m-d H:i:s', $this->data->answerTimestamp), 'R', 1, 'L');
 
         $this->setCellPaddings(0, 0, 0, 0);
         $this->Cell(0, 0, '', 'LR', 1, 'L');
@@ -107,6 +107,92 @@ class CustomPdf extends \TCPDF
         $availWidth = $this->w - $this->rMargin - $this->lMargin;
         return $availWidth * ($value/100);
     }
+
+    /**
+	 * Convert HTML string containing value and unit of measure to user's units or points.
+	 * @param string $htmlval String containing values and unit.
+	 * @param string $refsize Reference value in points.
+	 * @param string $defaultunit Default unit (can be one of the following: %, em, ex, px, in, mm, pc, pt).
+	 * @param boolean $points If true returns points, otherwise returns value in user's units.
+	 * @return float value in user's unit or point if $points=true
+	 * @public
+	 * @since 4.4.004 (2008-12-10)
+	 */
+	public function getHTMLUnitToUnits($htmlval, $refsize=1, $defaultunit='px', $points=false) {
+		$supportedunits = array('%', 'em', 'ex', 'px', 'in', 'cm', 'mm', 'pc', 'pt', 'rem');
+		$retval = 0;
+		$value = 0;
+		$unit = 'px';
+		if ($points) {
+			$k = 1;
+		} else {
+			$k = $this->k;
+		}
+		if (in_array($defaultunit, $supportedunits)) {
+			$unit = $defaultunit;
+		}
+		if (is_numeric($htmlval)) {
+			$value = floatval($htmlval);
+		} elseif (preg_match('/([0-9\.\-\+]+)/', $htmlval, $mnum)) {
+			$value = floatval($mnum[1]);
+			if (preg_match('/([a-z%]+)/', $htmlval, $munit)) {
+				if (in_array($munit[1], $supportedunits)) {
+					$unit = $munit[1];
+				}
+			}
+		}
+		switch ($unit) {
+			// percentage
+			case '%': {
+				$retval = (($value * $refsize) / 100);
+				break;
+			}
+			// relative-size
+			case 'em': 
+            case 'rem': 
+				$retval = ($value * $refsize);
+				break;
+			// height of lower case 'x' (about half the font-size)
+			case 'ex': {
+				$retval = ($value * ($refsize / 2));
+				break;
+			}
+			// absolute-size
+			case 'in': {
+				$retval = (($value * $this->dpi) / $k);
+				break;
+			}
+			// centimeters
+			case 'cm': {
+				$retval = (($value / 2.54 * $this->dpi) / $k);
+				break;
+			}
+			// millimeters
+			case 'mm': {
+				$retval = (($value / 25.4 * $this->dpi) / $k);
+				break;
+			}
+			// one pica is 12 points
+			case 'pc': {
+				$retval = (($value * 12) / $k);
+				break;
+			}
+			// points
+			case 'pt': {
+				$retval = ($value / $k);
+				break;
+			}
+			// pixels
+			case 'px': {
+				$retval = $this->pixelsToUnits($value);
+				if ($points) {
+					$retval *= $this->k;
+				}
+				break;
+			}
+		}
+		return $retval;
+	}
 }
 
 abstract class PdfWritter
