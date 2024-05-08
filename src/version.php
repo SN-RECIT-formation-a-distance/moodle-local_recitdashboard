@@ -24,7 +24,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->version   = 2024020501;       // The current module version (Date: YYYYMMDDXX)
-$plugin->release = 'v1.18.5-stable';
+$plugin->release = 'v1.18.6-stable';
 $plugin->supported = [39, 401];      //  Moodle 3.9.x, 3.10.x and 3.11.x are supported.
 $plugin->requires  = 2020061500.00; // Moodle 3.9.0
 $plugin->component = 'local_recitdashboard';        // Full name of the plugin (used for diagnostics)
