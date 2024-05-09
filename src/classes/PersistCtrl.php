@@ -736,8 +736,15 @@ abstract class PersistCtrl extends MoodlePersistCtrl
             //$output = preg_replace('/\s\s+/',' ',$input);
 
             $answer = html_entity_decode($item->answer);
-            $answer = strip_tags($item->answer);
-            $item->nbWords = str_word_count($answer);
+            $answer = str_replace( '<', ' <', $item->answer );
+            $answer = str_replace( '-', '', $item->answer );
+            $answer = strip_tags( $answer );
+            //$item->nbWords = str_word_count($answer);
+            $item->nbWords = preg_match_all('/\pL+[^\']/u', $answer, $matches);
+
+            /*echo "<pre>";
+            var_dump($matches);
+            die();*/
 
             if($onlyLastTry){
                 if(!isset($result[$item->userId])){
