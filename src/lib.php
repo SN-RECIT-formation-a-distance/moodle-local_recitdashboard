@@ -112,5 +112,6 @@ function local_recitdashboard_strings_for_js() {
         "documenttitle",
         "supervisorname",
         "permanentcode",
+        'numberwordscalculated'
     ), 'local_recitdashboard');
 }

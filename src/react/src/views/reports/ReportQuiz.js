@@ -347,6 +347,19 @@ class PrintEssayQuestionModal extends Component{
                         <Form.Label>{i18n.get_string('supervisorname')}</Form.Label>
                         <Form.Control name='supervisorName' value={this.state.data.supervisorName} onChange={this.onDataChange} maxLength={75} />
                     </Form.Group>
+                    <Form.Group controlId="formBasicEmail">
+                        <Form.Label>{i18n.get_string('numberwordscalculated')}</Form.Label>
+                        <Form.Text className="text-muted">
+                        <p>Quelques exemples qui illustrent la méthode de calcul du nombre de mots:</p>
+                        <ul>
+                            <li>S'intégrer : 2 mots</li>
+                            <li>Sommes-nous : 2 mots</li>
+                            <li>450 ans : 1 mot</li>
+                            <li>M. Trudeau : 2 mots</li>
+                        </ul>
+                        </Form.Text>
+                    </Form.Group>
+                    
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={this.props.onClose}>{i18n.get_string('cancel')}</Button>
