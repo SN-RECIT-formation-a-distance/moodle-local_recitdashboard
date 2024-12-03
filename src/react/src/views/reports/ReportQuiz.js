@@ -135,6 +135,7 @@ export class ReportQuiz  extends Component{
                                 <DataGrid.Body.Cell></DataGrid.Body.Cell>
                                 <DataGrid.Body.Cell></DataGrid.Body.Cell>
                                 <DataGrid.Body.Cell></DataGrid.Body.Cell>
+                                <DataGrid.Body.Cell></DataGrid.Body.Cell>
                                 {dataProvider.questions.map((item, index) => {
                                     let result = 
                                         <DataGrid.Body.Cell key={index} style={{textAlign: "center"}}>

@@ -1,6 +1,6 @@
 {
   "name": "recit_dashboard",
-  "version": "1.18.10-stable",
+  "version": "1.18.11-stable",
   "description": "RÉCIT Dashboard",
   "main": "index.js",
   "scripts": {
@@ -9,7 +9,7 @@
     "build": "parcel build ./src/index.js --out-dir ./build"
   },
   "keywords": [],
-  "author": "", 
+  "author": "",
   "license": "ISC",
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "1.2.35",

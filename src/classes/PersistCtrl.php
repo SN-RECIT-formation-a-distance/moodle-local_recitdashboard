@@ -656,7 +656,11 @@ abstract class PersistCtrl extends MoodlePersistCtrl
 
 
         function cmp2($a, $b) {
-            return strnatcasecmp("{$a->lastName} {$a->firstName}", "{$b->lastName} {$b->firstName}");
+            // fix sorting issue with quotes in names (for example: N'Gole)
+            // this replaces ' with _ then the function strnatcasecmp considers it greater than letters and numbers
+            $str1 = str_replace("'", "_", "{$a->lastName} {$a->firstName}");
+            $str2 = str_replace("'", "_", "{$b->lastName} {$b->firstName}");
+            return strnatcasecmp($str1, $str2); 
         }
 
         function cmp3($a, $b) {
