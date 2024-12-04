@@ -52,6 +52,14 @@ abstract class PersistCtrl extends MoodlePersistCtrl
         }
         return self::$instance;
     }
+
+    public static function compareString($str1, $str2){
+        // fix sorting issue with quotes in names (for example: N'Gole) by removing it
+        $str1 = str_replace("'", "", $str1);
+        $str2 = str_replace("'", "", $str2);
+        // //  Case insensitive string comparisons using a "natural order" algorithm
+        return strnatcasecmp($str1, $str2); 
+    }
     
     protected function __construct($mysqlConn, $signedUser){
         parent::__construct($mysqlConn, $signedUser);
@@ -304,12 +312,10 @@ abstract class PersistCtrl extends MoodlePersistCtrl
         }
 
         $result = array_values($result);
-
-        function cmp($a, $b) {
-            return strnatcasecmp($a->orderby, $b->orderby);
-        }
-
-        usort($result, "recitdashboard\cmp");
+        
+        usort($result, function($a, $b) {
+            return PersistCtrl::compareString($a->orderby, $b->orderby);
+        });
 
         return $result;
     }
@@ -398,14 +404,11 @@ abstract class PersistCtrl extends MoodlePersistCtrl
             $user->grades = array_values(array_merge($cmList, $user->grades));
         }
 
-        function cmp1($a, $b) { 
-            //  Case insensitive string comparisons using a "natural order" algorithm
-            return strnatcasecmp("{$a->lastName} {$a->firstName}", "{$b->lastName} {$b->firstName}");
-        }
-
         $result = array_values($result);
 
-        usort($result, "recitdashboard\cmp1");
+        usort($result, function($a, $b) {
+            return PersistCtrl::compareString("{$a->lastName} {$a->firstName}", "{$b->lastName} {$b->firstName}");
+        });
 
         return $result;
     }
@@ -456,8 +459,7 @@ abstract class PersistCtrl extends MoodlePersistCtrl
         left join {groups_members} t5 on t3.id = t5.userid 
         left join {course_modules_completion} t2 on t1.id = t2.coursemoduleid and t3.id = t2.userid
         where t1.course = :course and st1.shortname in ('student') $whereStmt
-        group by t1.course, t1.id, t2.id, t3.id, cm_id, t4.sequence 
-        order by ".$this->mysqlConn->sql_concat("t3.lastname", "' '", "t3.firstname") . " asc ";
+        group by t1.course, t1.id, t2.id, t3.id, cm_id, t4.sequence";
 
         $tmp = $this->getRecordsSQL($query, $vars);
         
@@ -484,6 +486,10 @@ abstract class PersistCtrl extends MoodlePersistCtrl
                 }
             }            
         }
+
+        usort($result, function($a, $b) {
+            return PersistCtrl::compareString("{$a->lastName} {$a->firstName}", "{$b->lastName} {$b->firstName}");
+        });
 
         return array_values($result);
     }
@@ -654,15 +660,6 @@ abstract class PersistCtrl extends MoodlePersistCtrl
         $result->questions = array_values($result->questions);
         $result->students = array_values($result->students);
 
-
-        function cmp2($a, $b) {
-            // fix sorting issue with quotes in names (for example: N'Gole)
-            // this replaces ' with _ then the function strnatcasecmp considers it greater than letters and numbers
-            $str1 = str_replace("'", "_", "{$a->lastName} {$a->firstName}");
-            $str2 = str_replace("'", "_", "{$b->lastName} {$b->firstName}");
-            return strnatcasecmp($str1, $str2); 
-        }
-
         function cmp3($a, $b) {
             if($a->slot == $b->slot){ return 0; }
             return ($a->slot < $b->slot) ? -1 : 1;
@@ -674,7 +671,10 @@ abstract class PersistCtrl extends MoodlePersistCtrl
         }
 
         // sort by student name and question slot
-        usort($result->students, "recitdashboard\cmp2");
+        usort($result->students, function($a, $b) {
+            return PersistCtrl::compareString("{$a->lastName} {$a->firstName}", "{$b->lastName} {$b->firstName}");
+        });
+
         usort($result->questions, "recitdashboard\cmp3");
 
         foreach($result->students as $student){
