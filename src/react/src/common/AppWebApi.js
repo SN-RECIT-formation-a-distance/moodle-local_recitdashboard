@@ -142,7 +142,6 @@ export class AppWebApi extends WebApi
         data = data || {};
 
         data.sesskey = M.cfg.sesskey;
-        data.service = "reportQuizEssayAnswers";
 
         let params = new URLSearchParams(data).toString();
 

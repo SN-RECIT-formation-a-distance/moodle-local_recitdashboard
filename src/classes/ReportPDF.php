@@ -167,7 +167,6 @@ class ReportQuizEssayAnswersPdf extends PdfWritter
 {
     protected $dataset;
     protected $extraData;
-    protected $studentPageCount = 0;
     
     private $marginTop = 25.4; 
     private $marginLeft = 25.4;
@@ -206,12 +205,15 @@ class ReportQuizEssayAnswersPdf extends PdfWritter
             return;
         }
 
-        foreach($this->dataset as $item){         
-            // Start First Page Group (each student is a page group)
-            $this->pdf->startPageGroup();
+        $lastStudentId = 0;
+        foreach($this->dataset as $item){
+            if($lastStudentId != $item->userId){
+                // Start First Page Group (each student is a page group)
+                $this->pdf->startPageGroup();
+                $lastStudentId = $item->userId;
+            }
             
             $this->pdf->AddPage('p', 'LETTER');
-
             $this->pdf->setCustomData($item, $this->extraData);
             $this->printContent($item);
         }

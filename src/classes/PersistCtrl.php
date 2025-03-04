@@ -764,6 +764,64 @@ abstract class PersistCtrl extends MoodlePersistCtrl
         return array_values($result);
     }
 
+    public function reportQuizEssayAnswers2($courseId, $cmId, $groupId, $studentId, $onlyLastTry = false){
+        $vars = array();
+        $vars['cmid'] = $cmId;
+        $vars['courseid'] = $courseId;
+
+        $groupStmt = "1";
+        if($groupId > 0){
+            $groupStmt = " t6_2.id = :groupid";
+            $vars['groupid'] = $groupId;
+        }
+
+        $studentStmt = "1";
+        if($studentId > 0){
+            $studentStmt = " t6.id = :studentid";
+            $vars['studentid'] = $studentId;
+        }
+
+        $onlyLastTryStmt = "1";
+        if($onlyLastTry){
+            $onlyLastTryStmt = " t4.attempt = (SELECT MAX(sub_t4.attempt) FROM mdl_quiz_attempts as sub_t4 WHERE sub_t4.quiz = t3.id AND sub_t4.userid = t6.id)";
+        }
+
+        $query = "select ". $this->sql_uniqueid() ." uniqueId, t1.id course_id, t1.shortname course_name, t2.id cmid, t3.id quiz_id, t3.name quiz_name, t6.id user_id, t6.firstname first_name, t6.lastname last_name, 
+". $this->mysqlConn->sql_concat('t6.firstname', "' '", 't6.lastname')." fullname, t6.email, t4.attempt, t4.timefinish attemp_timestamp, t5_2.value as answer
+from {course} t1 
+inner join {course_modules} t2 on t1.id= t2.course 
+inner join {modules} t2_1 on t2.module = t2_1.id 
+inner join {quiz} t3 on t2.instance = t3.id 
+inner join {quiz_attempts} t4 on t4.quiz = t3.id 
+inner join {question_attempts} t5 on t5.questionusageid = t4.uniqueid 
+inner join {question_attempt_steps} t5_1 on t5.id = t5_1.questionattemptid 
+inner join {question_attempt_step_data} t5_2 on t5_1.id = t5_2.attemptstepid and t5_2.name = 'answer' 
+inner join {qtype_essay_options} as t5_3 on t5.questionid = t5_3.questionid 
+inner join {user} t6 on t4.userid = t6.id and t6.deleted = 0 and t6.suspended = 0 
+left join {groups_members} t6_1 on t6.id = t6_1.userid 
+left join {groups} t6_2 on t6_1.groupid = t6_2.id 
+where t2_1.name = 'quiz' and t2.id = :cmid  and t1.id = :courseid  and $groupStmt and $studentStmt and $onlyLastTryStmt
+order by last_name asc, first_name asc,  attempt desc, t5_1.sequencenumber asc";
+
+        $tmp = $this->getRecordsSQL($query, $vars);
+
+        $result = array();
+
+        if(count($tmp) == 0){
+            return $result;
+        }
+
+        foreach($tmp as $item){
+            $answer = html_entity_decode($item->answer);
+            $answer = str_replace( '<', ' <', $item->answer );
+            $answer = strip_tags( $answer );
+            $item->nbWords = preg_match_all('/\pL+/u', $answer, $matches);
+            $result[] = $item;
+        }
+
+        return $result;
+    }
+
     public function getUserOptions($userId){
         global $DB;
 
