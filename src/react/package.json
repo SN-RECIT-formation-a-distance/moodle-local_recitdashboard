@@ -1,6 +1,6 @@
 {
   "name": "recit_dashboard",
-  "version": "v2.0.0-stable",
+  "version": "2.0.1-stable",
   "description": "RÉCIT Dashboard",
   "main": "index.js",
   "scripts": {

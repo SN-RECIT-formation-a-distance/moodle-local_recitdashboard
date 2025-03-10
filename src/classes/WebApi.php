@@ -432,33 +432,6 @@ class WebApi extends MoodleApi
             return new WebApiResult(false, false, $ex->GetMessage());
         } 
     }
-
-    public function reportQuizEssayAnswers2($request){
-        try{
-            $courseId = clean_param($request['courseId'], PARAM_INT);
-            $groupId = clean_param($request['groupId'], PARAM_INT);
-            $cmId = clean_param($request['cmId'], PARAM_INT);
-            $studentId = clean_param($request['studentId'], PARAM_INT);
-            $onlyLastTry = (clean_param($request['onlyLastTry'], PARAM_INT) == 1 ? true : false);
-
-            $extraData = new stdClass();
-            $extraData->documentTitle = clean_param($request['documentTitle'], PARAM_RAW);
-            $extraData->supervisorName = clean_param($request['supervisorName'], PARAM_RAW);
-                        
-            $this->canUserAccess('a', $courseId);
-            
-            $data = PersistCtrl::getInstance()->reportQuizEssayAnswers2($courseId, $cmId, $groupId, $studentId, $onlyLastTry);                   
-
-            $pdfWritter = new ReportQuizEssayAnswersPdf();
-            $pdfWritter->SetDataset($data, $extraData);
-            $pdfWritter->PrintOut('I');
-          
-            return new WebApiResult(true);
-        }
-        catch(Exception $ex){
-            return new WebApiResult(false, false, $ex->GetMessage());
-        } 
-    }
     /**
      * This function generates a report of used tags
      * 

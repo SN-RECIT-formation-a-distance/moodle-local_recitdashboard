@@ -205,8 +205,6 @@ export class ReportQuiz  extends Component{
                         <a href={`${Options.getGateway(true)}&service=reportQuiz&courseId=${this.props.options.course.id}&groupId=${this.props.options.group.id}&cmId=${this.props.options.cm.id}&output=csv`} target='_blank'>{i18n.get_string('downloadcsv')}</a>
                         <span className='ml-3 mr-3'>|</span>
                         <Button className='p-0' variant='link' onClick={() => this.onShowModal(true, 'reportQuizEssayAnswers')}>{i18n.get_string('printessayquestions')}</Button>
-                        <span className='ml-3 mr-3'>|</span>
-                        <Button className='p-0' variant='link' onClick={() => this.onShowModal(true, 'reportQuizEssayAnswers2')}>{i18n.get_string('printessayquestions') + ' 2'}</Button>
                     </div>                           
                     <PrintEssayQuestionModal show={this.state.printEssayQuestionModal} options={this.props.options} extraOptions={this.state.data} onClose={() => this.onShowModal(false)}/>
                 </div>;
@@ -385,8 +383,8 @@ class PrintEssayQuestionModal extends Component{
             documentTitle: this.state.data.documentTitle,
             supervisorName: this.state.data.supervisorName,
             onlyLastTry: (this.props.extraOptions.onlyLastTry ? '1' : '0'),
-        }
-
+        } 
+ 
         $glVars.webApi.reportQuizEssayAnswers(data);
     }
 
