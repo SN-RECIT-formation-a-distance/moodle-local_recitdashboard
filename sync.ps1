@@ -1,5 +1,6 @@
 $from = "moodle-local_recitdashboard/src/*"
 $to = "shared/recitfad/local/recitdashboard"
+$source = "./src";
 
 try {
     . ("..\sync\watcher.ps1")

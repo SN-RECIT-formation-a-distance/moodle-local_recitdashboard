@@ -52,6 +52,14 @@ abstract class PersistCtrl extends MoodlePersistCtrl
         }
         return self::$instance;
     }
+
+    public static function compareString($str1, $str2){
+        // fix sorting issue with quotes in names (for example: N'Gole) by removing it
+        $str1 = str_replace("'", "", $str1);
+        $str2 = str_replace("'", "", $str2);
+        // //  Case insensitive string comparisons using a "natural order" algorithm
+        return strnatcasecmp($str1, $str2); 
+    }
     
     protected function __construct($mysqlConn, $signedUser){
         parent::__construct($mysqlConn, $signedUser);
@@ -304,12 +312,10 @@ abstract class PersistCtrl extends MoodlePersistCtrl
         }
 
         $result = array_values($result);
-
-        function cmp($a, $b) {
-            return strnatcasecmp($a->orderby, $b->orderby);
-        }
-
-        usort($result, "recitdashboard\cmp");
+        
+        usort($result, function($a, $b) {
+            return PersistCtrl::compareString($a->orderby, $b->orderby);
+        });
 
         return $result;
     }
@@ -398,14 +404,11 @@ abstract class PersistCtrl extends MoodlePersistCtrl
             $user->grades = array_values(array_merge($cmList, $user->grades));
         }
 
-        function cmp1($a, $b) { 
-            //  Case insensitive string comparisons using a "natural order" algorithm
-            return strnatcasecmp("{$a->lastName} {$a->firstName}", "{$b->lastName} {$b->firstName}");
-        }
-
         $result = array_values($result);
 
-        usort($result, "recitdashboard\cmp1");
+        usort($result, function($a, $b) {
+            return PersistCtrl::compareString("{$a->lastName} {$a->firstName}", "{$b->lastName} {$b->firstName}");
+        });
 
         return $result;
     }
@@ -456,8 +459,7 @@ abstract class PersistCtrl extends MoodlePersistCtrl
         left join {groups_members} t5 on t3.id = t5.userid 
         left join {course_modules_completion} t2 on t1.id = t2.coursemoduleid and t3.id = t2.userid
         where t1.course = :course and st1.shortname in ('student') $whereStmt
-        group by t1.course, t1.id, t2.id, t3.id, cm_id, t4.sequence 
-        order by ".$this->mysqlConn->sql_concat("t3.lastname", "' '", "t3.firstname") . " asc ";
+        group by t1.course, t1.id, t2.id, t3.id, cm_id, t4.sequence";
 
         $tmp = $this->getRecordsSQL($query, $vars);
         
@@ -484,6 +486,10 @@ abstract class PersistCtrl extends MoodlePersistCtrl
                 }
             }            
         }
+
+        usort($result, function($a, $b) {
+            return PersistCtrl::compareString("{$a->lastName} {$a->firstName}", "{$b->lastName} {$b->firstName}");
+        });
 
         return array_values($result);
     }
@@ -654,11 +660,6 @@ abstract class PersistCtrl extends MoodlePersistCtrl
         $result->questions = array_values($result->questions);
         $result->students = array_values($result->students);
 
-
-        function cmp2($a, $b) {
-            return strnatcasecmp("{$a->lastName} {$a->firstName}", "{$b->lastName} {$b->firstName}");
-        }
-
         function cmp3($a, $b) {
             if($a->slot == $b->slot){ return 0; }
             return ($a->slot < $b->slot) ? -1 : 1;
@@ -670,7 +671,10 @@ abstract class PersistCtrl extends MoodlePersistCtrl
         }
 
         // sort by student name and question slot
-        usort($result->students, "recitdashboard\cmp2");
+        usort($result->students, function($a, $b) {
+            return PersistCtrl::compareString("{$a->lastName} {$a->firstName}", "{$b->lastName} {$b->firstName}");
+        });
+
         usort($result->questions, "recitdashboard\cmp3");
 
         foreach($result->students as $student){
@@ -701,28 +705,27 @@ abstract class PersistCtrl extends MoodlePersistCtrl
             $vars['studentid'] = $studentId;
         }
 
-        $query = "select * from
-            (select ". $this->sql_uniqueid() ." uniqueId, t1.id course_id, t1.shortname course_name, t2.id cmid, t3.id quiz_id, 
-                t3.name quiz_name, t6.id user_id, t6.firstname first_name, t6.lastname last_name, ". $this->mysqlConn->sql_concat('t6.firstname', "' '", 't6.lastname')." fullname,
-                t6.email, t4.attempt, t4.timefinish attemp_timestamp,
-                (select t5_2.value  from
-                    mdl_question_attempts t5 
-                    inner join mdl_question_attempt_steps t5_1 on t5.id = t5_1.questionattemptid
-                    inner join mdl_question_attempt_step_data t5_2 on t5_1.id = t5_2.attemptstepid and t5_2.name = 'answer'
-                    inner join mdl_qtype_essay_options as t5_3 on t5.questionid = t5_3.questionid
-                    where t5.questionusageid = t4.uniqueid
-                    order by t5_1.sequencenumber desc limit 1) answer                
-                from {course} t1 
-                inner join {course_modules} t2 on t1.id= t2.course 
-                inner join {modules} t2_1 on t2.module = t2_1.id 
-                inner join {quiz} t3 on t2.instance = t3.id 
-                inner join {quiz_attempts} t4 on t4.quiz = t3.id 
-                inner join {user} t6 on t4.userid = t6.id  and t6.deleted = 0 and t6.suspended = 0
-                left join {groups_members} t6_1 on t6.id = t6_1.userid 
-                left join {groups} t6_2 on t6_1.groupid = t6_2.id 
-                where t2_1.name = 'quiz' and t2.id = :cmid  and t1.id = :courseid  and $groupStmt and $studentStmt
-                order by last_name asc, first_name asc, attempt desc) as tab
-                where answer is not null";
+        $onlyLastTryStmt = "1";
+        if($onlyLastTry){
+            $onlyLastTryStmt = " t4.attempt = (SELECT MAX(sub_t4.attempt) FROM mdl_quiz_attempts as sub_t4 WHERE sub_t4.quiz = t3.id AND sub_t4.userid = t6.id)";
+        }
+
+        $query = "select ". $this->sql_uniqueid() ." uniqueId, t1.id course_id, t1.shortname course_name, t2.id cmid, t3.id quiz_id, t3.name quiz_name, t6.id user_id, t6.firstname first_name, t6.lastname last_name, 
+". $this->mysqlConn->sql_concat('t6.firstname', "' '", 't6.lastname')." fullname, t6.email, t4.attempt, t4.timefinish attemp_timestamp, t5_2.value as answer
+from {course} t1 
+inner join {course_modules} t2 on t1.id= t2.course 
+inner join {modules} t2_1 on t2.module = t2_1.id 
+inner join {quiz} t3 on t2.instance = t3.id 
+inner join {quiz_attempts} t4 on t4.quiz = t3.id 
+inner join {question_attempts} t5 on t5.questionusageid = t4.uniqueid 
+inner join {question_attempt_steps} t5_1 on t5.id = t5_1.questionattemptid 
+inner join {question_attempt_step_data} t5_2 on t5_1.id = t5_2.attemptstepid and t5_2.name = 'answer' 
+inner join {qtype_essay_options} as t5_3 on t5.questionid = t5_3.questionid 
+inner join {user} t6 on t4.userid = t6.id and t6.deleted = 0 and t6.suspended = 0 
+left join {groups_members} t6_1 on t6.id = t6_1.userid 
+left join {groups} t6_2 on t6_1.groupid = t6_2.id 
+where t2_1.name = 'quiz' and t2.id = :cmid  and t1.id = :courseid  and $groupStmt and $studentStmt and $onlyLastTryStmt
+order by last_name asc, first_name asc,  attempt desc, t5_1.sequencenumber asc";
 
         $tmp = $this->getRecordsSQL($query, $vars);
 
@@ -733,31 +736,14 @@ abstract class PersistCtrl extends MoodlePersistCtrl
         }
 
         foreach($tmp as $item){
-            //$output = preg_replace('/\s\s+/',' ',$input);
-
             $answer = html_entity_decode($item->answer);
             $answer = str_replace( '<', ' <', $item->answer );
-            //$answer = str_replace( '-', '', $item->answer );
             $answer = strip_tags( $answer );
-            //$item->nbWords = str_word_count($answer);
-            //$item->nbWords = preg_match_all('/\pL+[^\']/u', $answer, $matches);
             $item->nbWords = preg_match_all('/\pL+/u', $answer, $matches);
-
-            /*echo "<pre>";
-            var_dump($matches);
-            die();*/
-
-            if($onlyLastTry){
-                if(!isset($result[$item->userId])){
-                    $result[$item->userId] = $item;
-                }
-            }
-            else{
                 $result[] = $item;
             }
-        }
 
-        return array_values($result);
+        return $result;
     }
 
     public function getUserOptions($userId){

@@ -135,6 +135,7 @@ export class ReportQuiz  extends Component{
                                 <DataGrid.Body.Cell></DataGrid.Body.Cell>
                                 <DataGrid.Body.Cell></DataGrid.Body.Cell>
                                 <DataGrid.Body.Cell></DataGrid.Body.Cell>
+                                <DataGrid.Body.Cell></DataGrid.Body.Cell>
                                 {dataProvider.questions.map((item, index) => {
                                     let result = 
                                         <DataGrid.Body.Cell key={index} style={{textAlign: "center"}}>
@@ -203,7 +204,7 @@ export class ReportQuiz  extends Component{
                     <div className='d-flex align-items-center'>
                         <a href={`${Options.getGateway(true)}&service=reportQuiz&courseId=${this.props.options.course.id}&groupId=${this.props.options.group.id}&cmId=${this.props.options.cm.id}&output=csv`} target='_blank'>{i18n.get_string('downloadcsv')}</a>
                         <span className='ml-3 mr-3'>|</span>
-                        <Button className='p-0' variant='link' onClick={() => this.onShowModal(true)}>{i18n.get_string('printessayquestions')}</Button>
+                        <Button className='p-0' variant='link' onClick={() => this.onShowModal(true, 'reportQuizEssayAnswers')}>{i18n.get_string('printessayquestions')}</Button>
                     </div>                           
                     <PrintEssayQuestionModal show={this.state.printEssayQuestionModal} options={this.props.options} extraOptions={this.state.data} onClose={() => this.onShowModal(false)}/>
                 </div>;
@@ -305,8 +306,10 @@ export class ReportQuiz  extends Component{
         //return value;
     }
 
-    onShowModal(value){
-        this.setState({printEssayQuestionModal: value});
+    onShowModal(value, service){
+        let data = this.state.data;
+        data.service = service;
+        this.setState({printEssayQuestionModal: value, data: data});
     }
 }
 
@@ -372,6 +375,7 @@ class PrintEssayQuestionModal extends Component{
 
     viewReport(){
         let data = {
+            service: this.props.extraOptions.service,
             courseId: this.props.options.course.id,
             cmId: this.props.options.cm.id,
             groupId: this.props.options.group.id,
@@ -379,8 +383,8 @@ class PrintEssayQuestionModal extends Component{
             documentTitle: this.state.data.documentTitle,
             supervisorName: this.state.data.supervisorName,
             onlyLastTry: (this.props.extraOptions.onlyLastTry ? '1' : '0'),
-        }
-
+        } 
+ 
         $glVars.webApi.reportQuizEssayAnswers(data);
     }
 
