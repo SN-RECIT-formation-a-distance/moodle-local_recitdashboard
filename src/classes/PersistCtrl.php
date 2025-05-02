@@ -725,6 +725,9 @@ inner join {user} t6 on t4.userid = t6.id and t6.deleted = 0 and t6.suspended = 
 left join {groups_members} t6_1 on t6.id = t6_1.userid 
 left join {groups} t6_2 on t6_1.groupid = t6_2.id 
 where t2_1.name = 'quiz' and t2.id = :cmid  and t1.id = :courseid  and $groupStmt and $studentStmt and $onlyLastTryStmt
+and t5_2.attemptstepid = (select max(sub_t5_1.id) from {question_attempt_steps} sub_t5_1 
+                inner join {question_attempt_step_data} sub_t5_2 on sub_t5_1.id = sub_t5_2.attemptstepid and sub_t5_2.name = 'answer' 
+                where t5.id = sub_t5_1.questionattemptid) 
 order by last_name asc, first_name asc,  attempt desc, t5_1.sequencenumber asc";
 
         $tmp = $this->getRecordsSQL($query, $vars);
