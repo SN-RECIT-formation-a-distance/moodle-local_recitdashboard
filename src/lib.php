@@ -115,3 +115,27 @@ function local_recitdashboard_strings_for_js() {
         'numberwordscalculated'
     ), 'local_recitdashboard');
 }
+
+
+function local_recitdashboard_extend_navigation_course(\navigation_node $navigation, \stdClass $course, \context $context) {
+    if (!has_capability(RECITDASHBOARD_ACCESSDASHBOARD_CAPABILITY, $context)) {
+        // The user does not have the capability to view the course tools.
+        return;
+    }
+
+    // Display in the navigation if the user has site:config ability, or if the site is registered.
+    $enabled = has_capability('moodle/site:config', \context_system::instance());
+    if (!$enabled) {
+        return;
+    }
+
+    $url = new moodle_url('/local/recitdashboard/view.php', ['courseid' => $course->id]);
+    $navigation->add(
+        get_string('pluginname', 'local_recitdashboard'),
+        $url,
+        navigation_node::TYPE_SETTING,
+        null,
+        null,
+        new pix_icon('i/line-chart', '')
+    );
+}
