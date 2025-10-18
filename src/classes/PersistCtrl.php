@@ -743,6 +743,11 @@ order by last_name asc, first_name asc,  attempt desc, t5_1.sequencenumber asc";
             $answer = str_replace( '<', ' <', $item->answer );
             $answer = strip_tags( $answer );
             $item->nbWords = preg_match_all('/\pL+/u', $answer, $matches);
+
+            $customfields = profile_user_record($item->userId, false);
+            // Access the value by shortname
+            $permanent = isset($customfields->code_permanent) ? $customfields->code_permanent : null;
+            $item->code_permanent = $permanent;
             $result[] = $item;
         }
 

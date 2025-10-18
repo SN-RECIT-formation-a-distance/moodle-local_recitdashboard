@@ -90,7 +90,7 @@ class CustomPdf extends \TCPDF
 
         $this->SetFont('times', '', 10);
         $this->Cell($this->pctToMm(30), 0, $this->extraData->supervisorName, 'LB', 0, 'L');
-        $this->Cell($this->pctToMm(30), 0, "_____________________", 'B', 0, 'L');
+        $this->Cell($this->pctToMm(30), 0, $this->data->code_permanent, 'B', 0, 'L');
         $this->Cell($this->pctToMm(30), 0, $this->data->nbWords, 'B', 0, 'L');
         $this->Cell($this->pctToMm(10), 0, $this->getPageNumGroupAlias().' / '.$this->getPageGroupAlias(), 'BR', 1, 'L');
 
