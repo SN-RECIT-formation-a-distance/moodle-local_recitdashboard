@@ -209,6 +209,11 @@ class ReportQuizEssayAnswersPdf extends PdfWritter
         $lastStudentId = 0;
         foreach($this->dataset as $item){
             if($lastStudentId != $item->userId){
+                // if student has an odd number of pages, add a blank page for printing double-sided  
+                if(($lastStudentId > 0) && ($this->pdf->getGroupPageNo() % 2 !== 0)){
+                    $this->pdf->AddPage('p', 'LETTER');
+                }
+
                 // Start First Page Group (each student is a page group)
                 $this->pdf->startPageGroup();
                 $lastStudentId = $item->userId;
