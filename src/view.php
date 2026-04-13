@@ -46,10 +46,14 @@ class MainView{
     }
 
     public function display(){
+        global $CFG;
+
         $studentId = $this->user->id;
         $selectedCourseId = ($this->selectedCourseId > 1 ? $this->selectedCourseId : 0);
         if ($this->hasAccess()){
             echo sprintf("<div id='recit_dashboard' data-student-id='%ld' data-course-id='%ld'></div>", $studentId, $selectedCourseId);
+            // This injects the <script> tag directly, bypassing Moodle's JS processing pipeline entirely.
+            echo \html_writer::tag('script', '', ['src' => $CFG->wwwroot . '/local/recitdashboard/react/build/index.js', 'type' => 'text/javascript']);
         }else{
             throw new \moodle_exception('accessdenied', 'admin');
         }
@@ -68,7 +72,17 @@ require_login();
 // Globals.
 $PAGE->set_url("/local/recitdashboard/view.php");
 $PAGE->requires->css(new moodle_url($CFG->wwwroot . '/local/recitdashboard/react/build/index.css'), true);
-$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/local/recitdashboard/react/build/index.js'), true);
+/**
+ * Using $PAGE->requires->js is creating a bug.
+ * The root cause is that Moodle's JavaScript minifier/optimizer is processing 
+ * the already-minified Parcel bundle, and it's choking on modern JavaScript 
+ * syntax (specifically arrow functions like (()=>{...})() — an IIFE using arrow 
+ * function syntax). Moodle's built-in JS filter tries to re-process the file and 
+ * introduces a syntax error at character 112402.
+ * SOLUTION: Disable Moodle's JS filter for this file and inject the raw script 
+ */
+//$PAGE->requires->js(new moodle_url($CFG->wwwroot . '/local/recitdashboard/react/build/index.js'), true);
+
 local_recitdashboard_strings_for_js();
 
 // Set page context.

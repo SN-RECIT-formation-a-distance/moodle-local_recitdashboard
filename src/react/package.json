@@ -1,33 +1,34 @@
 {
   "name": "recit_dashboard",
-  "version": "2.0.2-stable",
-  "description": "RÉCIT Dashboard",
-  "main": "index.js",
+  "version": "3.0.0-stable",
+  "description": "RÉCIT Apprentimètre",
+  "targets": {
+        "default": {
+            "publicUrl": "./",
+            "distDir": "build"
+        }
+    },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "parcel ./src/index.js --out-dir ./build",
-    "build": "parcel build ./src/index.js --out-dir ./build"
+    "start": "parcel ./src/index.js --dist-dir ./build",
+    "build": "parcel build ./src/index.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@fortawesome/fontawesome-svg-core": "1.2.35",
-    "@fortawesome/free-solid-svg-icons": "5.15.3",
-    "@fortawesome/react-fontawesome": "0.2.0",
-    "bootstrap": "4.6.2",
-    "prop-types": "15.7.2",
-    "react": "18.2.0",
-    "react-bootstrap": "1.6.6",
-    "react-dom": "18.2.0",
-    "react-select": "5.4.0"
+    "@fortawesome/fontawesome-svg-core": "7.2.0",
+    "@fortawesome/free-solid-svg-icons": "7.2.0",
+    "@fortawesome/react-fontawesome": "3.2.0",
+    "bootstrap": "5.3.8",
+    "react": "19.2.4",
+    "react-bootstrap": "2.10.10",
+    "react-dom": "19.2.4",
+    "react-select": "5.10.2"
   },
   "devDependencies": {
-    "babel-core": "4.7.16",
-    "babel-plugin-transform-class-properties": "6.10.2",
-    "babel-preset-env": "0.0.0",
-    "babel-preset-react": "6.24.1",
-    "parcel-bundler": "1.12.5",
-    "sass": "1.34.1"
+    "@parcel/transformer-sass": "2.16.4",
+    "parcel": "2.16.4",
+    "sass": "1.97.3"
   }
 }
