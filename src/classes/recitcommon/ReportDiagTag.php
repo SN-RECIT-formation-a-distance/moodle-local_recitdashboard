@@ -443,7 +443,7 @@ class ReportDiagTagCSVWriter extends ReportDiagTagWriter
             foreach($fileContent as $row){
                 $nbCols = count($row);
                 for($iCol = 0; $iCol < $nbCols; $iCol++){
-                    $row[$iCol] = utf8_decode($row[$iCol]);
+                    $row[$iCol] = mb_convert_encoding($row[$iCol], 'ISO-8859-1', 'UTF-8');
                 }
                 fputcsv($fp, $row, $delimiter);
             }

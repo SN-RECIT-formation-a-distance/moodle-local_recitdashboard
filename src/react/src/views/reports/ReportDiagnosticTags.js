@@ -227,21 +227,17 @@ class AlertRange extends Component{
         let main =
             <div style={{width: this.props.width, marginRight: "2rem"}}>
                 <h6>{this.props.title}</h6>
-                    <div style={{display: "flex", justifyContent: "space-between", alignItems: "baseline"}}>
-                        <InputGroup className="mb-3" style={{width: 130}}>
-                            <FormControl value={this.props.min} name="min" onChange={this.onDataChange}/>
-                            <InputGroup.Append>
-                                <InputGroup.Text >%</InputGroup.Text>
-                            </InputGroup.Append>
-                        </InputGroup>
-                        et
-                        <InputGroup className="mb-3" style={{width: 130}}>
-                            <FormControl value={this.props.max} name="max" onChange={this.onDataChange}/>
-                            <InputGroup.Append>
-                                <InputGroup.Text>%</InputGroup.Text>
-                            </InputGroup.Append>
-                        </InputGroup>
-                    </div>
+                <div style={{display: "flex", justifyContent: "space-between", alignItems: "baseline"}}>
+                    <InputGroup className="mb-3" style={{width: 130}}>
+                        <FormControl value={this.props.min} name="min" onChange={this.onDataChange}/>
+                        <InputGroup.Text>%</InputGroup.Text>
+                    </InputGroup>
+                    et
+                    <InputGroup className="mb-3" style={{width: 130}}>
+                        <FormControl value={this.props.max} name="max" onChange={this.onDataChange}/>
+                        <InputGroup.Text>%</InputGroup.Text>
+                    </InputGroup>
+                </div>
             </div>;
 
         return main;

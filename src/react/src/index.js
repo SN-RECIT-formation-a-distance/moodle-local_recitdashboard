@@ -42,7 +42,7 @@ class App extends Component {
 
         this.onFeedback = this.onFeedback.bind(this);
 
-        $glVars.signedUser = this.props.signedUser;
+        $glVars.signedUser = this.props.signedUser; 
     }
 
     componentDidMount(){
@@ -81,3 +81,4 @@ document.addEventListener('DOMContentLoaded', function(){
 }, false);
 
 
+console.log("b");
