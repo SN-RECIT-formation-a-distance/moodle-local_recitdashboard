@@ -707,7 +707,7 @@ abstract class PersistCtrl extends MoodlePersistCtrl
 
         $onlyLastTryStmt = "1";
         if($onlyLastTry){
-            $onlyLastTryStmt = " t4.attempt = (SELECT MAX(sub_t4.attempt) FROM mdl_quiz_attempts as sub_t4 WHERE sub_t4.quiz = t3.id AND sub_t4.userid = t6.id)";
+            $onlyLastTryStmt = " t4.attempt = (SELECT MAX(sub_t4.attempt) FROM {quiz_attempts} sub_t4 WHERE sub_t4.quiz = t3.id AND sub_t4.userid = t6.id)";
         }
 
         $query = "select ". $this->sql_uniqueid() ." uniqueId, t1.id course_id, t1.shortname course_name, t2.id cmid, t3.id quiz_id, t3.name quiz_name, t6.id user_id, t6.firstname first_name, t6.lastname last_name, 
@@ -785,6 +785,19 @@ order by last_name asc, first_name asc,  attempt desc, t5_1.sequencenumber asc";
 
     public function setUserOption($userId, $key, $value){
         global $DB;
+
+        $allowedKeys = [
+            'showstudentfollowupwidget',
+            'showworkfollowupwidget',
+            'showgroupsoverviewwidget',
+            'dayswithoutconnect',
+            'daysdueintervalmin',
+            'daysdueintervalmax',
+        ];
+        if(!in_array($key, $allowedKeys, true)){
+            throw new \Exception(get_string('accessdenied', 'admin'));
+        }
+
         $DB->execute("insert into {local_recitdashboard_options} (userid, name, value)
         values(?, ?, ?)
         ON DUPLICATE KEY UPDATE value = ?", [$userId, $key, $value, $value]);

@@ -42,9 +42,27 @@ class WebApi extends MoodleApi
         parent::__construct($DB, $COURSE, $USER);
         PersistCtrl::getInstance($DB, $USER);
     }
+    protected function getAllowedServices(): array {
+        return [
+            'getCourseList',
+            'getSectionActivityList',
+            'getEnrolledUserList',
+            'getUserOptions',
+            'setUserOption',
+            'getGroupsOverview',
+            'getWorkFollowup',
+            'getStudentFollowup',
+            'reportSectionResults',
+            'reportActivityCompletion',
+            'reportQuiz',
+            'reportQuizEssayAnswers',
+            'getReportDiagTag',
+        ];
+    }
+
     /**
      * This function checks if user has access to access resource
-     * 
+     *
      * @param string $level [a = admin | s = student]
      */
     public function canUserAccess($level, $courseId = null){
@@ -190,10 +208,10 @@ class WebApi extends MoodleApi
         try{
             $courseId = clean_param($request['courseId'], PARAM_INT);
             $groupId = clean_param($request['groupId'], PARAM_INT);
-            $output = (isset($request['output']) ? clean_param($request['output'], PARAM_RAW) : 'json');
+            $output = (isset($request['output']) ? clean_param($request['output'], PARAM_ALPHA) : 'json');
 
             $this->canUserAccess('a', $courseId);
-            
+
             switch($output){
                 case 'json':
                     $result = new stdClass();
@@ -257,10 +275,10 @@ class WebApi extends MoodleApi
         try{
             $courseId = clean_param($request['courseId'], PARAM_INT);
             $groupId = clean_param($request['groupId'], PARAM_INT);
-            $output = (isset($request['output']) ? clean_param($request['output'], PARAM_RAW) : 'json');
+            $output = (isset($request['output']) ? clean_param($request['output'], PARAM_ALPHA) : 'json');
 
             $this->canUserAccess('a', $courseId);
-            
+
             switch($output){
                 case 'json':
                     $result = new stdClass();
@@ -328,7 +346,7 @@ class WebApi extends MoodleApi
             $courseId = clean_param($request['courseId'], PARAM_INT);
             $groupId = clean_param($request['groupId'], PARAM_INT);
             $cmId = clean_param($request['cmId'], PARAM_INT);
-            $output = (isset($request['output']) ? clean_param($request['output'], PARAM_RAW) : 'json');
+            $output = (isset($request['output']) ? clean_param($request['output'], PARAM_ALPHA) : 'json');
 
             $this->canUserAccess('a', $courseId);
             
@@ -415,8 +433,8 @@ class WebApi extends MoodleApi
             $onlyLastTry = (clean_param($request['onlyLastTry'], PARAM_INT) == 1 ? true : false);
 
             $extraData = new stdClass();
-            $extraData->documentTitle = clean_param($request['documentTitle'], PARAM_RAW);
-            $extraData->supervisorName = clean_param($request['supervisorName'], PARAM_RAW);
+            $extraData->documentTitle = clean_param($request['documentTitle'], PARAM_TEXT);
+            $extraData->supervisorName = clean_param($request['supervisorName'], PARAM_TEXT);
                         
             $this->canUserAccess('a', $courseId);
             

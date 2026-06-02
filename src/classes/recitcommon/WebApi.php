@@ -127,10 +127,20 @@ abstract class AWebApi
             return;
         }
 
-        $serviceWanted = clean_param($this->request['service'], PARAM_TEXT);
-		$result = $this->$serviceWanted($this->request);	
+        $serviceWanted = clean_param($this->request['service'], PARAM_ALPHANUMEXT);
 
+        $allowed = $this->getAllowedServices();
+        if(!in_array($serviceWanted, $allowed, true) || !method_exists($this, $serviceWanted)){
+            $this->lastResult = new WebApiResult(false, null, get_string('servicenotfound', 'local_recitdashboard'));
+            return;
+        }
+
+        $result = $this->$serviceWanted($this->request);
         $this->lastResult = $result;
+    }
+
+    protected function getAllowedServices(): array {
+        return [];
     }
 	
 	public function replyClient(){
